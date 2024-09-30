@@ -1,15 +1,15 @@
 <div align="center">
              <img src="docs/images/OC-Patcher.png" alt="OpenCore Patcher Logo" width="256" />
-             <h1>OpenCore Legacy Patcher</h1>
+             <h1>OCLP-Mod</h1>
 </div>
 
-A Python-based project revolving around [Acidanthera's OpenCorePkg](https://github.com/acidanthera/OpenCorePkg) and [Lilu](https://github.com/acidanthera/Lilu) for both running and unlocking features in macOS on supported and unsupported Macs.
+A Mod version [OCLP-Mod](https://github.com/laobamac/OCLP-Mod) which based on  Python-based project revolving around [Acidanthera's OpenCorePkg](https://github.com/acidanthera/OpenCorePkg) and [Lilu](https://github.com/acidanthera/Lilu) for both running and unlocking features in macOS on supported and unsupported Macs.
 
-Our project's main goal is to breathe new life into Macs no longer supported by Apple, allowing for the installation and usage of macOS Big Sur and newer on machines as old as 2007.
+Add Chinese language ,Intel Wireless in Sequoia ,KDK/MetalLib files accelerated download url and so on.
 
 ----------
 
-![GitHub all releases](https://img.shields.io/github/downloads/dortania/OpenCore-Legacy-Patcher/total?color=white&style=plastic) ![GitHub top language](https://img.shields.io/github/languages/top/dortania/OpenCore-Legacy-Patcher?color=4B8BBE&style=plastic) ![Discord](https://img.shields.io/discord/417165963327176704?color=7289da&label=discord&style=plastic)
+![GitHub all releases](https://img.shields.io/github/downloads/laobamac/OCLP-Mod/total?color=white&style=plastic) ![GitHub top language](https://img.shields.io/github/languages/top/laobamac/OCLP-Mod?color=4B8BBE&style=plastic)
 
 ----------
 
@@ -25,30 +25,15 @@ Noteworthy features of OpenCore Legacy Patcher:
 * Enables enhanced SATA and NVMe power management on non-Apple storage devices
 * Zero firmware patching required (ie. APFS ROM patching)
 * Graphics acceleration for both Metal and non-Metal GPUs
-
-----------
-
-Note: Only clean-installs and upgrades are supported. macOS Big Sur installs already patched with other patchers, such as [Patched Sur](https://github.com/BenSova/Patched-Sur) or [bigmac](https://github.com/StarPlayrX/bigmac), cannot be used due to broken file integrity with APFS snapshots and SIP.
-
-* You can, however, reinstall macOS with this patcher and retain your original data
-
-Note 2: Currently, OpenCore Legacy Patcher officially supports patching to run macOS Big Sur through Sonoma installs. For older OSes, OpenCore may function; however, support is currently not provided from Dortania.
-
-* For macOS Mojave and Catalina support, we recommend the use of [dosdude1's patchers](http://dosdude1.com)
-
-## Getting Started
-
-To start using the project, please see our in-depth guide:
-
-* [OpenCore Legacy Patcher Guide](https://dortania.github.io/OpenCore-Legacy-Patcher/)
+* zh_CN is available.
+* IntelWireless Card is avaliable.
 
 ## Support
 
 This project is offered on an AS-IS basis, we do not guarantee support for any issues that may arise. However, there is a community server with other passionate users and developers that can aid you:
 
-* [OpenCore Patcher Paradise Discord Server](https://discord.gg/rqdPgH8xSN)
-  * Keep in mind that the Discord server is maintained by the community, so we ask everyone to be respectful.
-  * Please review our docs on [how to debug with OpenCore](https://dortania.github.io/OpenCore-Legacy-Patcher/DEBUG.html) to gather important information to help others with troubleshooting.
+* [SimpleHac BBS](https://www.simplehac.cn)
+
 
 ## Running from source
 
