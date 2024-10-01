@@ -503,7 +503,7 @@ class IntelEthernet(EthernetController):
 
 @dataclass
 class Broadcom(WirelessCard):
-    VENDOR_ID: ClassVar[int] = 0x8086
+    VENDOR_ID: ClassVar[int] = 0x14E4
 
     class Chipsets(enum.Enum):
         # pylint: disable=invalid-name
@@ -532,6 +532,22 @@ class Broadcom(WirelessCard):
             self.chipset = Broadcom.Chipsets.AirPortBrcm43224
         else:
             self.chipset = Broadcom.Chipsets.Unknown
+
+@dataclass
+class IntelWirelessCard(WirelessCard):
+    VENDOR_ID: ClassVar[int] = 0x8086  # Intel的厂商ID
+
+    class Chipsets(enum.Enum):
+        IntelWirelessIDs = "Intel Wireless supported"
+        Unknown = "Unknown"
+
+    chipset: Chipsets = field(init=False)
+
+    def detect_chipset(self):
+        if self.device_id in pci_data.intelwl_ids.IntelWirelessIDs:
+            self.chipset = IntelWirelessCard.Chipsets.IntelWirelessIDs
+        else:
+            self.chipset = IntelWirelessCard.Chipsets.Unknown
 
 @dataclass
 class BroadcomEthernet(EthernetController):

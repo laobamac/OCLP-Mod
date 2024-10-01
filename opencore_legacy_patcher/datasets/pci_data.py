@@ -1180,6 +1180,46 @@ class broadcom_ids:
         0x4357,  # BCM43225
         0x43B1,  # BCM4352
         0x43B2,  # BCM4352 (2.4 GHz)
+    ]
+
+    AirPortBrcm4360 = [
+        # AirPortBrcm4360 IDs (removed duplicates for 4360 class cards)
+        0x4331,  # BCM94331
+        0x4353,  # BCM943224
+    ]
+
+    AirPortBrcm4331 = [
+        # AirPortBrcm4331 IDs (removed duplicates for 4331 class cards)
+        0x432B,  # BCM94322
+    ]
+
+    AppleAirPortBrcm43224 = [
+        # AppleAirPortBrcm43224 IDs
+        0x4311,  # BCM4311 - never used by Apple
+        0x4312,  # BCM4311 - never used by Apple
+        0x4313,  # BCM4311 - never used by Apple
+        0x4318,  # BCM4318 - never used by Apple
+        0x4319,  # BCM4318 - never used by Apple
+        0x431A,  # Unknown - never used by Apple
+        0x4320,  # BCM4306 - never used by Apple
+        0x4324,  # BCM4309 - never used by Apple
+        0x4325,  # BCM4306 - never used by Apple
+        0x4328,  # BCM4328
+        0x432C,  # BCM4322 - never used by Apple
+        0x432D,  # BCM4322 - never used by Apple
+    ]
+
+    AppleBCM5701Ethernet = [
+        # AppleBCM5701Ethernet IDs
+        0x1684,  # BCM5764M
+        0x16B0,  # BCM57761
+        0x16B4,  # BCM57765
+        0x1682,  # BCM57762
+        0x1686,  # BCM57766
+    ]
+
+class intelwl_ids:
+    IntelWirelessIDs = [
         # Dual Band Wireless AC 7260
         0x08b1,
         0x08b2,
@@ -1316,43 +1356,6 @@ class broadcom_ids:
         # Intel AX211 2x2
         0x7E40,
     ]
-
-    AirPortBrcm4360 = [
-        # AirPortBrcm4360 IDs (removed duplicates for 4360 class cards)
-        0x4331,  # BCM94331
-        0x4353,  # BCM943224
-    ]
-
-    AirPortBrcm4331 = [
-        # AirPortBrcm4331 IDs (removed duplicates for 4331 class cards)
-        0x432B,  # BCM94322
-    ]
-
-    AppleAirPortBrcm43224 = [
-        # AppleAirPortBrcm43224 IDs
-        0x4311,  # BCM4311 - never used by Apple
-        0x4312,  # BCM4311 - never used by Apple
-        0x4313,  # BCM4311 - never used by Apple
-        0x4318,  # BCM4318 - never used by Apple
-        0x4319,  # BCM4318 - never used by Apple
-        0x431A,  # Unknown - never used by Apple
-        0x4320,  # BCM4306 - never used by Apple
-        0x4324,  # BCM4309 - never used by Apple
-        0x4325,  # BCM4306 - never used by Apple
-        0x4328,  # BCM4328
-        0x432C,  # BCM4322 - never used by Apple
-        0x432D,  # BCM4322 - never used by Apple
-    ]
-
-    AppleBCM5701Ethernet = [
-        # AppleBCM5701Ethernet IDs
-        0x1684,  # BCM5764M
-        0x16B0,  # BCM57761
-        0x16B4,  # BCM57765
-        0x1682,  # BCM57762
-        0x1686,  # BCM57766
-    ]
-
 
 class aquantia_ids:
     AppleEthernetAquantiaAqtion = [
