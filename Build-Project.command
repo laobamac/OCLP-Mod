@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Build-Project.command: Generate OpenCore-Patcher.app and OpenCore-Patcher.pkg
+Build-Project.command: Generate OCLP-Mod.app and OCLP-Mod.pkg
 """
 
 import os
@@ -93,7 +93,7 @@ def main() -> None:
             notarization_team_id=args.notarization_team_id,
         ).sign_and_notarize()
 
-        # Build OpenCore-Patcher.app
+        # Build OCLP-Mod.app
         application.GenerateApplication(
             reset_pyinstaller_cache=args.reset_pyinstaller_cache,
             git_branch=args.git_branch,
@@ -103,9 +103,9 @@ def main() -> None:
             analytics_endpoint=args.analytics_endpoint,
         ).generate()
 
-        # Sign OpenCore-Patcher.app
+        # Sign OCLP-Mod.app
         sign_notarize.SignAndNotarize(
-            path=Path("dist/OpenCore-Patcher.app"),
+            path=Path("dist/OCLP-Mod.app"),
             signing_identity=args.application_signing_identity,
             notarization_apple_id=args.notarization_apple_id,
             notarization_password=args.notarization_password,
@@ -115,21 +115,21 @@ def main() -> None:
 
 
     if (args.run_as_individual_steps is False) or (args.run_as_individual_steps and args.prepare_package):
-        # Build OpenCore-Patcher.pkg and OpenCore-Patcher-Uninstaller.pkg
+        # Build OCLP-Mod.pkg and OCLP-Mod-Uninstaller.pkg
         package.GeneratePackage().generate()
 
-        # Sign OpenCore-Patcher.pkg
+        # Sign OCLP-Mod.pkg
         sign_notarize.SignAndNotarize(
-            path=Path("dist/OpenCore-Patcher.pkg"),
+            path=Path("dist/OCLP-Mod.pkg"),
             signing_identity=args.installer_signing_identity,
             notarization_apple_id=args.notarization_apple_id,
             notarization_password=args.notarization_password,
             notarization_team_id=args.notarization_team_id,
         ).sign_and_notarize()
 
-        # Sign OpenCore-Patcher-Uninstaller.pkg
+        # Sign OCLP-Mod-Uninstaller.pkg
         sign_notarize.SignAndNotarize(
-            path=Path("dist/OpenCore-Patcher-Uninstaller.pkg"),
+            path=Path("dist/OCLP-Mod-Uninstaller.pkg"),
             signing_identity=args.installer_signing_identity,
             notarization_apple_id=args.notarization_apple_id,
             notarization_password=args.notarization_password,
@@ -139,21 +139,21 @@ def main() -> None:
     # Create Update Shim
     if args.prepare_shim:
         shim.GenerateShim().generate()
-        if Path("dist/OpenCore-Patcher.app").exists():
+        if Path("dist/OCLP-Mod.app").exists():
             if Path("dist/OpenCore-Patcher (Original).app").exists():
                 Path("dist/OpenCore-Patcher (Original).app").unlink()
-            Path("dist/OpenCore-Patcher.app").rename("dist/OpenCore-Patcher (Original).app")
-        Path("dist/OpenCore-Patcher (Shim).app").rename("dist/OpenCore-Patcher.app")
+            Path("dist/OCLP-Mod.app").rename("dist/OpenCore-Patcher (Original).app")
+        Path("dist/OpenCore-Patcher (Shim).app").rename("dist/OCLP-Mod.app")
 
         # Update app version in Info.plist
-        plist_path = Path("dist/OpenCore-Patcher.app/Contents/Info.plist")
+        plist_path = Path("dist/OCLP-Mod.app/Contents/Info.plist")
         contents = plistlib.load(plist_path.open("rb"))
         contents["CFBundleVersion"] = constants.Constants().patcher_version
         contents["CFBundleShortVersionString"] = constants.Constants().patcher_version
         plistlib.dump(contents, plist_path.open("wb"))
 
         sign_notarize.SignAndNotarize(
-            path=Path("dist/OpenCore-Patcher.app"),
+            path=Path("dist/OCLP-Mod.app"),
             signing_identity=args.application_signing_identity,
             notarization_apple_id=args.notarization_apple_id,
             notarization_password=args.notarization_password,

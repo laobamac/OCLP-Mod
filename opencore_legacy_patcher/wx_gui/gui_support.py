@@ -276,7 +276,7 @@ class RestartHost:
         self.popup = wx.MessageDialog(
             self.frame,
             message,
-            "Reboot to apply?",
+            "重启以应用?",
             wx.YES_NO | wx.YES_DEFAULT | wx.ICON_INFORMATION
         )
         self.popup.SetYesNoLabels("Reboot", "Ignore")

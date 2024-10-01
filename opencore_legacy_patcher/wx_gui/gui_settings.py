@@ -39,7 +39,7 @@ class SettingsFrame(wx.Frame):
     Modal-based Settings Frame
     """
     def __init__(self, parent: wx.Frame, title: str, global_constants: constants.Constants, screen_location: tuple = None):
-        logging.info("Initializing Settings Frame")
+        logging.info("初始化设置窗口")
         self.constants: constants.Constants = global_constants
         self.title: str = title
         self.parent: wx.Frame = parent
@@ -55,9 +55,9 @@ class SettingsFrame(wx.Frame):
 
     def _generate_elements(self, frame: wx.Frame = None) -> None:
         """
-        Generates elements for the Settings Frame
-        Uses wx.Notebook to implement a tabbed interface
-        and relies on 'self._settings()' for populating
+        生成设置窗口的元素
+        使用 wx.Notebook 实现标签页界面
+        依赖于 'self._settings()' 填充内容
         """
 
         notebook = wx.Notebook(frame)
@@ -66,18 +66,18 @@ class SettingsFrame(wx.Frame):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.AddSpacer(10)
 
-        model_label = wx.StaticText(frame, label="Target Model", pos=(-1, -1))
+        model_label = wx.StaticText(frame, label="目标机型", pos=(-1, -1))
         model_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
         sizer.Add(model_label, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
-        model_choice = wx.Choice(frame, choices=model_array.SupportedSMBIOS + ["Host Model"], pos=(-1, -1), size=(150, -1))
+        model_choice = wx.Choice(frame, choices=model_array.SupportedSMBIOS + ["主机机型"], pos=(-1, -1), size=(150, -1))
         model_choice.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         model_choice.Bind(wx.EVT_CHOICE, lambda event: self.on_model_choice(event, model_choice))
-        selection = self.constants.custom_model if self.constants.custom_model else "Host Model"
+        selection = self.constants.custom_model if self.constants.custom_model else "主机机型"
         model_choice.SetSelection(model_choice.FindString(selection))
         sizer.Add(model_choice, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
-        model_description = wx.StaticText(frame, label="Overrides Mac Model the Patcher will build for.", pos=(-1, -1))
+        model_description = wx.StaticText(frame, label="覆盖 Patcher 将要构建的 Mac 模型。", pos=(-1, -1))
         model_description.SetFont(gui_support.font_factory(11, wx.FONTWEIGHT_NORMAL))
         sizer.Add(model_description, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
@@ -90,7 +90,7 @@ class SettingsFrame(wx.Frame):
 
         sizer.Add(notebook, 1, wx.EXPAND | wx.ALL, 10)
 
-        # Add return button
+        # 添加返回按钮
         return_button = wx.Button(frame, label="返回", pos=(-1, -1), size=(100, 30))
         return_button.Bind(wx.EVT_BUTTON, self.on_return)
         return_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
@@ -116,11 +116,11 @@ class SettingsFrame(wx.Frame):
 
             for setting, setting_info in self.settings[tab].items():
                 if setting_info["type"] == "populate":
-                    # execute populate function
+                    # 执行填充函数
                     if setting_info["args"] == wx.Frame:
                         setting_info["function"](panel)
                     else:
-                        raise Exception("Invalid populate function")
+                        raise Exception("无效的填充函数")
                     continue
 
                 if setting_info["type"] == "title":
@@ -130,7 +130,7 @@ class SettingsFrame(wx.Frame):
 
                     height += 10
 
-                    # Add title
+                    # 添加标题
                     title = wx.StaticText(panel, label=setting, pos=(-1, -1))
                     title.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
 
@@ -140,7 +140,7 @@ class SettingsFrame(wx.Frame):
                     continue
 
                 if setting_info["type"] == "sub_title":
-                    # Add sub-title
+                    # 添加子标题
                     sub_title = wx.StaticText(panel, label=setting, pos=(-1, -1))
                     sub_title.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
 
@@ -155,8 +155,8 @@ class SettingsFrame(wx.Frame):
                     continue
 
                 if setting_info["type"] == "checkbox":
-                    # Add checkbox, and description underneath
-                    checkbox = wx.CheckBox(panel, label=setting, pos=(10 + width, 10 + height), size = (300,-1))
+                    # 添加复选框，并在下方添加描述
+                    checkbox = wx.CheckBox(panel, label=setting, pos=(10 + width, 10 + height), size=(300, -1))
                     checkbox.SetValue(setting_info["value"] if setting_info["value"] else False)
                     checkbox.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
                     event = lambda event, warning=setting_info["warning"] if "warning" in setting_info else "", override=bool(setting_info["override_function"]) if "override_function" in setting_info else False: self.on_checkbox(event, warning, override)
@@ -167,21 +167,21 @@ class SettingsFrame(wx.Frame):
                             checkbox.SetValue(False)
 
                 elif setting_info["type"] == "spinctrl":
-                    # Add spinctrl, and description underneath
-                    spinctrl = wx.SpinCtrl(panel, value=str(setting_info["value"]), pos=(width - 20, 10 + height), min=setting_info["min"], max=setting_info["max"], size = (45,-1))
+                    # 添加数字输入框，并在下方添加描述
+                    spinctrl = wx.SpinCtrl(panel, value=str(setting_info["value"]), pos=(width - 20, 10 + height), min=setting_info["min"], max=setting_info["max"], size=(45, -1))
                     spinctrl.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
                     spinctrl.Bind(wx.EVT_TEXT, lambda event, variable=setting: self.on_spinctrl(event, variable))
-                    # Add label next to spinctrl
+                    # 在数字输入框旁边添加标签
                     label = wx.StaticText(panel, label=setting, pos=(spinctrl.GetSize()[0] + width - 16, spinctrl.GetPosition()[1]))
                     label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
                 elif setting_info["type"] == "choice":
-                    # Title
+                    # 标题
                     title = wx.StaticText(panel, label=setting, pos=(width + 30, 10 + height))
                     title.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
                     height += title.GetSize()[1] + 10
 
-                    # Add combobox, and description underneath
-                    choice = wx.Choice(panel, pos=(width + 25, 10 + height), choices=setting_info["choices"], size = (150,-1))
+                    # 添加下拉框，并在下方添加描述
+                    choice = wx.Choice(panel, pos=(width + 25, 10 + height), choices=setting_info["choices"], size=(150, -1))
                     choice.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
                     choice.SetSelection(choice.FindString(setting_info["value"]))
                     if "override_function" in setting_info:
@@ -190,13 +190,13 @@ class SettingsFrame(wx.Frame):
                         choice.Bind(wx.EVT_CHOICE, lambda event, variable=setting: self.on_choice(event, variable))
                     height += 10
                 elif setting_info["type"] == "button":
-                    button = wx.Button(panel, label=setting, pos=(width + 25, 10 + height), size = (200,-1))
+                    button = wx.Button(panel, label=setting, pos=(width + 25, 10 + height), size=(200, -1))
                     button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
                     button.Bind(wx.EVT_BUTTON, lambda event, variable=setting: self.settings[tab][variable]["function"](event))
                     height += 10
 
                 else:
-                    raise Exception("Invalid setting type")
+                    raise Exception("无效的设置类型")
 
                 lines = '\n'.join(setting_info["description"])
                 description = wx.StaticText(panel, label=lines, pos=(30 + width, 10 + height + 20))
@@ -206,7 +206,7 @@ class SettingsFrame(wx.Frame):
                     if setting_info["condition"] is False:
                         description.SetForegroundColour((128, 128, 128))
 
-                # Check number of lines in description, and adjust spacer accordingly
+                # 检查描述中的行数，并相应调整间隔
                 for i, line in enumerate(lines.split('\n')):
                     if line == "":
                         continue
@@ -250,8 +250,8 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.firewire_boot,
                     "variable": "firewire_boot",
                     "description": [
-                        "Enable booting macOS from",
-                        "FireWire drives.",
+                        "启用从火线驱动器",
+                        "启动macOS",
                     ],
                     "condition": not (generate_smbios.check_firewire(self.constants.custom_model or self.constants.computer.real_model) is False)
                 },
@@ -260,9 +260,8 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.xhci_boot,
                     "variable": "xhci_boot",
                     "description": [
-                        "Enable booting macOS from add-in",
-                        "USB 3.0 expansion cards on systems",
-                        "without native support.",
+                        "在没有原生支持的系统上，启用从",
+                        "USB 3.0扩展卡启动macOS。",
                     ],
                     "condition": not gui_support.CheckProperties(self.constants).host_has_cpu_gen(cpu_data.CPUGen.ivy_bridge) # Sandy Bridge and older do not natively support XHCI booting
                 },
@@ -274,21 +273,21 @@ class SettingsFrame(wx.Frame):
                         "启用macOS中对",
                         "NVMe驱动器的非原生",
                         "支持",
-                        "Note: Requires Firmware support",
-                        "for OpenCore to load from NVMe.",
+                        "注意：需要你的机器支持NVMe",
+                        "OC才可以从NVMe驱动器启动。",
                     ],
                     "condition": not gui_support.CheckProperties(self.constants).host_has_cpu_gen(cpu_data.CPUGen.ivy_bridge) # Sandy Bridge and older do not natively support NVMe booting
                 },
                 "wrap_around 2": {
                     "type": "wrap_around",
                 },
-                "OpenCore Vaulting": {
+                "OpenCore签名保护": {
                     "type": "checkbox",
                     "value": self.constants.vault,
                     "variable": "vault",
                     "description": [
-                        "Digitally sign OpenCore to prevent",
-                        "tampering or corruption."
+                        "对OpenCore进行数字签名，以防止",
+                        "篡改&破坏"
                     ],
                 },
 
@@ -297,8 +296,8 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.showpicker,
                     "variable": "showpicker",
                     "description": [
-                        "When disabled, users can hold ESC to",
-                        "show picker in the firmware.",
+                        "禁用时，用户可以按住ESC键",
+                        "在固件中显示选择器",
                     ],
                 },
                 "引导界面等待时间": {
@@ -306,21 +305,21 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.oc_timeout,
                     "variable": "oc_timeout",
                     "description": [
-                        "Timeout before boot picker selects default",
-                        "entry in seconds.",
-                        "Set to 0 for no timeout.",
+                        "在引导选择器选择默认",
+                        "条目之前的超时时间（秒）。",
+                        "设置为0表示无超时。",
                     ],
 
                     "min": 0,
                     "max": 60,
                 },
-                "MacPro3,1/Xserve2,1 Workaround": {
+                "MacPro3,1/Xserve2,1 解决方案": {
                     "type": "checkbox",
                     "value": self.constants.force_quad_thread,
                     "variable": "force_quad_thread",
                     "description": [
-                        "Limits to 4 threads max on these units.",
-                        "Required for macOS Sequoia and later.",
+                        "在这些单元上限制最大线程数为4。",
+                        "macOS Sequoia及更高版本需要。",
                     ],
                     "condition": (self.constants.custom_model and self.constants.custom_model in ["MacPro3,1", "Xserve2,1"]) or self.constants.computer.real_model in ["MacPro3,1", "Xserve2,1"]
                 },
@@ -333,7 +332,7 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.verbose_debug,
                     "variable": "verbose_debug",
                     "description": [
-                        "Verbose output during boot.",
+                        "启动时输出详细信息",
                     ],
 
                 },
@@ -342,8 +341,8 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.kext_debug,
                     "variable": "kext_debug",
                     "description": [
-                        "Use DEBUG variants of kexts and",
-                        "enables additional kernel logging.",
+                        "使用kext的DEBUG版本，并",
+                        "启用额外的内核日志记录。",
                     ],
                 },
                 "wrap_around 1": {
@@ -354,8 +353,8 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.opencore_debug,
                     "variable": "opencore_debug",
                     "description": [
-                        "Use DEBUG variant of OpenCore",
-                        "and enables additional logging.",
+                        "使用OpenCore的DEBUG版本，并",
+                        "启用额外的内核日志记录。",
                     ],
                 },
             },
@@ -368,11 +367,10 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.enable_wake_on_wlan,
                     "variable": "enable_wake_on_wlan",
                     "description": [
-                        "Disabled by default due to",
-                        "performance degradation",
-                        "on some systems from wake.",
-                        "Only applies to BCM943224, 331,",
-                        "360 and 3602 chipsets.",
+                        "默认情况下禁用，因为在某些系统上从唤醒状态可能会",
+                        "导致性能下降",
+                        "仅适用于BCM943224、331、",
+                        "360和3602芯片组。",
                     ],
                 },
                 "禁用雷电⚡️": {
@@ -380,8 +378,8 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.disable_tb,
                     "variable": "disable_tb",
                     "description": [
-                        "For MacBookPro11,x with faulty",
-                        "PCHs that may crash sporadically.",
+                        "针对有故障",
+                        "导致PCH可能会偶尔崩溃的MacBookPro11,x。",
                     ],
                     "condition": (self.constants.custom_model and self.constants.custom_model in ["MacBookPro11,1", "MacBookPro11,2", "MacBookPro11,3"]) or self.constants.computer.real_model in ["MacBookPro11,1", "MacBookPro11,2", "MacBookPro11,3"]
                 },
@@ -390,8 +388,8 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.dGPU_switch,
                     "variable": "dGPU_switch",
                     "description": [
-                        "Allow iGPU to be exposed in Windows",
-                        "for dGPU-based MacBooks.",
+                        "允许在Windows中暴露iGPU",
+                        "用于基于dGPU的MacBooks。",
                     ],
                 },
                 "禁用CPUFriend": {
@@ -399,18 +397,18 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.disallow_cpufriend,
                     "variable": "disallow_cpufriend",
                     "description": [
-                        "Disables power management helper",
-                        "for unsupported models.",
+                    "禁用不支持型号的",
+                    "CPUFriend",
                     ],
                 },
-                "Disable mediaanalysisd service": {
+                "禁用mediaanalysisd服务": {
                     "type": "checkbox",
                     "value": self.constants.disable_mediaanalysisd,
                     "variable": "disable_mediaanalysisd",
                     "description": [
-                        "For systems that are the primary iCloud",
-                        "Photo Library host with a 3802-based GPU,",
-                        "this may aid in prolonged idle stability.",
+                        "对于使用3802-Based GPU的iCloud",
+                        "Photos，这可能会延缓",
+                        "CPU占用",
                     ],
                     "condition": gui_support.CheckProperties(self.constants).host_has_3802_gpu()
                 },
@@ -422,10 +420,8 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.set_alc_usage,
                     "variable": "set_alc_usage",
                     "description": [
-                        "Allow AppleALC to manage audio",
-                        "if applicable.",
-                        "Only disable if your host lacks",
-                        "a GOP ROM.",
+                        "如果适用，允许AppleALC管理音频",
+                        "仅在主机缺少GOP ROM时禁用。",
                     ],
                 },
                 "写入NVRAM": {
@@ -433,9 +429,9 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.nvram_write,
                     "variable": "nvram_write",
                     "description": [
-                        "Allow OpenCore to write to NVRAM.",
-                        "Disable on systems with faulty or",
-                        "degraded NVRAM.",
+                        "允许OpenCore写入NVRAM。",
+                        "在有故障或",
+                        "降级的NVRAM系统上禁用。",
                     ],
                 },
 
@@ -444,8 +440,8 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.allow_nvme_fixing,
                     "variable": "allow_nvme_fixing",
                     "description": [
-                        "Enable non-stock NVMe power",
-                        "management in macOS.",
+                        "在 macOS 中启用未被提供的",
+                        "NVMe 电源管理",
                     ],
                 },
                 "第三方SATA电源管理": {
@@ -453,8 +449,8 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.allow_3rd_party_drives,
                     "variable": "allow_3rd_party_drives",
                     "description": [
-                        "Enable non-stock SATA power",
-                        "management in macOS.",
+                        "在 macOS 中启用未被提供的",
+                        "SATA 电源管理",
                     ],
                     "condition": not bool(self.constants.computer.third_party_sata_ssd is False and not self.constants.custom_model)
                 },
@@ -463,8 +459,8 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.apfs_trim_timeout,
                     "variable": "apfs_trim_timeout",
                     "description": [
-                        "Recommended for all users, however faulty",
-                        "SSDs may benefit from disabling this.",
+                        "建议所有用户使用，即使有故障",
+                        "SSDs 可能也会从禁用此功能中受益。",
                     ],
                 },
             },
@@ -477,9 +473,9 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.disable_fw_throttle,
                     "variable": "disable_fw_throttle",
                     "description": [
-                        "Disables firmware-based throttling",
-                        "caused by missing hardware.",
-                        "Ex. Missing Display, Battery, etc.",
+                        "禁用基于固件的限制",
+                        "由缺少硬件引起",
+                        "例如缺少显示器、电池等",
                     ],
                 },
                 "Software DeMUX": {
@@ -487,10 +483,10 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.software_demux,
                     "variable": "software_demux",
                     "description": [
-                        "Enable software based DeMUX",
-                        "for MacBookPro8,2 and MacBookPro8,3.",
-                        "Prevents faulty dGPU from turning on.",
-                        "Note: Requires associated NVRAM arg:",
+                        "启用基于软件的 DeMUX",
+                        "适用于 MacBookPro8,2 和 MacBookPro8,3.",
+                        "防止有故障的 dGPU 启用",
+                        "注意：需要相关的 NVRAM 参数：",
                         "'gpu-power-prefs'.",
                     ],
                     "warning": "This settings requires 'gpu-power-prefs' NVRAM argument to be set to '1'.\n\nIf missing and this option is toggled, the system will not boot\n\nFull command:\nnvram FA4CE28D-B62F-4C99-9CC3-6815686E30F9:gpu-power-prefs=%01%00%00%00",
@@ -509,9 +505,9 @@ class SettingsFrame(wx.Frame):
                     "value": "Enabled",
                     "variable": "",
                     "description": [
-                        "Configure FeatureUnlock level.",
-                        "Recommend lowering if your system",
-                        "experiences memory instability.",
+                        "配置 FeatureUnlock 等级.",
+                        "如果您的系统提示建议降低",
+                        "由于遇到内存不稳定",
                     ],
                 },
                 "Populate FeatureUnlock Override": {
@@ -519,15 +515,15 @@ class SettingsFrame(wx.Frame):
                     "function": self._populate_fu_override,
                     "args": wx.Frame,
                 },
-                "Hibernation Work-around": {
+                "休眠方案": {
                     "type": "checkbox",
                     "value": self.constants.disable_connectdrivers,
                     "variable": "disable_connectdrivers",
                     "description": [
-                        "Only load minimum EFI drivers",
-                        "to prevent hibernation issues.",
-                        "Note: This may break booting from",
-                        "external drives.",
+                        "仅加载最低 EFI 驱动程序",
+                        "防止休眠问题",
+                        "注意：这可能会中断从",
+                        "外置硬盘的启动",
                     ],
                 },
                 "显卡": {
@@ -538,8 +534,8 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.amd_gop_injection,
                     "variable": "amd_gop_injection",
                     "description": [
-                        "Inject AMD GOP for boot screen",
-                        "support on PC GPUs.",
+                        "注入AMD GOP来显示",
+                        "启动界面",
                     ],
                     "condition": not bool((not self.constants.custom_model and self.constants.computer.real_model not in socketed_gpu_models) or (self.constants.custom_model and self.constants.custom_model not in socketed_gpu_models))
                 },
@@ -548,8 +544,8 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.nvidia_kepler_gop_injection,
                     "variable": "nvidia_kepler_gop_injection",
                     "description": [
-                        "Inject Nvidia Kepler GOP for boot",
-                        "screen support on PC GPUs.",
+                        "注入Nvidia Kepler GOP来显示",
+                        "启动界面",
                     ],
                     "condition": not bool((not self.constants.custom_model and self.constants.computer.real_model not in socketed_gpu_models) or (self.constants.custom_model and self.constants.custom_model not in socketed_gpu_models))
                 },
@@ -569,8 +565,8 @@ class SettingsFrame(wx.Frame):
                     "value": "None",
                     "variable": "",
                     "description": [
-                        "Override detected/assumed GPU on",
-                        "socketed MXM-based iMacs.",
+                        "覆盖检测到的/假设的 MXM显卡",
+                        "适用于MXM-based iMacs.",
                     ],
                     "condition": bool((not self.constants.custom_model and self.constants.computer.real_model in socketed_imac_models) or (self.constants.custom_model and self.constants.custom_model in socketed_imac_models))
                 },
@@ -582,16 +578,16 @@ class SettingsFrame(wx.Frame):
 
             },
             "安全": {
-                "Kernel Security": {
+                "内核安全": {
                     "type": "title",
                 },
-                "Disable Library Validation": {
+                "禁用资源库验证": {
                     "type": "checkbox",
                     "value": self.constants.disable_cs_lv,
                     "variable": "disable_cs_lv",
                     "description": [
-                        "Required for loading modified",
-                        "system files from root patching.",
+                        "在打补丁时注入修改后",
+                        "的系统文件时需要",
                     ],
                 },
                 "禁用 AMFI": {
@@ -599,10 +595,8 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.disable_amfi,
                     "variable": "disable_amfi",
                     "description": [
-                        "Extended version of 'Disable",
-                        "Library Validation', required",
-                        "for systems with deeper",
-                        "root patches.",
+                        "在打补丁时注入修改后",
+                        "的系统文件时需要",
                     ],
                 },
                 "wrap_around 1": {
@@ -613,9 +607,9 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.secure_status,
                     "variable": "secure_status",
                     "description": [
-                        "Set Apple Secure Boot Model Identifier",
-                        "to matching T2 model if spoofing.",
-                        "Note: Incompatible with Root Patching.",
+                        "设置 Apple 安全启动模型标识符",
+                        "如果已经仿冒，则匹配 T2 模型",
+                        "注意：与驱动补丁不兼容",
                     ],
                 },
                 "系统完整性保护（SIP）": {
@@ -642,11 +636,11 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.serial_settings,
                     "variable": "serial_settings",
                     "description": [
-                        "Supported Levels:",
-                        "   - None: No spoofing.",
-                        "   - Minimal: Overrides Board ID.",
-                        "   - Moderate: Overrides Model.",
-                        "   - Advanced: Overrides Model and serial.",
+                        "支持的级别：",
+                        "    - 无：无",
+                        "   - 小: 覆写 Board ID.",
+                        "   - 中: 覆写 Model.",
+                        "   - 高: 覆写 Model 和 serial.",
                     ],
                 },
 
@@ -656,7 +650,7 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.override_smbios,
                     "variable": "override_smbios",
                     "description": [
-                        "Set Mac Model to spoof to.",
+                        "设置仿冒的机型",
                     ],
 
                 },
@@ -668,10 +662,10 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.allow_native_spoofs,
                     "variable": "allow_native_spoofs",
                     "description": [
-                        "Allow OpenCore to spoof natively",
-                        "supported Macs.",
-                        "Primarily used for enabling",
-                        "Universal Control on unsupported Macs",
+                        "允许 OpenCore 仿冒原生",
+                        "受支持的Mac.",
+                        "主要用于启用",
+                        "不受支持的 Mac 上的 Universal Control",
                     ],
                 },
                 "Serial Spoofing": {
@@ -693,11 +687,11 @@ class SettingsFrame(wx.Frame):
                     "variable": "MacBookPro_TeraScale_2_Accel",
                     "constants_variable": "allow_ts2_accel",
                     "description": [
-                        "Enable AMD TeraScale 2 GPU",
-                        "Acceleration on MacBookPro8,2 and",
-                        "MacBookPro8,3.",
-                        "By default this is disabled due to",
-                        "common GPU failures on these models.",
+                        "启用 AMD TeraScale 2 GPU",
+                        "在 MacBookPro8,2 和",
+                        "MacBookPro8,3 上的加速。",
+                        "默认情况下这是禁用的，因为",
+                        "这些型号的 GPU 常见故障。"
                     ],
                     "override_function": self._update_global_settings,
                     "condition": not bool(self.constants.computer.real_model not in ["MacBookPro8,2", "MacBookPro8,3"])
@@ -711,14 +705,14 @@ class SettingsFrame(wx.Frame):
                 "Log out required to apply changes to SkyLight": {
                     "type": "sub_title",
                 },
-                "Dark Menu Bar": {
+                "暗黑模式菜单": {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea_DarkMenuBar"),
                     "variable": "Moraea_DarkMenuBar",
                     "description": [
-                        "If Beta Menu Bar is enabled,",
-                        "menu bar colour will dynamically",
-                        "change as needed.",
+                        "如果启用了 Beta 菜单栏，"
+                        "菜单栏颜色将根据需要动态"
+                        "变化。"
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
@@ -734,12 +728,12 @@ class SettingsFrame(wx.Frame):
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
 
                 },
-                "Beach Ball Cursor Workaround": {
+                "加载光标（彩虹圈圈）解决方案": {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea.EnableSpinHack"),
                     "variable": "Moraea.EnableSpinHack",
                     "description": [
-                        "Note: May be more CPU intensive.",
+                        "注意：可能会占用更多 CPU 资源。",
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
@@ -752,30 +746,30 @@ class SettingsFrame(wx.Frame):
                     "value": self._get_system_settings("Amy.MenuBar2Beta"),
                     "variable": "Amy.MenuBar2Beta",
                     "description": [
-                        "Supports dynamic colour changes.",
-                        "Note: Setting is still experimental.",
-                        "If you experience issues, please",
-                        "disable this setting.",
+                        "支持动态颜色变化。"
+                        "注意：此设置仍在试验阶段。"
+                        "如果遇到问题，请"
+                        "禁用此设置。"
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
                 },
-                "Disable Beta Rim": {
+                "禁用 Beta Rim": {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea_RimBetaDisabled"),
                     "variable": "Moraea_RimBetaDisabled",
                     "description": [
-                        "Control Window Rim rendering.",
+                        "控制窗口边缘的渲染效果",
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
                 },
-                "Disable Color Widgets Enforcement": {
+                "控制桌面小部件颜色强制执行": {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea_ColorWidgetDisabled"),
                     "variable": "Moraea_ColorWidgetDisabled",
                     "description": [
-                        "Control Color Desktop Widgets Enforcement.",
+                        "控制桌面小部件颜色强制执行",
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
@@ -790,15 +784,14 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.allow_oc_everywhere,
                     "variable": "allow_oc_everywhere",
                     "description": [
-                        "Allow OpenCore to be installed",
-                        "on natively supported Macs.",
-                        "Note this will not allow unsupported",
-                        "macOS versions to be installed on",
-                        "your system.",
+                        "允许在原生支持的Mac上安装OpenCore。",
+                        "注意这不会允许不支持的",
+                        "macOS版本安装在",
+                        "你的系统上。"
                     ],
-                    "warning": "This option should only be used if your Mac natively supports the OSes you wish to run.\n\nIf you are currently running an unsupported OS, this option will break booting. Only toggle for enabling OS features on a native Mac.\n\nAre you certain you want to continue?",
+                    "注意": "这个选项仅应在您的Mac原生支持您想要运行的操作系统时使用。\n\n如果您当前正在运行一个不支持的操作系统，这个选项将会导致启动失败。\n\n仅在原生Mac上切换以启用操作系统特性。\n\n您确定要继续吗？",
                 },
-                "Ignore App Updates": {
+                "忽略App更新": {
                     "type": "checkbox",
                     "value": global_settings.GlobalEnviromentSettings().read_property("IgnoreAppUpdates") or self.constants.ignore_updates,
                     "variable": "IgnoreAppUpdates",
@@ -811,13 +804,13 @@ class SettingsFrame(wx.Frame):
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "Disable Reporting": {
+                "禁用报告": {
                     "type": "checkbox",
                     "value": global_settings.GlobalEnviromentSettings().read_property("DisableCrashAndAnalyticsReporting"),
                     "variable": "DisableCrashAndAnalyticsReporting",
                     "description": [
-                        "When enabled, patcher will not",
-                        "report any info to Dortania.",
+                        "当启用时，修补程序将不会",
+                        "向Dortania报告任何信息。",
                     ],
                     "override_function": self._update_global_settings,
                 },
@@ -827,9 +820,9 @@ class SettingsFrame(wx.Frame):
                     "variable": "ShouldNukeKDKs",
                     "constants_variable": "should_nuke_kdks",
                     "description": [
-                        "When enabled, the app will remove",
-                        "unused Kernel Debug Kits from the system",
-                        "during root patching.",
+                        "当启用时，应用程序将从系统中移除",
+                        "未使用的KDK",
+                        "在根目录修补期间。",
                     ],
                     "override_function": self._update_global_settings,
                 },
@@ -843,16 +836,16 @@ class SettingsFrame(wx.Frame):
                 },
             },
             "开发者": {
-                "Validation": {
+                "验证": {
                     "type": "title",
                 },
-                "Install latest nightly build 🧪": {
+                "安装最新日构建版本 🧪": {
                     "type": "button",
                     "function": self.on_nightly,
                     "description": [
-                        "If you're already here, I assume you're ok",
-                        "bricking your system 🧱.",
-                        "Check CHANGELOG before blindly updating.",
+                        "如果你已经在这里，我假设你已经准备好了",
+                        "冒着系统变砖的风险 🧱。",
+                        "在盲目更新前请检查更新日志。",
                     ],
                 },
                 "Trigger Exception": {
@@ -872,7 +865,7 @@ class SettingsFrame(wx.Frame):
                     ],
                 },
 
-                "Developer Root Volume Patching": {
+                "开发者补丁选项": {
                     "type": "title",
                 },
                 "挂载根目录": {
@@ -887,11 +880,11 @@ class SettingsFrame(wx.Frame):
                 "wrap_around 2": {
                     "type": "wrap_around",
                 },
-                "Save Root Volume": {
+                "保存根目录": {
                     "type": "button",
                     "function": self.on_bless_root_vol,
                     "description": [
-                        "Rebuild kernel cache and bless snapshot 🙏",
+                        "重建内核缓存并祈祷快照别寄（bushi 🙏",
                     ],
                 },
             },

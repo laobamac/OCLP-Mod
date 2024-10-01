@@ -62,16 +62,16 @@ class BuildFrame(wx.Frame):
         """
         frame = self if not frame else frame
 
-        title_label = wx.StaticText(frame, label="Build and Install OpenCore", pos=(-1,5))
+        title_label = wx.StaticText(frame, label="创建&安装OpenCore", pos=(-1,5))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title_label.Centre(wx.HORIZONTAL)
 
-        model_label = wx.StaticText(frame, label=f"Model: {self.constants.custom_model or self.constants.computer.real_model}", pos=(-1,30))
+        model_label = wx.StaticText(frame, label=f"型号: {self.constants.custom_model or self.constants.computer.real_model}", pos=(-1,30))
         model_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         model_label.Centre(wx.HORIZONTAL)
 
         # Button: Install OpenCore
-        install_button = wx.Button(frame, label="🔩 Install OpenCore", pos=(-1, model_label.GetPosition()[1] + model_label.GetSize()[1]), size=(150, 30))
+        install_button = wx.Button(frame, label="🔩 安装 OpenCore", pos=(-1, model_label.GetPosition()[1] + model_label.GetSize()[1]), size=(150, 30))
         install_button.Bind(wx.EVT_BUTTON, self.on_install)
         install_button.Centre(wx.HORIZONTAL)
         install_button.Disable()
@@ -83,7 +83,7 @@ class BuildFrame(wx.Frame):
         self.text_box = text_box
 
         # Button: Return to Main Menu
-        return_button = wx.Button(frame, label="Return to Main Menu", pos=(-1, text_box.GetPosition()[1] + text_box.GetSize()[1] + 5), size=(150, 30))
+        return_button = wx.Button(frame, label="返回", pos=(-1, text_box.GetPosition()[1] + text_box.GetSize()[1] + 5), size=(150, 30))
         return_button.Bind(wx.EVT_BUTTON, self.on_return_to_main_menu)
         return_button.Centre(wx.HORIZONTAL)
         return_button.Disable()

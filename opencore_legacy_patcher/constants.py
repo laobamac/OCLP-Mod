@@ -16,7 +16,7 @@ class Constants:
         self.patcher_version:                 str = "2.1.0"  # OpenCore-Legacy-Patcher
         self.patcher_support_pkg_version:     str = "1.8.0"  # PatcherSupportPkg
         self.copyright_date:                  str = "Copyright © 2020-2024 Dortania && SimpleHac"
-        self.patcher_name:                    str = "OCLP Modified By SimpleHAC"
+        self.patcher_name:                    str = "OCLP-Mod"
 
         # URLs
         self.url_patcher_support_pkg:         str = "https://github.com/dortania/PatcherSupportPkg/releases/download/"

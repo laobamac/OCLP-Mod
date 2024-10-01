@@ -25,28 +25,26 @@ class ModernWireless(BaseHardware):
         return f"{self.hardware_variant()}: Intel/BCM无线网卡"
 
 
-def present(self) -> bool:
-    """
-    Targeting Modern Wireless
-    """
-    # 检测Broadcom无线网卡
-    bcmwl_condition = isinstance(self._computer.wifi, device_probe.Broadcom) and (
-        self._computer.wifi.chipset in [
-            device_probe.Broadcom.Chipsets.AirPortBrcm4360,
-            device_probe.Broadcom.Chipsets.AirportBrcmNIC,
-            device_probe.Broadcom.Chipsets.AirPortBrcmNICThirdParty,
+    def present(self) -> bool:
+        """
+        Targeting Modern Wireless
+        """
+        # 检测Broadcom无线网卡
+        bcmwl_condition = isinstance(self._computer.wifi, device_probe.Broadcom) and (
+            self._computer.wifi.chipset in [
+                device_probe.Broadcom.Chipsets.AirPortBrcm4360,
+                device_probe.Broadcom.Chipsets.AirportBrcmNIC,
+                device_probe.Broadcom.Chipsets.AirPortBrcmNICThirdParty,
         ]
     )
 
-    # 检测Intel无线网卡
-    intelwl_condition = isinstance(self._computer.wifi, device_probe.IntelWirelessCard) and (
-        self._computer.wifi.chipset in [
-            device_probe.IntelWirelessCard.Chipsets.IntelWirelessIDs,
+        # 检测Intel无线网卡
+        intelwl_condition = isinstance(self._computer.wifi, device_probe.IntelWirelessCard) and (
+            self._computer.wifi.chipset in [
+                device_probe.IntelWirelessCard.Chipsets.IntelWirelessIDs,
         ]
     )
-
-    # 满足任一即返回True
-    return bcmwl_condition or intelwl_condition
+        return bcmwl_condition or intelwl_condition
 
 
     def native_os(self) -> bool:

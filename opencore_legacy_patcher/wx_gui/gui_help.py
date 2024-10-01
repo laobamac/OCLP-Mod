@@ -48,9 +48,10 @@ class HelpFrame(wx.Frame):
         text_label.Centre(wx.HORIZONTAL)
 
         buttons = {
-            "Official Guide":           self.constants.guide_link,
-            "Official Phone Support":   "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-            "Community Discord Server": self.constants.discord_link,
+            "官方指南":           self.constants.guide_link,
+            "官方支持":   "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "官方Discord社区": self.constants.discord_link,
+            "SimpleHac论坛": "https://www.simplehac.cn"
         }
 
         for button in buttons:

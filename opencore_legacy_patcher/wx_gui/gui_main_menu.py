@@ -73,12 +73,12 @@ class MainFrame(wx.Frame):
         """
 
         # Title label: OpenCore Legacy Patcher v{X.Y.Z}
-        title_label = wx.StaticText(self, label=f"OCLP Modified By laobamac {'' if self.constants.special_build else ''}{self.constants.patcher_version}{' (Intel无线卡)' if not self.constants.commit_info[0].startswith('refs/tags') else ''}", pos=(-1, 10))
+        title_label = wx.StaticText(self, label=f"OCLP Modified By laobamac {'' if self.constants.special_build else ''}{self.constants.patcher_version}{'' if not self.constants.commit_info[0].startswith('refs/tags') else ''}", pos=(-1, 10))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title_label.Centre(wx.HORIZONTAL)
 
         # Text: Model: {Build or Host Model}
-        model_label = wx.StaticText(self, label=f"Model: {self.constants.custom_model or self.constants.computer.real_model} ，modified by laobamac", pos=(-1, title_label.GetPosition()[1] + 25
+        model_label = wx.StaticText(self, label=f"型号: {self.constants.custom_model or self.constants.computer.real_model} ，modified by laobamac", pos=(-1, title_label.GetPosition()[1] + 25
                                                                                                                                     ))
         model_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         model_label.Centre(wx.HORIZONTAL)
