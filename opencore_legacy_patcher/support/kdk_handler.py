@@ -24,7 +24,7 @@ from . import (
 
 KDK_INSTALL_PATH: str  = "/Library/Developer/KDKs"
 KDK_INFO_PLIST:   str  = "KDKInfo.plist"
-KDK_API_LINK:     str  = "https://dortania.github.io/KdkSupportPkg/manifest.json"
+KDK_API_LINK:     str  = "https://oclpapi.simplehac.cn/KdkSupportPkg/manifest.json"
 
 KDK_ASSET_LIST:   list = None
 
