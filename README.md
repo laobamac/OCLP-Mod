@@ -13,7 +13,7 @@ Add Chinese language ,Intel Wireless in Sequoia ,KDK/MetalLib files accelerated 
 
 ----------
 
-Noteworthy features of OpenCore Legacy Patcher:
+Noteworthy features of OCLP-Mod:
 
 * Support for macOS Big Sur, Monterey, Ventura, Sonoma and Sequoia
 * Native Over the Air (OTA) System Updates
