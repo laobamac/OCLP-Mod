@@ -23,7 +23,8 @@ from ..support import (
     global_settings,
     defaults,
     generate_smbios,
-    network_handler
+    network_handler,
+    subprocess_wrapper
 )
 from ..datasets import (
     model_array,
@@ -39,7 +40,7 @@ class SettingsFrame(wx.Frame):
     Modal-based Settings Frame
     """
     def __init__(self, parent: wx.Frame, title: str, global_constants: constants.Constants, screen_location: tuple = None):
-        logging.info("初始化设置窗口")
+        logging.info("Initializing Settings Frame")
         self.constants: constants.Constants = global_constants
         self.title: str = title
         self.parent: wx.Frame = parent
@@ -55,9 +56,9 @@ class SettingsFrame(wx.Frame):
 
     def _generate_elements(self, frame: wx.Frame = None) -> None:
         """
-        生成设置窗口的元素
-        使用 wx.Notebook 实现标签页界面
-        依赖于 'self._settings()' 填充内容
+        Generates elements for the Settings Frame
+        Uses wx.Notebook to implement a tabbed interface
+        and relies on 'self._settings()' for populating
         """
 
         notebook = wx.Notebook(frame)
@@ -77,7 +78,7 @@ class SettingsFrame(wx.Frame):
         model_choice.SetSelection(model_choice.FindString(selection))
         sizer.Add(model_choice, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
-        model_description = wx.StaticText(frame, label="覆盖 Patcher 将要构建的 Mac 模型。", pos=(-1, -1))
+        model_description = wx.StaticText(frame, label="覆写Patcher将要仿冒的机型", pos=(-1, -1))
         model_description.SetFont(gui_support.font_factory(11, wx.FONTWEIGHT_NORMAL))
         sizer.Add(model_description, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
@@ -90,7 +91,7 @@ class SettingsFrame(wx.Frame):
 
         sizer.Add(notebook, 1, wx.EXPAND | wx.ALL, 10)
 
-        # 添加返回按钮
+        # Add return button
         return_button = wx.Button(frame, label="返回", pos=(-1, -1), size=(100, 30))
         return_button.Bind(wx.EVT_BUTTON, self.on_return)
         return_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
@@ -116,11 +117,11 @@ class SettingsFrame(wx.Frame):
 
             for setting, setting_info in self.settings[tab].items():
                 if setting_info["type"] == "populate":
-                    # 执行填充函数
+                    # execute populate function
                     if setting_info["args"] == wx.Frame:
                         setting_info["function"](panel)
                     else:
-                        raise Exception("无效的填充函数")
+                        raise Exception("Invalid populate function")
                     continue
 
                 if setting_info["type"] == "title":
@@ -130,7 +131,7 @@ class SettingsFrame(wx.Frame):
 
                     height += 10
 
-                    # 添加标题
+                    # Add title
                     title = wx.StaticText(panel, label=setting, pos=(-1, -1))
                     title.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
 
@@ -140,7 +141,7 @@ class SettingsFrame(wx.Frame):
                     continue
 
                 if setting_info["type"] == "sub_title":
-                    # 添加子标题
+                    # Add sub-title
                     sub_title = wx.StaticText(panel, label=setting, pos=(-1, -1))
                     sub_title.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
 
@@ -155,8 +156,8 @@ class SettingsFrame(wx.Frame):
                     continue
 
                 if setting_info["type"] == "checkbox":
-                    # 添加复选框，并在下方添加描述
-                    checkbox = wx.CheckBox(panel, label=setting, pos=(10 + width, 10 + height), size=(300, -1))
+                    # Add checkbox, and description underneath
+                    checkbox = wx.CheckBox(panel, label=setting, pos=(10 + width, 10 + height), size = (300,-1))
                     checkbox.SetValue(setting_info["value"] if setting_info["value"] else False)
                     checkbox.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
                     event = lambda event, warning=setting_info["warning"] if "warning" in setting_info else "", override=bool(setting_info["override_function"]) if "override_function" in setting_info else False: self.on_checkbox(event, warning, override)
@@ -167,21 +168,21 @@ class SettingsFrame(wx.Frame):
                             checkbox.SetValue(False)
 
                 elif setting_info["type"] == "spinctrl":
-                    # 添加数字输入框，并在下方添加描述
-                    spinctrl = wx.SpinCtrl(panel, value=str(setting_info["value"]), pos=(width - 20, 10 + height), min=setting_info["min"], max=setting_info["max"], size=(45, -1))
+                    # Add spinctrl, and description underneath
+                    spinctrl = wx.SpinCtrl(panel, value=str(setting_info["value"]), pos=(width - 20, 10 + height), min=setting_info["min"], max=setting_info["max"], size = (45,-1))
                     spinctrl.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
                     spinctrl.Bind(wx.EVT_TEXT, lambda event, variable=setting: self.on_spinctrl(event, variable))
-                    # 在数字输入框旁边添加标签
+                    # Add label next to spinctrl
                     label = wx.StaticText(panel, label=setting, pos=(spinctrl.GetSize()[0] + width - 16, spinctrl.GetPosition()[1]))
                     label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
                 elif setting_info["type"] == "choice":
-                    # 标题
+                    # Title
                     title = wx.StaticText(panel, label=setting, pos=(width + 30, 10 + height))
                     title.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
                     height += title.GetSize()[1] + 10
 
-                    # 添加下拉框，并在下方添加描述
-                    choice = wx.Choice(panel, pos=(width + 25, 10 + height), choices=setting_info["choices"], size=(150, -1))
+                    # Add combobox, and description underneath
+                    choice = wx.Choice(panel, pos=(width + 25, 10 + height), choices=setting_info["choices"], size = (150,-1))
                     choice.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
                     choice.SetSelection(choice.FindString(setting_info["value"]))
                     if "override_function" in setting_info:
@@ -190,13 +191,13 @@ class SettingsFrame(wx.Frame):
                         choice.Bind(wx.EVT_CHOICE, lambda event, variable=setting: self.on_choice(event, variable))
                     height += 10
                 elif setting_info["type"] == "button":
-                    button = wx.Button(panel, label=setting, pos=(width + 25, 10 + height), size=(200, -1))
+                    button = wx.Button(panel, label=setting, pos=(width + 25, 10 + height), size = (200,-1))
                     button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
                     button.Bind(wx.EVT_BUTTON, lambda event, variable=setting: self.settings[tab][variable]["function"](event))
                     height += 10
 
                 else:
-                    raise Exception("无效的设置类型")
+                    raise Exception("Invalid setting type")
 
                 lines = '\n'.join(setting_info["description"])
                 description = wx.StaticText(panel, label=lines, pos=(30 + width, 10 + height + 20))
@@ -206,7 +207,7 @@ class SettingsFrame(wx.Frame):
                     if setting_info["condition"] is False:
                         description.SetForegroundColour((128, 128, 128))
 
-                # 检查描述中的行数，并相应调整间隔
+                # Check number of lines in description, and adjust spacer accordingly
                 for i, line in enumerate(lines.split('\n')):
                     if line == "":
                         continue
@@ -359,7 +360,7 @@ class SettingsFrame(wx.Frame):
                 },
             },
             "额外": {
-                "General (Continued)": {
+                "通用（可持续生效）": {
                     "type": "title",
                 },
                 "WOL": {
@@ -465,7 +466,7 @@ class SettingsFrame(wx.Frame):
                 },
             },
             "高级": {
-                "Miscellaneous": {
+                "杂项": {
                     "type": "title",
                 },
                 "Disable Firmware Throttling": {
@@ -552,7 +553,7 @@ class SettingsFrame(wx.Frame):
                 "wrap_around 2": {
                     "type": "wrap_around",
                 },
-                "Graphics Override": {
+                "显卡覆写": {
                     "type": "choice",
                     "choices": [
                         "None",
@@ -622,7 +623,7 @@ class SettingsFrame(wx.Frame):
                 },
             },
             "SMBIOS": {
-                "Model Spoofing": {
+                "机型覆写": {
                     "type": "title",
                 },
                 "SMBIOS 覆写等级": {
@@ -657,7 +658,7 @@ class SettingsFrame(wx.Frame):
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "Allow spoofing native Macs": {
+                "允许覆写原生支持的Mac": {
                     "type": "checkbox",
                     "value": self.constants.allow_native_spoofs,
                     "variable": "allow_native_spoofs",
@@ -668,17 +669,17 @@ class SettingsFrame(wx.Frame):
                         "不受支持的 Mac 上的 Universal Control",
                     ],
                 },
-                "Serial Spoofing": {
+                "序列号覆写": {
                     "type": "title",
                 },
-                "Populate Serial Spoofing": {
+                "Populate 序列号覆写": {
                     "type": "populate",
                     "function": self._populate_serial_spoofing_settings,
                     "args": wx.Frame,
                 },
             },
             "补丁": {
-                "Root Volume Patching": {
+                "根目录补丁": {
                     "type": "title",
                 },
                 "TeraScale 2 Acceleration": {
@@ -699,7 +700,7 @@ class SettingsFrame(wx.Frame):
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "Non-Metal Configuration": {
+                "Non-Metal配置": {
                     "type": "title",
                 },
                 "Log out required to apply changes to SkyLight": {
@@ -776,7 +777,7 @@ class SettingsFrame(wx.Frame):
                 },
             },
             "App": {
-                "General": {
+                "通用": {
                     "type": "title",
                 },
                 "Allow native models": {
@@ -826,7 +827,7 @@ class SettingsFrame(wx.Frame):
                     ],
                     "override_function": self._update_global_settings,
                 },
-                "Statistics": {
+                "统计": {
                     "type": "title",
                 },
                 "Populate Stats": {
@@ -899,13 +900,13 @@ class SettingsFrame(wx.Frame):
         """
 
         selection = model_choice.GetStringSelection()
-        if selection == "Host Model":
+        if selection == "主机机型":
             selection = self.constants.computer.real_model
             self.constants.custom_model = None
-            logging.info(f"使用真实机型: {self.constants.computer.real_model}")
+            logging.info(f"Using Real Model: {self.constants.computer.real_model}")
             defaults.GenerateDefaults(self.constants.computer.real_model, True, self.constants)
         else:
-            logging.info(f"使用自定义机型: {selection}")
+            logging.info(f"Using Custom Model: {selection}")
             self.constants.custom_model = selection
             defaults.GenerateDefaults(self.constants.custom_model, False, self.constants)
             self.parent.build_button.Enable()
@@ -938,7 +939,7 @@ class SettingsFrame(wx.Frame):
 
         # Label: Flip individual bits corresponding to XNU's csr.h
         # If you're unfamiliar with how SIP works, do not touch this menu
-        sip_label = wx.StaticText(panel, label="Flip individual bits corresponding to", pos=(sip_title.GetPosition()[0] - 20, sip_title.GetPosition()[1] + 30))
+        sip_label = wx.StaticText(panel, label="反转对应于", pos=(sip_title.GetPosition()[0] - 20, sip_title.GetPosition()[1] + 30))
         sip_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
 
         # Hyperlink: csr.h
@@ -956,12 +957,12 @@ class SettingsFrame(wx.Frame):
             self.sip_value = 0x00
         else:
             self.sip_value = 0x803
-        sip_configured_label = wx.StaticText(panel, label=f"当前 SIP: {hex(self.sip_value)}", pos=(sip_label.GetPosition()[0] + 35, sip_label.GetPosition()[1] + 20))
+        sip_configured_label = wx.StaticText(panel, label=f"当前设置的SIP: {hex(self.sip_value)}", pos=(sip_label.GetPosition()[0] + 35, sip_label.GetPosition()[1] + 20))
         sip_configured_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
         self.sip_configured_label = sip_configured_label
 
         # Label: SIP Status
-        sip_booted_label = wx.StaticText(panel, label=f"Currently booted SIP: {hex(py_sip_xnu.SipXnu().get_sip_status().value)}", pos=(sip_configured_label.GetPosition()[0], sip_configured_label.GetPosition()[1] + 20))
+        sip_booted_label = wx.StaticText(panel, label=f"当前启动的SIP: {hex(py_sip_xnu.SipXnu().get_sip_status().value)}", pos=(sip_configured_label.GetPosition()[0], sip_configured_label.GetPosition()[1] + 20))
         sip_booted_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
 
 
@@ -990,7 +991,7 @@ class SettingsFrame(wx.Frame):
     def _populate_serial_spoofing_settings(self, panel: wx.Frame) -> None:
         title: wx.StaticText = None
         for child in panel.GetChildren():
-            if child.GetLabel() == "Serial Spoofing":
+            if child.GetLabel() == "序列号覆写":
                 title = child
                 break
 
@@ -1001,13 +1002,13 @@ class SettingsFrame(wx.Frame):
         # Textbox: Custom Serial Number
         custom_serial_number_textbox = wx.TextCtrl(panel, pos=(custom_serial_number_label.GetPosition()[0] - 27, custom_serial_number_label.GetPosition()[1] + 20), size=(200, 25))
         custom_serial_number_textbox.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-        custom_serial_number_textbox.SetToolTip("在这里输入自定义序列号. 将会在iservice中使用.\n\nNote: This will not be used if the \"Use Custom Serial Number\" checkbox is not checked.")
+        custom_serial_number_textbox.SetToolTip("Enter a custom serial number here. This will be used for the SMBIOS and iMessage.\n\nNote: This will not be used if the \"Use Custom Serial Number\" checkbox is not checked.")
         custom_serial_number_textbox.Bind(wx.EVT_TEXT, self.on_custom_serial_number_textbox)
         custom_serial_number_textbox.SetValue(self.constants.custom_serial_number)
         self.custom_serial_number_textbox = custom_serial_number_textbox
 
         # Label: Custom Board Serial Number
-        custom_board_serial_number_label = wx.StaticText(panel, label="Custom Board Serial Number", pos=(title.GetPosition()[0] + 120, custom_serial_number_label.GetPosition()[1]))
+        custom_board_serial_number_label = wx.StaticText(panel, label="自定义主板序列号", pos=(title.GetPosition()[0] + 120, custom_serial_number_label.GetPosition()[1]))
         custom_board_serial_number_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
 
         # Textbox: Custom Board Serial Number
@@ -1019,7 +1020,7 @@ class SettingsFrame(wx.Frame):
         self.custom_board_serial_number_textbox = custom_board_serial_number_textbox
 
         # Button: Generate Serial Number (below)
-        generate_serial_number_button = wx.Button(panel, label=f"Generate S/N: {self.constants.custom_model or self.constants.computer.real_model}", pos=(title.GetPosition()[0] - 30, custom_board_serial_number_label.GetPosition()[1] + 60), size=(200, 25))
+        generate_serial_number_button = wx.Button(panel, label=f"生成 S/N: {self.constants.custom_model or self.constants.computer.real_model}", pos=(title.GetPosition()[0] - 30, custom_board_serial_number_label.GetPosition()[1] + 60), size=(200, 25))
         generate_serial_number_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         generate_serial_number_button.Bind(wx.EVT_BUTTON, self.on_generate_serial_number)
 
@@ -1027,28 +1028,28 @@ class SettingsFrame(wx.Frame):
     def _populate_app_stats(self, panel: wx.Frame) -> None:
         title: wx.StaticText = None
         for child in panel.GetChildren():
-            if child.GetLabel() == "Statistics":
+            if child.GetLabel() == "统计":
                 title = child
                 break
 
-        lines = f"""Application Information:
-    Application Version: {self.constants.patcher_version}
-    PatcherSupportPkg Version: {self.constants.patcher_support_pkg_version}
-    Application Path: {self.constants.launcher_binary}
-    Application Mount: {self.constants.payload_path}
+        lines = f"""软件信息:
+    软件版本: {self.constants.patcher_version}
+    补丁支持包版本: {self.constants.patcher_support_pkg_version}
+    软件路径: {self.constants.launcher_binary}
+    软件加载: {self.constants.payload_path}
 
 Commit Information:
     Branch: {self.constants.commit_info[0]}
     Date: {self.constants.commit_info[1]}
     URL: {self.constants.commit_info[2] if self.constants.commit_info[2] != "" else "N/A"}
 
-Booted Information:
+启动信息:
     Booted OS: XNU {self.constants.detected_os} ({self.constants.detected_os_version})
     Booted Patcher Version: {self.constants.computer.oclp_version}
     Booted OpenCore Version: {self.constants.computer.opencore_version}
     Booted OpenCore Disk: {self.constants.booted_oc_disk}
 
-Hardware Information:
+硬件信息:
     {pprint.pformat(self.constants.computer, indent=4)}
 """
         # TextCtrl: properties
@@ -1120,6 +1121,19 @@ Hardware Information:
         subprocess.run(["/usr/bin/defaults", "write", "-globalDomain", variable, value_type, str(value)])
 
 
+    def _update_system_defaults_root(self, variable, value, global_setting = None):
+        value_type = type(value)
+        if value_type is str:
+            value_type = "-string"
+        elif value_type is int:
+            value_type = "-int"
+        elif value_type is bool:
+            value_type = "-bool"
+
+        logging.info(f"Updating System Defaults (root): {variable} = {value} ({value_type})")
+        subprocess_wrapper.run_as_root(["/usr/bin/defaults", "write", "/Library/Preferences/.GlobalPreferences.plist", variable, value_type, str(value)])
+
+
     def _find_parent_for_key(self, key: str) -> str:
         for parent in self.settings:
             if key in self.settings[parent]:
@@ -1145,7 +1159,7 @@ Hardware Information:
         else:
             self.constants.custom_sip_value = hex(self.sip_value)
 
-        self.sip_configured_label.SetLabel(f"当前 SIP: {hex(self.sip_value)}")
+        self.sip_configured_label.SetLabel(f"当前配置的SIP: {hex(self.sip_value)}")
 
     def on_choice(self, event: wx.Event, label: str) -> None:
         """
@@ -1155,7 +1169,7 @@ Hardware Information:
 
 
     def on_generate_serial_number(self, event: wx.Event) -> None:
-        dlg = wx.MessageDialog(self.frame_modal, "Please take caution when using serial spoofing. This should only be used on machines that were legally obtained and require reserialization.\n\nNote: new serials are only overlayed through OpenCore and are not permanently installed into ROM.\n\nMisuse of this setting can break power management and other aspects of the OS if the system does not need spoofing\n\nDortania does not condone the use of our software on stolen devices.\n\nAre you certain you want to continue?", "Warning", wx.YES_NO | wx.ICON_WARNING | wx.NO_DEFAULT)
+        dlg = wx.MessageDialog(self.frame_modal, "Please take caution when using 序列号覆写. This should only be used on machines that were legally obtained and require reserialization.\n\nNote: new serials are only overlayed through OpenCore and are not permanently installed into ROM.\n\nMisuse of this setting can break power management and other aspects of the OS if the system does not need spoofing\n\nDortania does not condone the use of our software on stolen devices.\n\nAre you certain you want to continue?", "Warning", wx.YES_NO | wx.ICON_WARNING | wx.NO_DEFAULT)
         if dlg.ShowModal() != wx.ID_YES:
             return
 

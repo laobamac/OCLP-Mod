@@ -13,9 +13,9 @@ from .detections import device_probe
 class Constants:
     def __init__(self) -> None:
         # Patcher Versioning
-        self.patcher_version:                 str = "2.1.0"  # OpenCore-Legacy-Patcher
-        self.patcher_support_pkg_version:     str = "1.8.0"  # PatcherSupportPkg
-        self.copyright_date:                  str = "Copyright © 2020-2024 Dortania && SimpleHac"
+        self.patcher_version:                 str = "2.1.2"  # OpenCore-Legacy-Patcher
+        self.patcher_support_pkg_version:     str = "1.8.3"  # PatcherSupportPkg
+        self.copyright_date:                  str = "Copyright © 2020-2024 Dortania & SimpleHac"
         self.patcher_name:                    str = "OCLP-Mod"
 
         # URLs
@@ -751,7 +751,7 @@ class Constants:
 
     @property
     def app_icon_path(self):
-        return self.payload_path / Path("Icon/AppIcons/OC-Patcher.icns")
+        return self.payload_path / Path("Icon/AppIcons/OC-Mod.icns")
 
     @property
     def icon_path_external(self):

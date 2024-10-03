@@ -18,7 +18,7 @@ class AboutFrame(wx.Frame):
             return
 
         logging.info("Generating About frame")
-        super(AboutFrame, self).__init__(None, title="About", size=(350, 350), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
+        super(AboutFrame, self).__init__(None, title="关于", size=(350, 350), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
         self.constants: constants.Constants = global_constants
         self.Centre()
         self.hyperlink_colour = (25, 179, 231)
@@ -31,7 +31,7 @@ class AboutFrame(wx.Frame):
     def _generate_elements(self, frame: wx.Frame) -> None:
 
         # Set title
-        title = wx.StaticText(frame, label="OCLP Modified By laobamac", pos=(-1, 5))
+        title = wx.StaticText(frame, label="OCLP-Mod By laobamac", pos=(-1, 5))
         title.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title.Centre(wx.HORIZONTAL)
 
@@ -44,7 +44,7 @@ class AboutFrame(wx.Frame):
         description = [
             "Written by a small group of Mac hobbyists who just",
             "want to keep old machines out of the landfill!",
-            "SimpleHac[laobamac]添加Intel支持并汉化",
+            "SimpleHac[laobamac]修改并汉化",
             "SimpleHac论坛：www.simplehac.cn",
             "Q群：1006766467",
         ]
