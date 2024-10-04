@@ -30,6 +30,8 @@ from ..wx_gui import (
     gui_settings,
     gui_sys_patch_display,
     gui_update,
+    gui_kdk_dl,
+    gui_ml_dl,
 )
 
 
@@ -138,7 +140,7 @@ class MainFrame(wx.Frame):
             # place icon
             if "icon" in button_function:
                 icon = wx.StaticBitmap(self, bitmap=wx.Bitmap(button_function["icon"], wx.BITMAP_TYPE_ICON), pos=(button_x - 10, button_y), size=(64, 64))
-                if button_name == "a安装驱动补丁":
+                if button_name == "安装驱动补丁":
                     icon.SetPosition((-1, button_y + 7))
                 if button_name == "创建macOS安装器":
                     icon.SetPosition((button_x - 5, button_y + 3))
@@ -149,6 +151,7 @@ class MainFrame(wx.Frame):
                     icon.SetSize((70, 70))
             if button_name == "⚙️ 设置":
                 button_y += 5
+                button_x += 150
 
             button = wx.Button(self, label=button_name, pos=(button_x + 70, button_y), size=(180, 30))
             button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
@@ -178,9 +181,16 @@ class MainFrame(wx.Frame):
                 if self.constants.detected_os < os_data.os_data.big_sur:
                     button.Disable()
             elif button_name == "⚙️ 设置":
-                button.SetSize((100, -1))
-                button.Centre(wx.HORIZONTAL)
-                description_label.Centre(wx.HORIZONTAL)
+                  button.SetSize((100, -1))
+                  #button.Centre(wx.HORIZONTAL)
+                  description_label.Centre(wx.HORIZONTAL)
+                  kdk_button = wx.Button(self, label="KDK下载", pos=(button_x - 50, button.GetPosition()[1]), size=(100, 30))
+                  kdk_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
+                  kdk_button.Bind(wx.EVT_BUTTON, lambda event: self.on_download_kdk_package(event))
+                  ml_button = wx.Button(self, label="MetalLib下载", pos=(button_x + 190, button.GetPosition()[1]), size=(100, 30))
+                  ml_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
+                  ml_button.Bind(wx.EVT_BUTTON, lambda event: self.on_download_ml_package(event))
+                  #button_y += 60  # 调整按钮的垂直位置
 
             index += 1
             if index == rollover:
@@ -389,6 +399,18 @@ Please check the Github page for more information about this release."""
         )
 
         frame.Destroy()
+    
+    def on_download_kdk_package(self, event: wx.Event = None):
+        kdk_window = gui_kdk_dl.DownloadKDKFrame(
+            parent=self
+        )
+        kdk_window.Show()
+
+    def on_download_ml_package(self, event: wx.Event = None):
+        ml_window = gui_ml_dl.DownloadMLFrame(
+            parent=self
+        )
+        ml_window.Show()
 
     def _onWebviewNav(self, event):
         url = event.GetURL()
