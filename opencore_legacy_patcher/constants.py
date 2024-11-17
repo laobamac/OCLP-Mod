@@ -13,7 +13,7 @@ from .detections import device_probe
 class Constants:
     def __init__(self) -> None:
         # Patcher Versioning
-        self.patcher_version:                 str = "2.3.0"  # OpenCore-Legacy-Patcher
+        self.patcher_version:                 str = "2.3.1"  # OpenCore-Legacy-Patcher
         self.patcher_support_pkg_version:     str = "1.8.4"  # PatcherSupportPkg
         self.copyright_date:                  str = "Copyright © 2020-2024 Dortania & SimpleHac"
         self.patcher_name:                    str = "OCLP-Mod"
@@ -186,8 +186,8 @@ class Constants:
         self.custom_board_serial_number: str = ""  # Set SMBIOS board serial number
 
         ## FeatureUnlock Settings
-        self.fu_status:    bool = True  # Enable FeatureUnlock
-        self.fu_arguments: str  = None  # Set FeatureUnlock arguments
+        self.fu_status:    bool = False  # Enable FeatureUnlock
+        self.fu_arguments: str  = None   # Set FeatureUnlock arguments
 
         ## Security Settings
         self.sip_status:     bool = True  #  System Integrity Protection
@@ -751,7 +751,7 @@ class Constants:
 
     @property
     def app_icon_path(self):
-        return self.payload_path / Path("Icon/AppIcons/OC-Mod.icns")
+        return self.payload_path / Path("Icon/AppIcons/OC-Patcher.icns")
 
     @property
     def icon_path_external(self):
