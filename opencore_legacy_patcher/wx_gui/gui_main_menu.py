@@ -217,8 +217,8 @@ class MainFrame(wx.Frame):
             # Notify user they're booting an unsupported configuration
             pop_up = wx.MessageDialog(
                 self,
-                f"We found you are currently booting OpenCore built for a different unit: {self.constants.computer.build_model}\n\nWe builds configs to match individual units and cannot be mixed or reused with different Macs.\n\nPlease Build and Install a new OpenCore config, and reboot your Mac.",
-                "Unsupported Configuration Detected!",
+                f"我们发现您当前正在引导为其他单元构建的 OpenCore: {self.constants.computer.build_model}\n\n我们构建配置以匹配各个单元，并且不能与不同的 Mac 混合或重复使用。\n\n请构建并安装新的 OpenCore 配置，然后重新启动您的 Mac。",
+                "检测到不支持的配置！",
                 style=wx.OK | wx.ICON_EXCLAMATION
             )
             pop_up.ShowModal()
@@ -231,7 +231,7 @@ class MainFrame(wx.Frame):
             pop_up = wx.MessageDialog(
                 self,
                 f"OpenCore Legacy Patcher has been updated to the latest version: {self.constants.patcher_version}\n\nWould you like to update OpenCore and your root volume patches?",
-                "Update successful!",
+                "更新成功!",
                 style=wx.YES_NO | wx.YES_DEFAULT | wx.ICON_INFORMATION
             )
             pop_up.ShowModal()

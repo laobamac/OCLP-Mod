@@ -115,7 +115,7 @@ class BuildFrame(wx.Frame):
             dialog = wx.MessageDialog(
                 parent=self,
                 message="构建OpenCore遇到错误",
-                caption="Error building OpenCore",
+                caption="未能构建OpenCore",
                 style=wx.OK | wx.ICON_ERROR
             )
             dialog.ShowModal()
@@ -124,10 +124,10 @@ class BuildFrame(wx.Frame):
         dialog = wx.MessageDialog(
             parent=self,
             message=f"你想现在安装OpenCore吗?",
-            caption="Finished building your OpenCore configuration!",
+            caption="完成OpenCore构建！",
             style=wx.YES_NO | wx.ICON_QUESTION
         )
-        dialog.SetYesNoLabels("Install to disk", "View build log")
+        dialog.SetYesNoLabels("安装到磁盘", "查看生成日志")
 
         self.on_install() if dialog.ShowModal() == wx.ID_YES else self.install_button.Enable()
 

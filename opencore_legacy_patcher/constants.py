@@ -13,9 +13,9 @@ from .detections import device_probe
 class Constants:
     def __init__(self) -> None:
         # Patcher Versioning
-        self.patcher_version:                 str = "2.3.1"  # OpenCore-Legacy-Patcher
+        self.patcher_version:                 str = "2.3.2"  # OpenCore-Legacy-Patcher
         self.patcher_support_pkg_version:     str = "1.8.4"  # PatcherSupportPkg
-        self.copyright_date:                  str = "Copyright © 2020-2024 Dortania & SimpleHac"
+        self.copyright_date:                  str = "Copyright © 2020-2024 Dortania & laobamac"
         self.patcher_name:                    str = "OCLP-Mod"
 
         # URLs
@@ -28,7 +28,7 @@ class Constants:
 
         # OpenCore Versioning
         # https://github.com/acidanthera/OpenCorePkg
-        self.opencore_version: str = "1.0.1"
+        self.opencore_version: str = "1.0.2"
 
         # Kext Versioning
         ## Acidanthera
