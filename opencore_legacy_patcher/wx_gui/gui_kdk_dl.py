@@ -80,22 +80,30 @@ class LoadingFrame(wx.Frame):
 class DownloadListCtrl(wx.ListCtrl):
     def __init__(self, parent):
         super(DownloadListCtrl, self).__init__(parent, style=wx.LC_REPORT | wx.BORDER_SUNKEN)
-        self.InsertColumn(0, "版本", width=100)
-        self.InsertColumn(1, "大小", width=80)
+        self.InsertColumn(0, "版本", width=80)
+        self.InsertColumn(1, "系统", width=100)
         self.InsertColumn(2, "日期", width=120)
         self.InsertColumn(3, "下载链接", width=225)
+        self.data = []  # 存储每个条目的数据
 
-    def SetData(self, kdk_data):
-        for item in kdk_data:
-            global kdkurl
-            version = f"{item['build']} {item['version']}"
-            size = f"{item['fileSize']/1024/1024:.2f} MB"
+    def SetData(self, MetalLib_data):
+        self.data = []  # 清空旧数据
+        for item in MetalLib_data:
+            version = f"{item['build']}"
+            size = f"macOS {item['version']}"
             date = item['date'].split('T')[0]
-            kdkurl = item['url']
+            url = item['url']
             index = self.InsertItem(self.GetItemCount(), version)
             self.SetItem(index, 1, size)
             self.SetItem(index, 2, date)
-            self.SetItem(index, 3, "那能告诉你吗，哥们，万一刷我流量（")
+            self.SetItem(index, 3, url)
+            self.data.append({'version': version, 'url': url})  # 存储数据
+
+    def get_selected_data(self):
+        selected_index = self.GetFirstSelected()
+        if selected_index != -1:
+            return self.data[selected_index]
+        return None
             #kdkurl = item['url']
 
 class DownloadKDKFrame(wx.Frame):
@@ -104,12 +112,15 @@ class DownloadKDKFrame(wx.Frame):
         panel = wx.Panel(self)
 
         self.list_ctrl = DownloadListCtrl(panel)
-        self.download_button = wx.Button(panel, label="下载", pos=(250, 350))
+        self.download_button = wx.Button(panel, label="下载", pos=(-250, 35))
+        self.copy_button = wx.Button(panel, label="复制链接", pos=(30, 350))
+        self.copy_button.Bind(wx.EVT_BUTTON, self.on_copy)
         self.download_button.Bind(wx.EVT_BUTTON, self.on_download)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.list_ctrl, proportion=1, flag=wx.EXPAND | wx.ALL, border=5)
         sizer.Add(self.download_button, proportion=0, flag=wx.CENTER | wx.ALL, border=5)
+        sizer.Add(self.copy_button, proportion=0, flag=wx.CENTER | wx.ALL, border=5)
 
         panel.SetSizer(sizer)
         self.Show()
@@ -128,16 +139,28 @@ class DownloadKDKFrame(wx.Frame):
         except requests.RequestException as e:
             wx.MessageBox(f"获取KDK信息失败: {e}", "错误", wx.OK | wx.ICON_ERROR)
             wx.CallAfter(self.loading_frame.close)
+    
+    def on_copy(self, event):
+        selected_data = self.list_ctrl.get_selected_data()
+        if selected_data:
+            url = selected_data['url']
+            wx.TheClipboard.Open()
+            wx.TheClipboard.SetData(wx.TextDataObject(url))
+            wx.TheClipboard.Close()
+            wx.MessageBox("链接已复制到剪贴板", "成功", wx.OK | wx.ICON_INFORMATION)
+        else:
+            wx.MessageBox("请选择一个KDK版本进行复制", "提示", wx.OK | wx.ICON_INFORMATION)
+
 
     def on_download(self, event):
-        selected_index = self.list_ctrl.GetFirstSelected()
-        if selected_index != -1:
-            with wx.FileDialog(self, "保存文件", wildcard="DMG Files (*.dmg)|*.dmg", style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT) as dlg:
+        selected_data = self.list_ctrl.get_selected_data()
+        if selected_data:
+            with wx.FileDialog(self, "保存文件", wildcard="PKG Files (*.pkg)|*.pkg", style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT) as dlg:
                 if dlg.ShowModal() == wx.ID_CANCEL:
                     return
                 file_path = dlg.GetPath()
-            url = kdkurl
+            url = selected_data['url']
             DPF_Window = DownloadProgressFrame(self, title="下载进度", url=url, file_path=file_path)
             DPF_Window.Show()
         else:
-            wx.MessageBox("请选择一个KDK版本进行下载", "提示", wx.OK | wx.ICON_INFORMATION)
+            wx.MessageBox("请选择一个MetalLib版本进行下载", "提示", wx.OK | wx.ICON_INFORMATION)
