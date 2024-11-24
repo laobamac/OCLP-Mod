@@ -13,7 +13,7 @@ from .detections import device_probe
 class Constants:
     def __init__(self) -> None:
         # Patcher Versioning
-        self.patcher_version:                 str = "2.3.3"  # OpenCore-Legacy-Patcher
+        self.patcher_version:                 str = "2.4.0"  # OpenCore-Legacy-Patcher
         self.patcher_support_pkg_version:     str = "1.8.4"  # PatcherSupportPkg
         self.copyright_date:                  str = "Copyright © 2020-2024 Dortania and laobamac"
         self.patcher_name:                    str = "OCLP-Mod"
@@ -255,12 +255,12 @@ class Constants:
         """
         Special builds are used for testing. They do not get updates through the updater
         """
-
-        try:
-            version.parse(self.patcher_version)
-            return False
-        except version.InvalidVersion:
-            return True
+        return False
+        #try:
+         #   version.parse(self.patcher_version)
+          #  return False
+        #except version.InvalidVersion:
+         #   return True
 
     # Payload Location
 
