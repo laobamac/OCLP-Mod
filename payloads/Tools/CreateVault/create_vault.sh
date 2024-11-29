@@ -4,7 +4,7 @@
 #
 #
 #  Created by Rodion Shingarev on 13.04.19.
-#  Modified by Jazzzny for OpenCore Legacy Patcher on 06.10.23.
+#  Modified by Jazzzny for OCLP-Mod on 06.10.23.
 #
 OCPath="$1"
 UtilsPath="$PWD"

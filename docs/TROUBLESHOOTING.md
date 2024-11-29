@@ -2,7 +2,7 @@
 
 Here are some common errors that users may experience while using this patcher:
 
-* [OpenCore Legacy Patcher not launching](#opencore-legacy-patcher-not-launching)
+* [OCLP-Mod not launching](#oclp-mod-not-launching)
 * ["You don't have permission to save..." error when creating USB installer](#you-don-t-have-permission-to-save-error-when-creating-usb-installer)
 * [Stuck on `This version of Mac OS X is not supported on this platform` or (🚫) Prohibited Symbol](#stuck-on-this-version-of-mac-os-x-is-not-supported-on-this-platform-or-🚫-prohibited-symbol)
 * [Cannot boot macOS without the USB](#cannot-boot-macos-without-the-usb)
@@ -10,7 +10,7 @@ Here are some common errors that users may experience while using this patcher:
 * [Stuck on boot after root patching](#stuck-on-boot-after-root-patching)
 * ["Unable to resolve dependencies, error code 71" when root patching](#unable-to-resolve-dependencies-error-code-71-when-root-patching)
 * [Reboot when entering Hibernation (`Sleep Wake Failure`)](#reboot-when-entering-hibernation-sleep-wake-failure)
-* [How to Boot Recovery through OpenCore Legacy Patcher](#how-to-boot-recovery-through-opencore-legacy-patcher)
+* [How to Boot Recovery through OCLP-Mod](#how-to-boot-recovery-through-oclp-mod)
 * [Stuck on "Your Mac needs a firmware update"](#stuck-on-your-mac-needs-a-firmware-update)
 * [No Brightness Control](#no-brightness-control)
 * [Cannot connect Wi-Fi on Monterey with legacy cards](#cannot-connect-Wi-Fi-on-Monterey-with-legacy-cards)
@@ -25,12 +25,12 @@ Here are some common errors that users may experience while using this patcher:
 * [No T1 functionality after installing Sonoma or newer](#no-t1-functionality-after-installing-sonoma-or-newer)
 
 
-## OpenCore Legacy Patcher not launching
+## OCLP-Mod not launching
 
 If the application won't launch (e.g. icon will bounce in the Dock), try launching OCLP via Terminal by typing the following command, make sure you've moved the app to `/Applications` before this.
 
 ```sh
-/Applications/OpenCore-Patcher.app/Contents/MacOS/OpenCore-Patcher
+/Applications/OCLP-Mod.app/Contents/MacOS/OCLP-Mod
 ```
 
 ## "You don't have permission to save..." error when creating USB installer
@@ -43,17 +43,17 @@ In some cases, a following error saying "The bless of the installer disk failed"
 </div>
 
 
-To resolve this, you may try adding Full Disk Access permission for OpenCore Legacy Patcher. To add it, first go to the settings
+To resolve this, you may try adding Full Disk Access permission for OCLP-Mod. To add it, first go to the settings
 
 * Ventura and Sonoma: Go to System Settings -> Privacy and Security -> Full Disk Access
 
 * Big Sur and Monterey: Go to System Preferences -> Security and Privacy -> Full Disk Access
 
-Enable OpenCore-Patcher in the list. If not found on the list, press the + sign to add a new entity and find OpenCore Legacy Patcher from Applications.
+Enable OCLP-Mod in the list. If not found on the list, press the + sign to add a new entity and find OCLP-Mod from Applications.
 
-Restart OpenCore Legacy Patcher and try creating your USB drive again.
+Restart OCLP-Mod and try creating your USB drive again.
 
-Optional: After you've created your USB drive, you can remove OpenCore Legacy Patcher from Full Disk Access again.
+Optional: After you've created your USB drive, you can remove OCLP-Mod from Full Disk Access again.
 
 
 ## Stuck on `This version of Mac OS X is not supported on this platform` or (🚫) Prohibited Symbol
@@ -68,13 +68,13 @@ However, if the 🚫 Symbol only appears after the boot process has already star
 
 By default, the OpenCore Patcher won't install OpenCore onto the internal drive itself during installs.
 
-After installing macOS, OpenCore Legacy Patcher should automatically prompt you to install OpenCore onto the internal drive. However, if it doesn't show the prompt, you'll need to either [manually transfer](https://dortania.github.io/OpenCore-Post-Install/universal/oc2hdd.html) OpenCore to the internal drive's EFI or Build and Install again and select your internal drive.
+After installing macOS, OCLP-Mod should automatically prompt you to install OpenCore onto the internal drive. However, if it doesn't show the prompt, you'll need to either [manually transfer](https://laobamac.github.io/OpenCore-Post-Install/universal/oc2hdd.html) OpenCore to the internal drive's EFI or Build and Install again and select your internal drive.
 
 Reminder that once this is done, you'll need to select OpenCore in the boot picker again for your hardware to remember this entry and auto boot from then on.
 
 ## Infinite Recovery OS Booting
 
-With OpenCore Legacy Patcher, we rely on Apple Secure Boot to ensure OS updates work correctly and reliably with Big Sur. However this installs NVRAM variables that will confuse your Mac if not running with OpenCore. To resolve this, simply uninstall OpenCore and [reset NVRAM](https://support.apple.com/en-mide/HT201255).
+With OCLP-Mod, we rely on Apple Secure Boot to ensure OS updates work correctly and reliably with Big Sur. However this installs NVRAM variables that will confuse your Mac if not running with OpenCore. To resolve this, simply uninstall OpenCore and [reset NVRAM](https://support.apple.com/en-mide/HT201255).
 
 * Note: Machines with modified root volumes will also result in an infinite recovery loop until integrity is restored.
 
@@ -133,13 +133,13 @@ Run OCLP root patcher again.
 
 ## Reboot when entering Hibernation (`Sleep Wake Failure`)
 
-[Known issue on some models](https://github.com/dortania/Opencore-Legacy-Patcher/issues/72), a temporary fix is to disable Hibernation by executing the following command in the terminal:
+[Known issue on some models](https://github.com/laobamac/oclp-mod/issues/72), a temporary fix is to disable Hibernation by executing the following command in the terminal:
 
 ```
 sudo pmset -a hibernatemode 0
 ```
 
-## How to Boot Recovery through OpenCore Legacy Patcher
+## How to Boot Recovery through OCLP-Mod
 
 By default, the patcher will try to hide extra boot options such as recovery from the user. To make them appear, simply press the `Spacebar` key while inside OpenCore's Picker to list all boot options.
 
@@ -171,7 +171,7 @@ If you're using OCLP v0.4.4, you should have been prompted to install Root Volum
 
 ## Black Screen on MacBookPro11,3 in macOS Monterey
 
-Due to Apple dropping NVIDIA Kepler support in macOS Monterey, [MacBookPro11,3's GMUX has difficulties switching back to the iGPU to display macOS correctly.](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/522) To work-around this issue, boot the MacBookPro11,3 in Safe Mode and once macOS is installed, run OCLP's Post Install Root Patches to enable GPU Acceleration for the NVIDIA dGPU.
+Due to Apple dropping NVIDIA Kepler support in macOS Monterey, [MacBookPro11,3's GMUX has difficulties switching back to the iGPU to display macOS correctly.](https://github.com/laobamac/oclp-mod/issues/522) To work-around this issue, boot the MacBookPro11,3 in Safe Mode and once macOS is installed, run OCLP's Post Install Root Patches to enable GPU Acceleration for the NVIDIA dGPU.
 
 * Safe Mode can be started by holding `Shift` + `Enter` when selecting macOS Monterey in OCLP's Boot Menu.
 
@@ -232,13 +232,13 @@ The reason for this is that the autopatcher will assume that you will be using t
 
 ## Keyboard, Mouse and Trackpad not working in installer or after update
 
-For Macs using legacy USB 1.1 controllers, OpenCore Legacy Patcher can only restore support once it has performed root volume patches. Thus to install macOS, you need to hook up a USB hub between your Mac and Keyboard/Mouse.
+For Macs using legacy USB 1.1 controllers, OCLP-Mod can only restore support once it has performed root volume patches. Thus to install macOS, you need to hook up a USB hub between your Mac and Keyboard/Mouse.
 
 ::: warning Note
 
 In macOS Sonoma, this seems to have been further weakened and some hubs may not be functional. 
 
-Alternative way is making sure to enable "Remote Login" in General -> Sharing before updating, which will enable SSH. That means you can take control using Terminal in another system by typing `ssh username@lan-ip-address` and your password. After that run Post Install Volume Patching by typing `/Applications/OpenCore-Patcher.app/Contents/MacOS/OpenCore-Patcher --patch_sys_vol` and finally `sudo reboot`.
+Alternative way is making sure to enable "Remote Login" in General -> Sharing before updating, which will enable SSH. That means you can take control using Terminal in another system by typing `ssh username@lan-ip-address` and your password. After that run Post Install Volume Patching by typing `/Applications/OCLP-Mod.app/Contents/MacOS/OCLP-Mod --patch_sys_vol` and finally `sudo reboot`.
 
 :::
 
@@ -248,7 +248,7 @@ Alternative way is making sure to enable "Remote Login" in General -> Sharing be
 
 More information can be found here:
 
-* [Legacy UHCI/OHCI support in Ventura #1021](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/1021)
+* [Legacy UHCI/OHCI support in Ventura #1021](https://github.com/laobamac/oclp-mod/issues/1021)
 
 Applicable models include:
 

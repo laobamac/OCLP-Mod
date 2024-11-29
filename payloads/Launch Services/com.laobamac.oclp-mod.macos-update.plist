@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AssociatedBundleIdentifiers</key>
+	<array>
+		<string>com.laobamac.oclp-mod</string>
+	</array>
+	<key>Label</key>
+	<string>com.laobamac.oclp-mod.macos-update</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Library/Application Support/laobamac/OCLP-Mod.app/Contents/MacOS/OCLP-Mod</string>
+		<string>--prepare_for_update</string>
+	</array>
+	<key>WatchPaths</key>
+	<array>
+		<string>/System/Volumes/Update/Update.plist</string>
+	</array>
+</dict>
+</plist>

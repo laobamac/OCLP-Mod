@@ -40,7 +40,7 @@ From there, you'll have a log on your desktop.
 Currently issues have been disabled due to [current events](ISSUES-HOLD.md). You can continue to receive support in the [OpenCore Patcher Paradise Discord Server](https://discord.gg/rqdPgH8xSN), where there are active members of the community available.
 :::
 
-Now that you have proper logs, you can now [file issues with us](https://github.com/dortania/OpenCore-Legacy-Patcher/issues). This is a reminder to include the following info:
+Now that you have proper logs, you can now [file issues with us](https://github.com/laobamac/oclp-mod/issues). This is a reminder to include the following info:
 
 * Model that you're patching for (ie. MacBookPro10,1)
 * Target OS (ie. macOS 11.2.3)

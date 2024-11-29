@@ -1,8 +1,8 @@
 # Updating OpenCore and Patches
 
-With OpenCore Legacy Patcher, there's generally very little reason for users to update the OpenCore installation on their machine unless you feel there's a benefit with new versions for your setup, e.g. Bluetooth has stopped working with a new macOS update.
+With OCLP-Mod, there's generally very little reason for users to update the OpenCore installation on their machine unless you feel there's a benefit with new versions for your setup, e.g. Bluetooth has stopped working with a new macOS update.
 
-For those who do wish to update, simply [download the latest release](https://github.com/dortania/OpenCore-Legacy-Patcher/releases) and rerun the patcher:
+For those who do wish to update, simply [download the latest release](https://github.com/laobamac/oclp-mod/releases) and rerun the patcher:
 
 ![](./images/OCLP-GUI-Main-Menu.png)
 

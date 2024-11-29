@@ -1,15 +1,15 @@
 {
-   "name": "OpenCore-Legacy-Patcher",
+   "name": "oclp-mod",
    "version": "0.0.1",
    "description": "Guide to put macOS on unsupported devices",
    "main": "",
    "author": {
-      "name": "Dortania",
-      "url": "https://github.com/dortania"
+      "name": "laobamac",
+      "url": "https://github.com/laobamac"
    },
    "repository": {
       "type": "git",
-      "url": "git+https://github.com/dortania/OpenCore-Legacy-Patcher.git"
+      "url": "git+https://github.com/laobamac/oclp-mod.git"
    },
    "scripts": {
       "dev": "vuepress dev",
@@ -44,6 +44,6 @@
       "vuepress-plugin-fulltext-search": "^2.2.1",
       "vuepress-theme-succinct": "^1.7.2"
    },
-   "homepage": "https://dortania.github.io/OpenCore-Legacy-Patcher/",
+   "homepage": "https://laobamac.github.io/oclp-mod/",
    "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }

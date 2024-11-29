@@ -4,7 +4,7 @@
 
 *Well here we are again, it's always such a pleasure~*
 
-Apple has yet again dropped a bunch of models, continuing their journey on discontinuing Intel Macs. With the release of OpenCore Legacy Patcher 1.0.0, early support for macOS Sonoma has been implemented.
+Apple has yet again dropped a bunch of models, continuing their journey on discontinuing Intel Macs. With the release of OCLP-Mod 1.0.0, early support for macOS Sonoma has been implemented.
 
 ## Versioning
 
@@ -27,7 +27,7 @@ With 1.0.0, we'll be switching to a proper major, minor and bug fix system ([Sem
 
 ## Current status
 
-OpenCore Legacy Patcher 1.0.0 will support Sonoma for all models normally supported by the Patcher, however some challenges remain. You can find information about them below.
+OCLP-Mod 1.0.0 will support Sonoma for all models normally supported by the Patcher, however some challenges remain. You can find information about them below.
 
 ## Issues
 
@@ -54,7 +54,7 @@ Sonoma has removed support for T1 chips found in most 2016 and 2017 Macs. Theref
 * Add fingerprints (if upgrading, existing fingerprints will be deleted)
 * Add cards to Apple Pay
 
-[More information here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/1103)
+[More information here](https://github.com/laobamac/oclp-mod/issues/1103)
 
 :::
 
@@ -71,7 +71,7 @@ While USB 1.1 may seem unimportant, it handles many important devices on your sy
 * IR Receivers
 * Bluetooth
 
-With OpenCore Legacy Patcher v0.6.0+, basic support has been implemented via Root Volume patching. However due to this, users will need to use a USB hub for installation and post-OS updates when patches are cleaned:
+With OCLP-Mod v0.6.0+, basic support has been implemented via Root Volume patching. However due to this, users will need to use a USB hub for installation and post-OS updates when patches are cleaned:
 
 ![](./images/usb11-chart.png)
 
@@ -85,11 +85,11 @@ With OpenCore Legacy Patcher v0.6.0+, basic support has been implemented via Roo
 * Xserve 3,1 and older
 :::
 
-[More information here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/1021)
+[More information here](https://github.com/laobamac/oclp-mod/issues/1021)
 
 ### Graphics support and issues
 This build includes both Legacy Metal and non-Metal patches for macOS Sonoma. Refer to the following links for more information about Legacy Metal and non-Metal support and their respective issues.
 
-* [Legacy Metal](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/1008)
-* [Non-Metal](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108)
+* [Legacy Metal](https://github.com/laobamac/oclp-mod/issues/1008)
+* [Non-Metal](https://github.com/laobamac/oclp-mod/issues/108)
 

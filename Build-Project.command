@@ -19,7 +19,7 @@ from ci_tooling.build_modules import (
     shim
 )
 
-from opencore_legacy_patcher import constants
+from oclp_mod import constants
 
 
 def main() -> None:
@@ -27,7 +27,7 @@ def main() -> None:
     Parse Command Line Arguments
     """
 
-    parser = argparse.ArgumentParser(description="Build OpenCore Legacy Patcher Suite", add_help=False)
+    parser = argparse.ArgumentParser(description="Build OCLP-Mod Suite", add_help=False)
 
     # Signing Parameters
     parser.add_argument("--application-signing-identity", type=str, help="Application Signing Identity")
@@ -86,7 +86,7 @@ def main() -> None:
     if (args.run_as_individual_steps is False) or (args.run_as_individual_steps and args.prepare_application):
         # Prepare Privileged Helper Tool
         sign_notarize.SignAndNotarize(
-            path=Path("./ci_tooling/privileged_helper_tool/com.dortania.opencore-legacy-patcher.privileged-helper"),
+            path=Path("./ci_tooling/privileged_helper_tool/com.laobamac.oclp-mod.privileged-helper"),
             signing_identity=args.application_signing_identity,
             notarization_apple_id=args.notarization_apple_id,
             notarization_password=args.notarization_password,
@@ -140,10 +140,10 @@ def main() -> None:
     if args.prepare_shim:
         shim.GenerateShim().generate()
         if Path("dist/OCLP-Mod.app").exists():
-            if Path("dist/OpenCore-Patcher (Original).app").exists():
-                Path("dist/OpenCore-Patcher (Original).app").unlink()
-            Path("dist/OCLP-Mod.app").rename("dist/OpenCore-Patcher (Original).app")
-        Path("dist/OpenCore-Patcher (Shim).app").rename("dist/OCLP-Mod.app")
+            if Path("dist/OCLP-Mod (Original).app").exists():
+                Path("dist/OCLP-Mod (Original).app").unlink()
+            Path("dist/OCLP-Mod.app").rename("dist/OCLP-Mod (Original).app")
+        Path("dist/OCLP-Mod (Shim).app").rename("dist/OCLP-Mod.app")
 
         # Update app version in Info.plist
         plist_path = Path("dist/OCLP-Mod.app/Contents/Info.plist")

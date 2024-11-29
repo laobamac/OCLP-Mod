@@ -8,7 +8,7 @@ This document is centered around downloading and writing the macOS installer to 
 
 To start off, you'll want to grab the app:
 
-* [OpenCore Legacy Patcher Release Apps](https://github.com/dortania/OpenCore-Legacy-Patcher/releases)
+* [OCLP-Mod Release Apps](https://github.com/laobamac/oclp-mod/releases)
 
 Once downloaded, open the app and you should be greeted by the main menu. 
 

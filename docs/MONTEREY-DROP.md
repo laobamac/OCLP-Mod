@@ -2,11 +2,11 @@
 
 ![](./images/macos-monterey.png)
 
-With OpenCore Legacy Patcher v0.1.7 and newer, we've implemented beta macOS Monterey support for users. Please note that Apple has dropped a lot of hardware with this release as well as broken many of our previous patch sets. This page will be used to inform users regarding current issues and will be updated as new patch sets are developed and added to our patcher.
+With OCLP-Mod v0.1.7 and newer, we've implemented beta macOS Monterey support for users. Please note that Apple has dropped a lot of hardware with this release as well as broken many of our previous patch sets. This page will be used to inform users regarding current issues and will be updated as new patch sets are developed and added to our patcher.
 
 ## Newly dropped hardware
 
-With Monterey, Apple continues their their somewhat ruthless march of dropping Intel hardware. This release saw the removal, and thus addition into OpenCore Legacy Patcher, of the following models:
+With Monterey, Apple continues their their somewhat ruthless march of dropping Intel hardware. This release saw the removal, and thus addition into OCLP-Mod, of the following models:
 
 * iMac14,4
 * iMac15,1
@@ -33,13 +33,13 @@ With Monterey, Apple continues their their somewhat ruthless march of dropping I
 
 :::
 
-All of these models now have support in OpenCore Legacy Patcher.
+All of these models now have support in OCLP-Mod.
 
 ## Current Monterey Issues
 
 ### MacBookPro11,3 booting issue without Kepler acceleration
 
-Due to the display being routed through the NVIDIA Kepler card and macOS being rendered on the Intel iGPU, users have been experiencing issues booting without post-install patches applied ([see here for more info](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/522).) Currently the only workaround is to install the patches in safe mode, by holding down `Shift+Enter` when you select macOS in the OCLP boot picker.
+Due to the display being routed through the NVIDIA Kepler card and macOS being rendered on the Intel iGPU, users have been experiencing issues booting without post-install patches applied ([see here for more info](https://github.com/laobamac/oclp-mod/issues/522).) Currently the only workaround is to install the patches in safe mode, by holding down `Shift+Enter` when you select macOS in the OCLP boot picker.
 
 ## Previously Broken Hardware
 
@@ -48,7 +48,7 @@ Due to the display being routed through the NVIDIA Kepler card and macOS being r
 * Documentation:
   * [5K iMac and UEFI: Fixing the dreaded output limitation](https://khronokernel.github.io/macos/2021/12/08/5K-UEFI.html)
 * Associated Github Issue:
-  * [5k Output issues on iMac15,1 (27" 5k iMac - 2014) #359](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/359)
+  * [5k Output issues on iMac15,1 (27" 5k iMac - 2014) #359](https://github.com/laobamac/oclp-mod/issues/359)
 
 :::
 
@@ -81,7 +81,7 @@ The following models lost Wifi support in macOS Monterey due to their legacy Wir
   * MacBookPro6,x is exempt
 * MacPro5,1 and older
 
-Note: BCM943224, BCM94331, BCM94360 and BCM943602 are still fully supported by OpenCore Legacy Patcher
+Note: BCM943224, BCM94331, BCM94360 and BCM943602 are still fully supported by OCLP-Mod
 
 :::
 
@@ -98,7 +98,7 @@ The following models lost Bluetooth support in macOS Monterey due to their legac
 * MacBookPro8,1 and older
 * MacPro5,1 and older
 
-Note: Native BRCM20702 and BRCM20703 are still fully supported by OpenCore Legacy Patcher
+Note: Native BRCM20702 and BRCM20703 are still fully supported by OCLP-Mod
 
 ::: details Dropped Firmwares
 
@@ -127,7 +127,7 @@ Here are the firmwares macOS Monterey Dropped (previously located within IOBluet
 
 * Intel HD4000 iGPUs lost support
 
-By default these machines require root volume patches to gain graphics acceleration in Monterey. OpenCore Legacy Patcher supports readding support however SIP can no longer be enabled due to root patching:
+By default these machines require root volume patches to gain graphics acceleration in Monterey. OCLP-Mod supports readding support however SIP can no longer be enabled due to root patching:
 
 * Macmini6,x
 * MacBookAir5,x
@@ -140,7 +140,7 @@ By default these machines require root volume patches to gain graphics accelerat
 
 * NVIDIA Kepler dGPUs lost support
 
-By default these machines require root volume patches to gain graphics acceleration in Monterey. OpenCore Legacy Patcher supports readding support however SIP can no longer be enabled due to root patching:
+By default these machines require root volume patches to gain graphics acceleration in Monterey. OCLP-Mod supports readding support however SIP can no longer be enabled due to root patching:
 
 * MacBookPro9,1
 * MacBookPro10,1

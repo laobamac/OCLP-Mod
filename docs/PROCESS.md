@@ -1,6 +1,6 @@
 # Background process
 
-OpenCore Legacy Patcher utilizes a background process to:
+OCLP-Mod utilizes a background process to:
 - Check for mismatched configurations and warn the user (e.g. installed MacBookPro11,1 config on MacBookPro11,5)
 - Monitor the status of installed Root Patches and OpenCore
 - Ask you to install Root Patches in case they aren't detected (typically after an update)
@@ -15,5 +15,5 @@ If you decide to disable the background process, the KDK installation for each u
 ::: warning  Note:
 
 In some cases macOS may report background process being added by "Mykola Grymalyuk", this happens due to a macOS bug where sometimes the developer name who sent the app for notarization is shown instead of the application name.
-Dortania cannot do anything about this.
+laobamac cannot do anything about this.
 :::

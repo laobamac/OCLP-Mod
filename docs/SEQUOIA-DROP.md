@@ -4,7 +4,7 @@
 
 Another year, another release.
 
-This time Apple dropped surprisingly few amount of Macs. With the release of OpenCore Legacy Patcher 2.0.0, early support for macOS Sequoia has been implemented.
+This time Apple dropped surprisingly few amount of Macs. With the release of OCLP-Mod 2.0.0, early support for macOS Sequoia has been implemented.
 
 
 ## Newly dropped hardware
@@ -14,11 +14,11 @@ This time Apple dropped surprisingly few amount of Macs. With the release of Ope
 
 ## Current status
 
-OpenCore Legacy Patcher 2.0.0 will support Sequoia for most models normally supported by the Patcher, however some challenges remain. You can find information about them below.
+OCLP-Mod 2.0.0 will support Sequoia for most models normally supported by the Patcher, however some challenges remain. You can find information about them below.
 
 Unfortunately due to T2 related problems, the recently dropped MacBookAir8,x models cannot be supported at this time.
 
-[More information here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/1136)
+[More information here](https://github.com/laobamac/oclp-mod/issues/1136)
 
 ## Non-functional features
 
@@ -36,7 +36,7 @@ iPhone Mirroring requires T2 for attestation and Apple Intelligence requires an 
 
 ### Dual socket CPUs with Mac Pro 2008 and Xserve 2008
 
-Booting Sequoia on Mac Pro 2008 (MacPro3,1) or Xserve 2008 (Xserve2,1) with more than 4 cores will cause Sequoia to panic. OpenCore Legacy Patcher will automatically disable additional cores.
+Booting Sequoia on Mac Pro 2008 (MacPro3,1) or Xserve 2008 (Xserve2,1) with more than 4 cores will cause Sequoia to panic. OCLP-Mod will automatically disable additional cores.
 
 This is due to the dual socket nature of the machine, and likely some firmware/ACPI table incompatibility. 
 
@@ -85,7 +85,7 @@ However, the driver has recently been weakened starting from Sonoma, which means
 An alternative way is making sure to enable "Remote Login" in General -> Sharing before updating, which will enable SSH. 
 That means you can take control using Terminal in another system by typing `ssh username@lan-ip-address` and your password. 
 
-After that run Post Install Volume Patching by typing `/Applications/OpenCore-Patcher.app/Contents/MacOS/OpenCore-Patcher --patch_sys_vol` and finally `sudo reboot`.
+After that run Post Install Volume Patching by typing `/Applications/OCLP-Mod.app/Contents/MacOS/OCLP-Mod --patch_sys_vol` and finally `sudo reboot`.
 
 
 ![](./images/usb11-chart.png)
@@ -100,10 +100,10 @@ After that run Post Install Volume Patching by typing `/Applications/OpenCore-Pa
 * Xserve 3,1 and older
 :::
 
-[More information here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/1021)
+[More information here](https://github.com/laobamac/oclp-mod/issues/1021)
 
 ### Graphics support and issues
 This build includes both Legacy Metal and non-Metal patches for macOS Sequoia. Refer to the following links for more information about Legacy Metal and non-Metal support and their respective issues.
 
-* [Legacy Metal](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/1008)
-* [Non-Metal](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108)
+* [Legacy Metal](https://github.com/laobamac/oclp-mod/issues/1008)
+* [Non-Metal](https://github.com/laobamac/oclp-mod/issues/108)

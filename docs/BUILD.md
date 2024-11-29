@@ -4,9 +4,9 @@ Now that we have a macOS installer, let's now build our OpenCore configuration!
 
 If you haven't downloaded OpenCore Patcher yet, do so now:
 
-* [OpenCore Legacy Patcher Releases](https://github.com/dortania/Opencore-Legacy-Patcher/releases)
+* [OCLP-Mod Releases](https://github.com/laobamac/oclp-mod/releases)
 
-Next, run the `OpenCore-Patcher.app`
+Next, run the `OCLP-Mod.app`
 
 Here we'll select Build and Install OpenCore and start building:
 

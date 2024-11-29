@@ -1,6 +1,6 @@
 # Privacy Policy
 
-OpenCore Legacy Patcher may collect pseudo-anonymized data about the host system and the OpenCore Legacy Patcher application. This data is used to improve the project and to help diagnose issues. The data collected is as follows:
+OCLP-Mod may collect pseudo-anonymized data about the host system and the OCLP-Mod application. This data is used to improve the project and to help diagnose issues. The data collected is as follows:
 
 * System's UUID as a SHA1 hash
   * This is used to identify the system and to prevent duplicate reports
@@ -19,7 +19,7 @@ In the future, crash logs may also be collected to help with diagnosing issues.
 
 Users who wish to opt-out can do so either via the application's preferences or via the following command:
 ```
-defaults write com.dortania.opencore-legacy-patcher DisableCrashAndAnalyticsReporting -bool true
+defaults write com.laobamac.oclp-mod DisableCrashAndAnalyticsReporting -bool true
 ```
 
 To have your data removed, please contact us via our [Discord server](https://discord.gg/rqdPgH8xSN) and provide the UUID of your system.

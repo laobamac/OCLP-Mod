@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Script to download and generate valid OpenCorePkg folder/file structure for use with OpenCore-Legacy-Patcher
+# Script to download and generate valid OpenCorePkg folder/file structure for use with oclp-mod
 # To use:
 # - Download OpenCore-{VERSION}-{VARIANT}.zip
 #   - If no files are found, the script will download the latest version

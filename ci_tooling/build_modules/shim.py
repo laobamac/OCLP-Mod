@@ -4,18 +4,18 @@ shim.py: Generate Update Shim
 
 from pathlib import Path
 
-from opencore_legacy_patcher.volume  import generate_copy_arguments
-from opencore_legacy_patcher.support import subprocess_wrapper
+from oclp_mod.volume  import generate_copy_arguments
+from oclp_mod.support import subprocess_wrapper
 
 
 class GenerateShim:
 
     def __init__(self) -> None:
-        self._shim_path = "./ci_tooling/update_shim/OpenCore-Patcher.app"
-        self._shim_pkg  = f"{self._shim_path}/Contents/Resources/OpenCore-Patcher.pkg"
+        self._shim_path = "./ci_tooling/update_shim/OCLP-Mod.app"
+        self._shim_pkg  = f"{self._shim_path}/Contents/Resources/OCLP-Mod.pkg"
 
-        self._build_pkg   = "./dist/OpenCore-Patcher.pkg"
-        self._output_shim = "./dist/OpenCore-Patcher (Shim).app"
+        self._build_pkg   = "./dist/OCLP-Mod.pkg"
+        self._output_shim = "./dist/OCLP-Mod (Shim).app"
 
 
     def generate(self) -> None:

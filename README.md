@@ -43,7 +43,7 @@ To run the project from source, see here: [Build and run from source](./SOURCE.m
 
 * [Acidanthera](https://github.com/Acidanthera)
   * OpenCorePkg, as well as many of the core kexts and tools
-* [Dortania](https://github.com/dortania) and OpenCore Legacy Patcher contributors
-  * OpenCore-Legacy-Patcher
+* [laobamac](https://github.com/laobamac) and OCLP-Mod contributors
+  * oclp-mod
 * Apple
   * for macOS and many of the kexts, frameworks and other binaries we reimplemented into newer OSes

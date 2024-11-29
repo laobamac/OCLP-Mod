@@ -19,16 +19,16 @@ import subprocess
 from pathlib import Path
 from datetime import datetime
 
-# To allow easy importing of OpenCore Legacy Patcher's utilities
+# To allow easy importing of OCLP-Mod's utilities
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-from opencore_legacy_patcher.support import (
+from oclp_mod.support import (
     macos_installer_handler,
     network_handler,
     integrity_verification,
     utilities,
 )
-from opencore_legacy_patcher.datasets import os_data
+from oclp_mod.datasets import os_data
 
 
 _DEFAULT_PATH: str = "/Volumes/macOS Installers"

@@ -1,6 +1,6 @@
 # OpenCore Patcher Terminology
 
-With OpenCore Legacy Patcher, we use a lot of different terms to refer to hardware including `SSE4.1`, `32-Bit Firmware`, etc. This page is to help users understand what all these confusing words mean.
+With OCLP-Mod, we use a lot of different terms to refer to hardware including `SSE4.1`, `32-Bit Firmware`, etc. This page is to help users understand what all these confusing words mean.
 
 # Terminology
 

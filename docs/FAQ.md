@@ -24,11 +24,11 @@ The patcher is designed to target **macOS Big Sur 11.x to macOS Sequoia 15.x**.
 
 ## Why are the settings "not saving"?
 
-OpenCore Legacy Patcher is a config build tool and as such the user interface always reverts to safe defaults, the user interface therefore **does not** reflect the status of settings. Settings are accounted for and saved by the OpenCore building process and you will always have to build OpenCore again after settings change. 
+OCLP-Mod is a config build tool and as such the user interface always reverts to safe defaults, the user interface therefore **does not** reflect the status of settings. Settings are accounted for and saved by the OpenCore building process and you will always have to build OpenCore again after settings change. 
 
 Settings are saved to a config.plist file inside your EFI partition.
 
-In SIP settings, booted SIP is reported in text form e.g. "0x803" but the checkboxes **do not** reflect the applied settings. Refer to [SIP Settings](https://dortania.github.io/OpenCore-Legacy-Patcher/POST-INSTALL.html#sip-settings) for more information.
+In SIP settings, booted SIP is reported in text form e.g. "0x803" but the checkboxes **do not** reflect the applied settings. Refer to [SIP Settings](https://laobamac.github.io/oclp-mod/POST-INSTALL.html#sip-settings) for more information.
 
 ## Can I use the same USB install media as a universal installer?
 
@@ -50,15 +50,15 @@ If you are feeling brave and don't mind having to possibly recover your system. 
 
 It is extremely recommended to disable automatic updates (even downloading) when using OCLP, as Apple has recently changed the way automatic updates work. You can still manually initiate an update when you're ready to do so.
 
-For a related "System version mismatch" error while root patching, refer to [System version mismatch error when root patching](https://dortania.github.io/OpenCore-Legacy-Patcher/TROUBLESHOOTING.html#system-version-mismatch-error-when-root-patching) for troubleshooting.
+For a related "System version mismatch" error while root patching, refer to [System version mismatch error when root patching](https://laobamac.github.io/oclp-mod/TROUBLESHOOTING.html#system-version-mismatch-error-when-root-patching) for troubleshooting.
 
 ## Why is my system slow?
 
 This can mean many things. Firstly, newer operating systems are harder to run and can appear more slow.
 
-However, if your system is being **really** slow and you have no transparency in Dock and menubar, this typically indicates that root patches are not installed and as such there is no acceleration. Make sure to install root patches to get proper drivers and functionality. Refer to [Applying post install volume patches](https://dortania.github.io/OpenCore-Legacy-Patcher/POST-INSTALL.html#applying-post-install-volume-patches) and the [Troubleshooting](https://dortania.github.io/OpenCore-Legacy-Patcher/TROUBLESHOOTING.html) section for more information.
+However, if your system is being **really** slow and you have no transparency in Dock and menubar, this typically indicates that root patches are not installed and as such there is no acceleration. Make sure to install root patches to get proper drivers and functionality. Refer to [Applying post install volume patches](https://laobamac.github.io/oclp-mod/POST-INSTALL.html#applying-post-install-volume-patches) and the [Troubleshooting](https://laobamac.github.io/oclp-mod/TROUBLESHOOTING.html) section for more information.
 
-Patches can also break if automatic updates are enabled and an update modifies the system volume, refer to [System version mismatch error when root patching](https://dortania.github.io/OpenCore-Legacy-Patcher/TROUBLESHOOTING.html#system-version-mismatch-error-when-root-patching) for more information.
+Patches can also break if automatic updates are enabled and an update modifies the system volume, refer to [System version mismatch error when root patching](https://laobamac.github.io/oclp-mod/TROUBLESHOOTING.html#system-version-mismatch-error-when-root-patching) for more information.
 
 ## Crashing in random places
 

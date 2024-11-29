@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleIdentifier</key>
-	<string>com.dortania.USB-Map</string>
+	<string>com.laobamac.USB-Map</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -10514,7 +10514,7 @@
 			<key>model</key>
 			<string>iXacPro1,1</string>
 		</dict>
-		<key>Dortania1,1</key>
+		<key>laobamac1,1</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.apple.driver.AppleUSBHostMergeProperties</string>
@@ -10648,7 +10648,7 @@
 		</dict>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © Dortania</string>
+	<string>Copyright © laobamac</string>
 	<key>OSBundleRequired</key>
 	<string>Root</string>
 </dict>

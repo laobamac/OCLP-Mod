@@ -27,7 +27,7 @@ Technical requirements:
 * Bluetooth 4.0
 * macOS Monterey 12.4 or newer
 * iPadOS 15.4 or newer (if applicable)
-* OpenCore Legacy Patcher 0.4.3 or newer
+* OCLP-Mod 0.4.3 or newer
 
 Check the [table of models](#table-of-models) below to see whether you need to upgrade hardware and exactly what hardware is required to be changed based on the offending Macs listed. For help on how to upgrade the Wi-Fi card in older 2008-2011 models, refer to the `#hardware` channel in the [Discord server](https://discord.gg/rqdPgH8xSN) if required.
 
@@ -206,7 +206,7 @@ Ventura has dropped more models which includes all of the blacklisted Macs in qu
 
 ::: details macOS Sonoma
 
-Firstly run OpenCore Legacy Patcher.
+Firstly run OCLP-Mod.
 
 Then go to **Settings** and **SMBIOS** tab, set SMBIOS Spoof Level to **Moderate**. Set SMBIOS Spoof Model **one listed next to your native model in the table for spoofed models below.**
 
@@ -238,7 +238,7 @@ Spoofing to any model with native Sonoma support should work, but these are the 
 
 ::: details macOS Ventura
 
-Firstly run OpenCore Legacy Patcher.
+Firstly run OCLP-Mod.
 
 Then go to **Settings** and **SMBIOS** tab, set SMBIOS Spoof Level to **Moderate**. Set SMBIOS Spoof Model **one listed next to your native model in the table for spoofed models below.**
 
@@ -270,7 +270,7 @@ Spoofing to any model with native Ventura support should work, but these are the
 
 ::: details macOS Monterey
 
-Firstly, run OpenCore Legacy Patcher. Secondly, go to **Settings** then the **App** tab and tick **Allow native models**.
+Firstly, run OCLP-Mod. Secondly, go to **Settings** then the **App** tab and tick **Allow native models**.
 
 [](./images/OCLP-App-Allow-Native-Models.png)
 
