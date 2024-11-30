@@ -404,17 +404,17 @@ class SysPatchStartFrame(wx.Frame):
             return
 
         if self.constants.detected_os >= os_data.os_data.ventura:
-            gui_support.RestartHost(self.frame_modal).restart(message="驱动补丁操作成功!\nIf you were prompted to open System Settings to authorize new kexts, this can be ignored. Your system is ready once restarted.\n\n现在重启吗?")
+            gui_support.RestartHost(self.frame_modal).restart(message="驱动补丁操作成功!\n如果系统提示您打开“系统设置”以授权新的 Kext，可以忽略此项。重新启动后，您的系统已准备就绪.\n\n现在重启吗?")
             return
 
         # Create dialog box to open System Preferences -> Security and Privacy
         self.popup = wx.MessageDialog(
             self.frame_modal,
-            "We just finished installing the patches to your Root Volume!\n\nHowever, Apple requires users to manually approve the kernel extensions installed before they can be used next reboot.\n\nWould you like to open System Preferences?",
+            "我们刚刚完成了到根卷的补丁安装！\n\n但是，Apple 要求用户手动批准已安装的内核扩展，然后才能在下次重新启动之前使用它们。\n\n您要打开系统偏好设置吗？",
             "Open System Preferences?",
             wx.YES_NO | wx.ICON_INFORMATION
         )
-        self.popup.SetYesNoLabels("Open System Preferences", "Ignore")
+        self.popup.SetYesNoLabels("打开系统设置", "忽略")
         answer = self.popup.ShowModal()
         if answer == wx.ID_YES:
             output =subprocess.run(

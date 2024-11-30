@@ -196,8 +196,8 @@ class PatchSysVolume:
         ).clean_auxiliary_kc()
 
         self.constants.root_patcher_succeeded = True
-        logging.info("- Unpatching complete")
-        logging.info("\nPlease reboot the machine for patches to take effect")
+        logging.info("- Un补丁完成")
+        logging.info("\n请重启系统使补丁生效")
 
 
     def _rebuild_root_volume(self) -> bool:
@@ -222,8 +222,8 @@ class PatchSysVolume:
 
         self._unmount_root_vol()
 
-        logging.info("- Patching complete")
-        logging.info("\nPlease reboot the machine for patches to take effect")
+        logging.info("- 补丁完成")
+        logging.info("\n请重启系统使补丁生效")
 
         if self.needs_kmutil_exemptions is True:
             logging.info("Note: Apple will require you to open System Preferences -> Security to allow the new kernel extensions to be loaded")

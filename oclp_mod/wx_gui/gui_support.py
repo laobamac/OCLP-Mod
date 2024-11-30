@@ -279,7 +279,7 @@ class RestartHost:
             "重启以应用?",
             wx.YES_NO | wx.YES_DEFAULT | wx.ICON_INFORMATION
         )
-        self.popup.SetYesNoLabels("Reboot", "Ignore")
+        self.popup.SetYesNoLabels("重启", "忽略")
         answer = self.popup.ShowModal()
         if answer == wx.ID_YES:
             # Reboots with Count Down prompt (user can still dismiss if needed)
