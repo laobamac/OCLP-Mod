@@ -57,7 +57,9 @@ jobs:
           --prepare-shim
 
       - name: Prepare App for Upload
-        run: /bin/mv ./dist/OCLP-Mod.zip ./OCLP-Mod.app.zip
+        run: |
+          zip -r ./dist/OCLP-Mod.app.zip -j ./dist/OCLP-Mod.app
+          /bin/mv ./dist/OCLP-Mod.zip ./OCLP-Mod.app.zip
 
       - name: Upload App to Artifacts
         uses: actions/upload-artifact@v4
