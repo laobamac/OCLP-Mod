@@ -58,7 +58,7 @@ jobs:
 
       - name: Prepare App for Upload
         run: |
-          zip -r ./dist/OCLP-Mod.app.zip -j ./dist/OCLP-Mod.app
+          zip -r ./dist/OCLP-Mod.zip -j ./dist/OCLP-Mod.app
           /bin/mv ./dist/OCLP-Mod.zip ./OCLP-Mod.app.zip
 
       - name: Upload App to Artifacts
