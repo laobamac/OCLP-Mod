@@ -16,5 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate
-        run: pip3 install -r requirements.txt
-        run: /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 OCLP-Mod-GUI.command --validate
+        run: |
+          pip3 install -r requirements.txt
+          /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 OCLP-Mod-GUI.command --validate
+    
