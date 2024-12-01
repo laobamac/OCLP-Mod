@@ -18,5 +18,6 @@ jobs:
       - name: Validate
         run: |
           pip3 install -r requirements.txt
+          pip3 install packaging
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 OCLP-Mod-GUI.command --validate
     
