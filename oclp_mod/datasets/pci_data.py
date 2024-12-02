@@ -1437,4 +1437,7 @@ class atheros_ids:
         0x0034,  # AR94xx
         0x0032,  # AR9485
         0x0036,  # AR94xx
+        0x002B,  # AR9285
+        0x0037,  # AR9485 / AR8111
+        0x8600,  # AR958x
     ]
