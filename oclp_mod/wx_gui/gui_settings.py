@@ -1176,7 +1176,7 @@ Commit Information:
 
 
     def on_generate_serial_number(self, event: wx.Event) -> None:
-        dlg = wx.MessageDialog(self.frame_modal, "Please take caution when using 序列号覆写. This should only be used on machines that were legally obtained and require reserialization.\n\nNote: new serials are only overlayed through OpenCore and are not permanently installed into ROM.\n\nMisuse of this setting can break power management and other aspects of the OS if the system does not need spoofing\n\nlaobamac does not condone the use of our software on stolen devices.\n\nAre you certain you want to continue?", "Warning", wx.YES_NO | wx.ICON_WARNING | wx.NO_DEFAULT)
+        dlg = wx.MessageDialog(self.frame_modal, "使用序列号覆写时请小心，这只能在合法获得并需要重新覆写序列号的机器上使用。\n\n注意：新的序列号仅通过 OpenCore 覆盖，不会永久安装到 ROM 中。\n\n如果系统不需要仿冒，滥用此设置可能会破坏电源管理和操作系统。\n\nlaobamac 不容忍在被盗设备上使用OCLP-Mod！如经发现，OCLP-Mod将根据法律与MIT License追究责任。\n\n您确定要继续吗？", "警告", wx.YES_NO | wx.ICON_WARNING | wx.NO_DEFAULT)
         if dlg.ShowModal() != wx.ID_YES:
             return
 
@@ -1186,7 +1186,7 @@ Commit Information:
             self.custom_serial_number_textbox.SetValue(macserial_output[0])
             self.custom_board_serial_number_textbox.SetValue(macserial_output[1])
         else:
-            wx.MessageBox(f"Failed to generate serial number:\n\n{macserial_output}", "Error", wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(f"生成序列号失败:\n\n{macserial_output}", "错误", wx.OK | wx.ICON_ERROR)
 
 
     def on_custom_serial_number_textbox(self, event: wx.Event) -> None:

@@ -311,7 +311,7 @@ class macOSInstallerFlashFrame(wx.Frame):
             except:
                 total_bytes_written = initial_bytes_written
             bytes_written = total_bytes_written - initial_bytes_written
-            wx.CallAfter(bytes_written_label.SetLabel, f"Bytes Written: {bytes_written:.2f} MB")
+            wx.CallAfter(bytes_written_label.SetLabel, f"已写入: {bytes_written:.2f} MB")
             try:
                 bytes_written = int(bytes_written)
             except:
@@ -328,7 +328,7 @@ class macOSInstallerFlashFrame(wx.Frame):
         progress_bar_animation = gui_support.GaugePulseCallback(self.constants, progress_bar)
         progress_bar_animation.start_pulse()
 
-        bytes_written_label.SetLabel("Validating Installer Integrity...")
+        bytes_written_label.SetLabel("验证安装器...")
         error_message = self._validate_installer_pkg(disk['identifier'])
 
         progress_bar_animation.stop_pulse()
@@ -342,11 +342,11 @@ class macOSInstallerFlashFrame(wx.Frame):
         progress_bar.SetValue(estimated_size)
 
         if gui_support.CheckProperties(self.constants).host_can_build() is False:
-            wx.MessageBox("Installer created successfully! If you want to install OpenCore to this USB, you will need to change the Target Model in settings", "Successfully created the macOS installer!", wx.OK | wx.ICON_INFORMATION)
+            wx.MessageBox("安装程序创建成功！如果要将 OpenCore 安装到此 USB，则需要在设置中更改目标机型", "已成功创建 macOS 安装器！", wx.OK | wx.ICON_INFORMATION)
             self.on_return_to_main_menu()
             return
 
-        answer = wx.MessageBox("Installer created successfully, would you like to continue and Install OpenCore to this disk?", "Successfully created the macOS installer!", wx.YES_NO | wx.ICON_QUESTION)
+        answer = wx.MessageBox("安装程序创建成功，是否要继续并将 OpenCore 安装到此磁盘？", "已成功创建 macOS 安装器！", wx.YES_NO | wx.ICON_QUESTION)
         if answer != wx.YES:
             self.on_return_to_main_menu()
             return
@@ -394,7 +394,7 @@ class macOSInstallerFlashFrame(wx.Frame):
 
         if "Install media now available at" not in output:
             logging.info("Failed to create macOS installer")
-            popup = wx.MessageDialog(self, f"Failed to create macOS installer\n\nOutput: {output}\n\nError: {error}", "Error", wx.OK | wx.ICON_ERROR)
+            popup = wx.MessageDialog(self, f"创建安装器失败\n\n输出: {output}\n\n错误: {error}", "错误", wx.OK | wx.ICON_ERROR)
             popup.ShowModal()
             return False
 
