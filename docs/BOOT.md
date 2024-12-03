@@ -6,7 +6,10 @@ Reboot the machine while holding `Option` to select the EFI Boot entry with the 
 
 * This will be the Mac Boot Picker
 
-![](./images/efi-boot.png)
+
+<div align="left">
+             <img src="./images/efi-boot.png" alt="EFI boot" width="800" />
+</div>
 
 ::: details Note for Mac Pros/Xserves/iMacs with unflashed GPUs
 
@@ -27,7 +30,10 @@ Now you'll want to get a list of drive identifiers. To do so, run the following 
 diskutil list
 ```
 The command should produce a list of drives installed in your system:
-![](./images/Unflashed-Boot-1.png)
+
+<div align="left">
+             <img src="./images/Unflashed-Boot-1.png" alt="Unflashed boot" width="800" />
+</div>
 
 Keep track of the drive with the OCLP install. You will need the drive identifer for later.
 
@@ -37,7 +43,11 @@ Run the following command (Replace X with the drive number):
 ```sh
 diskutil mount diskXs1
 ```
-![](./images/Unflashed-Boot-2.png)
+
+<div align="left">
+             <img src="./images/Unflashed-Boot-2.png" alt="Unflashed boot 2" width="800" />
+</div>
+
 If everything is correct, the EFI partion should be mounted.
 
 Now you'll want to use the `bless` command to set the default boot device:
@@ -45,7 +55,10 @@ Now you'll want to use the `bless` command to set the default boot device:
 bless --mount /Volumes/EFI --setBoot --file /Volumes/EFI/System/Library/CoreServices/boot.efi
 ```
 Once the command is run, it should produce no output.
-![](./images/Unflashed-Boot-3.png)
+
+<div align="left">
+             <img src="./images/Unflashed-Boot-3.png" alt="Unflashed boot 3" width="800" />
+</div>
 
 If the command produces an output, ensure that you've typed it in correctly.
 
@@ -56,32 +69,45 @@ Now that you've loaded OpenCore, "select Install macOS":
 
 * This will be the OpenCore Picker
 
-![](./images/oc-boot.png)
+<div align="left">
+             <img src="./images/oc-boot.png" alt="OpenCore boot" width="800" />
+</div>
+
 
 You will soon reach the installer screen! If you enabled verbose mode when building OCLP, a lot of text will run across the screen. From there, it's just like any normal macOS install. For an example of how the boot process looks, see the following video:
 
-* [OCLP-Mod Boot Process](https://www.youtube.com/watch?v=AN3zsbQV_n4)
+* [OpenCore Legacy Patcher Boot Process](https://www.youtube.com/watch?v=AN3zsbQV_n4)
 
-If your Mac is looping back into the beginning of the setup after the first reboot, turn it off, start it again and hold `Option`. This time, select the option with a grey hard disk icon, it can say "macOS Installer" or the name you gave the disk during the installer process. Keep repeating this step after every reboot if necessary.
+**Important:** If you're using a brand new disk that has not been used before, choose "View -> Show all devices" in Disk Utility and format the entire disk by choosing the topmost option in the sidebar to avoid a missing internal EFI later when trying to boot OpenCore to internal disk.
 
-![](./images/oclp-stuck-firstreboot.png)
+
+<div align="left">
+             <img src="./images/wipe-disk.png" alt="Wipe disk" width="800" />
+</div>
+
+::: warning Warning for T1 Macs
+
+When installing macOS Sonoma or newer on a T1 system (2016-2017), full disk wipe will remove T1 functionality (touchbar etc). Therefore when installing, only wipe the volume containing the operating system.  
+
+<div align="left">
+             <img src="./images/wipe-volume.png" alt="WipeVolume" width="800" />
+</div>
+
+[More info here](https://dortania.github.io/OpenCore-Legacy-Patcher/TROUBLESHOOTING.html#no-t1-functionality-after-installing-sonoma-or-newer)
+
+:::
+
+
+If your Mac is looping back into the beginning of the setup after the first reboot, turn it off, start it again and hold Option. This time (after choosing `EFI Boot` first) select the option with a grey hard disk icon in the OpenCore picker. It can either say `macOS Installer` or the name you gave the disk during the installer process. Keep repeating this step after every reboot if necessary.
+
+<div align="left">
+             <img src="./images/oclp-stuck-firstreboot.png" alt="Stuck on first reboot" width="800" />
+</div>
 
 
 ::: warning
 
-**MacBookPro11,3 Note**: When booting macOS Monterey, you'll need to boot into safe mode if acceleration patches are not installed yet. [Otherwise, you'll hit a black screen due to missing NVIDIA drivers.](https://github.com/laobamac/oclp-mod/issues/522) Safe Mode can be entered by holding `Shift + Enter` when selecting macOS Monterey in OCLP's Boot Menu.
-
-:::
-
-::: warning 
-
-**T1 Macs**: When installing macOS Sonoma or newer on a T1 system, full disk wipe will remove T1 functionality (touchbar etc). Therefore when installing, only wipe the volume containing the operating system.  
-
-<div align="center">
-             <img src="./images/wipe-volume.png" alt="WipeVolume" width="800" />
-</div>
-
-[More info here](https://laobamac.github.io/oclp-mod/TROUBLESHOOTING.html#no-t1-functionality-after-installing-sonoma-or-newer)
+**MacBookPro11,3 Note**: When booting macOS Monterey, you'll need to boot into safe mode if acceleration patches are not installed yet. [Otherwise, you'll hit a black screen due to missing NVIDIA drivers.](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/522) Safe Mode can be entered by holding `Shift + Enter` when selecting macOS Monterey in OCLP's Boot Menu.
 
 :::
 

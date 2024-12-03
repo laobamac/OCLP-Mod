@@ -1,4 +1,4 @@
-# Working Around Legacy Acceleration Issues
+# Working Around Non-Metal Issues
 
 * [Broken Background Blurs](#broken-background-blurs)
 * [Downloading older non-Metal Apps](#downloading-older-non-metal-apps)
@@ -46,7 +46,11 @@ Metal is Apple's in-house graphics API that acts as a replacement for OpenGL/Ope
 
 By default with the non-Metal acceleration patches, many background blur menus may act distorted when moving a cursor over it. With 0.4.1 and newer, users can enable a new Beta Blur feature to try and resolve the issue:
 
-![](./images/OCLP-GUI-Settings-Beta-Blur.png)
+![]()
+
+<div align="left">
+             <img src="./images/OCLP-GUI-Settings-Beta-Blur.png" alt="Beta Blur settings" width="600" />
+</div>
 
 Do note that enabling beta blurs can be more demanding on slower hardware
 ## Downloading older non-Metal Apps
@@ -55,7 +59,7 @@ Many Apple apps now have direct reliance on Metal for proper functioning, howeve
 
 * [Apple Apps for Non-Metal Macs](https://archive.org/details/apple-apps-for-non-metal-macs)
 
-Note: This archive assumes that you own these copies of these apps through the Mac App Store, laobamac does not condone piracy
+Note: This archive assumes that you own these copies of these apps through the Mac App Store, Dortania does not condone piracy
 
 ## Unable to run Zoom
 
@@ -123,7 +127,7 @@ In the event Apple removes 11.2.3 from their catalogue, we've provided a mirror 
 
 ## Unable to switch GPUs on 2011 15" and 17" MacBook Pros
 
-Currently, with OCLP-Mod, GPU switching between the iGPU and dGPU is broken. The simplest way to set a specific GPU is to disable the dGPU when you wish to remain on the more power efficient iGPU.
+Currently, with OpenCore Legacy Patcher, GPU switching between the iGPU and dGPU is broken. The simplest way to set a specific GPU is to disable the dGPU when you wish to remain on the more power efficient iGPU.
 
 The best way to achieve this is to boot to Recovery (or Single User Mode if the dGPU refuses to function at all) and run the following command:
 
@@ -139,7 +143,7 @@ Note: This driver only provides partial support in macOS, full graphics accelera
 
 ## Erratic Colours on ATI TeraScale 2 GPUs (HD5000/HD6000)
 
-Resolved with OCLP-Mod v0.4.2
+Resolved with OpenCore Legacy Patcher v0.4.2
 
 ::: details Legacy Fix (prior to 0.4.2)
 
@@ -162,7 +166,7 @@ The following tool can be used to work-around this issue:
 
 ## Cannot Login on 2011 15" and 17" MacBook Pros
 
-By default, OCLP-Mod will assume MacBookPro8,2/3 have a faulty dGPU and disable acceleration. This is the safest option for most users as enabling dGPU acceleration on faulty Macs will result in failed booting.
+By default, OpenCore Legacy Patcher will assume MacBookPro8,2/3 have a faulty dGPU and disable acceleration. This is the safest option for most users as enabling dGPU acceleration on faulty Macs will result in failed booting.
 
 However, if your machine does not have the dGPU disabled via NVRAM, you'll experience a login loop. To work around this is quite simple:
 
@@ -170,7 +174,7 @@ However, if your machine does not have the dGPU disabled via NVRAM, you'll exper
     * Press Cmd+S in OpenCore's menu when you turn the Mac on
 2. When the command line prompt appears, enter the dGPU disabler argument (at the bottom)
 3. Reboot and patched macOS should work normally
-4. If you still want to use the dGPU, run OCLP-Mod and enable TS2 Acceleration from settings. Go to `Patcher Settings -> Developer Settings -> Set TeraScale 2 Accel`, then root patch again.
+4. If you still want to use the dGPU, run OpenCore Legacy Patcher and enable TS2 Acceleration from settings. Go to `Patcher Settings -> Developer Settings -> Set TeraScale 2 Accel`, then root patch again.
 5. Either Reset NVRAM or set `gpu-power-prefs` to zeros to re-enable the dGPU
 
 ```sh

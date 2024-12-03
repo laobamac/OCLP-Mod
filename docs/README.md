@@ -1,7 +1,7 @@
 ---
 home: true
 heroImage: /homepage.png
-heroText: OCLP-Mod
+heroText: OpenCore Legacy Patcher
 actionText: Getting Started→
 actionLink: START.md
 
@@ -12,8 +12,8 @@ meta:
 features:
 # - title: Built with security in mind
 #   details: Supporting System Integrity Protection(SIP), FileVault 2, .im4m Secure Boot and Vaulting. We make an effort to ensure your system is as secure as possible.
-- title: Native OTA updates
-  details: Install updates the moment they come out, with native System Preferences support, just like a supported Mac.
+- title: Near-native OTA updates.
+  details: Install updates from System Settings, with just couple more additional steps compared to native.
 - title: Zero firmware patching
   details: Using the capabilities of the OpenCore boot manager, our protocol upgrades are done in memory and are never permanent.
 - title: Supporting more hardware
@@ -22,5 +22,5 @@ features:
   details: Unlock Sidecar, AirPlay to Mac, Night Shift, and Universal Control, even on natively supported models!
 - title: A helpful community
   details: Whether it's getting started or learning the specifics, you can always find answers with our amazing community of tinkerers, developers, and dreamers.
-footer: Copyright © laobamac 2020-2024
+footer: Copyright © Dortania 2020-2024
 ---

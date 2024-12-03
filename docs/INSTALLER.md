@@ -1,14 +1,15 @@
-# Download and build macOS Installers
+# Creating macOS Installers
 
-This document is centered around downloading and writing the macOS installer to a USB drive. If you're already familiar with how to do this, you can skip this section.
+This document is centered around downloading and writing the macOS installer to a USB drive. If you're planning to install macOS on other system than you're currently running, it is recommended to choose the Mac model in Settings now before proceeding, so that automatic root patching works correctly later on.
 
 * Note: A 32GB drive is recommended, later versions of Sonoma and Sequoia cannot fit installer and patches to a 16GB disk. 16GB drive may work for older versions.
+
 
 ## Downloading the installer
 
 To start off, you'll want to grab the app:
 
-* [OCLP-Mod Release Apps](https://github.com/laobamac/oclp-mod/releases)
+* [OpenCore Legacy Patcher Release Apps](https://github.com/dortania/OpenCore-Legacy-Patcher/releases)
 
 Once downloaded, open the app and you should be greeted by the main menu. 
 
@@ -29,7 +30,8 @@ Once the download is finished, you can proceed to write the installer onto a USB
 
 | Select Downloaded Installer | Select disk to format |
 | :--- | :--- |
-| ![](./images/OCLP-GUI-Installer-Select-Local-Installer.png) | ![](./images/OCLP-GUI-Installer-Format-USB.png) |
+| <img src="./images/OCLP-GUI-Installer-Select-Local-Installer.png" alt="Select local installer" width="600" /> | <img src="./images/OCLP-GUI-Installer-Format-USB.png" alt="Select disk to format" width="600" /> |
+
 
 Now the patcher will start the installer flashing!
 

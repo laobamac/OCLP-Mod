@@ -10,7 +10,10 @@ The easiest way to debug yourself is via Patcher Settings. Here there are many d
 * "Enable OpenCore DEBUG"
 * "Enable Kext DEBUG"
 
-![](./images/ocdebugimage.png)
+<div align="left">
+             <img src="./images/ocdebugimage.png" alt="OCLP debug" width="600" />
+</div>
+
 
 When you've enabled these 3 options, rebuild OpenCore and install to your drive. This will provide much greater debug information as well as write logs to the EFI Partition.
 
@@ -18,11 +21,15 @@ When you've enabled these 3 options, rebuild OpenCore and install to your drive.
 
 With "Enable OpenCore DEBUG" set, on every boot there will be a .txt file generated on the EFI Partition. To grab these logs, [download and run MountEFI](https://github.com/corpnewt/MountEFI):
 
-![](./images/mountefi.png)
+<div align="left">
+             <img src="./images/mountefi.png" alt="Mount EFI" width="600" />
+</div>
 
 Once you've mounted the EFI Partition of the drive you have macOS on, you should see some nice logs:
 
-![](./images/logs-efi.png)
+<div align="left">
+             <img src="./images/logs-efi.png" alt="Mount EFI" width="800" />
+</div>
 
 ## Obtaining Kernel logs from macOS
 
@@ -40,7 +47,7 @@ From there, you'll have a log on your desktop.
 Currently issues have been disabled due to [current events](ISSUES-HOLD.md). You can continue to receive support in the [OpenCore Patcher Paradise Discord Server](https://discord.gg/rqdPgH8xSN), where there are active members of the community available.
 :::
 
-Now that you have proper logs, you can now [file issues with us](https://github.com/laobamac/oclp-mod/issues). This is a reminder to include the following info:
+Now that you have proper logs, you can now [file issues with us](https://github.com/dortania/OpenCore-Legacy-Patcher/issues). This is a reminder to include the following info:
 
 * Model that you're patching for (ie. MacBookPro10,1)
 * Target OS (ie. macOS 11.2.3)

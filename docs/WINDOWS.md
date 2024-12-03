@@ -3,6 +3,13 @@
 Modern versions of Windows officially support two types of firmware: UEFI and BIOS. Users may want to boot Windows through the OCLP Bootpicker, but only UEFI Installations of Windows will show up in the OCLP Bootpicker.
 Many older Macs do not "officially" support UEFI Windows installations, leading to installation failures and strange behaviour, but OCLP can be used to prevent almost all of these issues.
 
+::: warning
+
+When booting Windows with OpenCore, it's highly recommended to create a new 200MB **MS-DOS (FAT)** partition in Disk Utility to install OpenCore in. This will prevent Windows from overwriting OpenCore with its own bootloader in the EFI partition and causing boot issues.
+
+::::
+
+
 ## Minimum Requirements
 
 This guide will focus on the installation of modern Windows (10/11) without using Boot Camp Assistant.
@@ -49,7 +56,7 @@ Incorrectly erasing your drive can lead to data loss! Please verify that you are
 
 If you plan to use the same hard drive for macOS and Windows, we recommend creating a dedicated partition just for OpenCore. This lets Windows have the ESP to itself and OpenCore can stay within it's own bubble.
 
-Recommended size is 200MB and the partition format **must** be FAT32 for OpenCore to operate correctly. You will next want to install OpenCore onto the new partition, either moving from the ESP with [MountEFI](https://github.com/corpnewt/MountEFI) or rerunning the OCLP-Mod.app
+Recommended size is 200MB and the partition format **must** be FAT32 for OpenCore to operate correctly. You will next want to install OpenCore onto the new partition, either moving from the ESP with [MountEFI](https://github.com/corpnewt/MountEFI) or rerunning the OpenCore-Patcher.app
 
 * Note 1: For machines with dedicated drives for Windows, having different partitions for OpenCore is not required.
 * Note 2: Having different partitions for OpenCore is not required if the Windows boot files detected by the stock Bootpicker are removed. See "Removing the Windows option from the stock bootpicker" for further information.

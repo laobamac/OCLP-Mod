@@ -1,4 +1,4 @@
-# Explaining the patches in OCLP-Mod
+# Explaining the patches in OpenCore Legacy Patcher
 
 In our patcher, there are numerous patches used to ensure a stable system. Here, we're going to go over what patches are used and why we recommend or even require them.
 
@@ -8,9 +8,9 @@ In our patcher, there are numerous patches used to ensure a stable system. Here,
 
 ## OpenCore Settings
 
-Below is a rundown of the main logic that OCLP-Mod uses to gain native support in macOS. Note that OpenCore's configuration is documented within [OpenCorePkg](https://github.com/acidanthera/OpenCorePkg) as well as on an online version provided by us:
+Below is a rundown of the main logic that OpenCore Legacy Patcher uses to gain native support in macOS. Note that OpenCore's configuration is documented within [OpenCorePkg](https://github.com/acidanthera/OpenCorePkg) as well as on an online version provided by us:
 
-* [OpenCorePkg Online Docs](https://laobamac.github.io/docs/latest/Configuration.html)
+* [OpenCorePkg Online Docs](https://dortania.github.io/docs/latest/Configuration.html)
 
 ::: details Configuration Explanation
 
@@ -155,7 +155,7 @@ Below is a rundown of the main logic that OCLP-Mod uses to gain native support i
 
 ## Injected Kext
 
-Below is an explanation of what Kexts OCLP-Mod will inject into memory on boot-up.
+Below is an explanation of what Kexts OpenCore Legacy Patcher will inject into memory on boot-up.
 
 ::: details Injected Kext Explanation
 

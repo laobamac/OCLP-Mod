@@ -9,7 +9,7 @@
 
 Once you've installed macOS through OpenCore, you can boot up and go through the regular install process. To boot without the USB drive plugged in is quite simple:
 
-* Download OCLP-Mod
+* Download OpenCore Legacy Patcher
 * Change Patcher settings as you'd like
 * Build OpenCore again
 * Install OpenCore to internal drive
@@ -17,12 +17,14 @@ Once you've installed macOS through OpenCore, you can boot up and go through the
 
 And voila! No more USB drive required.
 
+If you're having issues with undetected internal disk, refer to [Internal disk missing when building OpenCore](https://dortania.github.io/OpenCore-Legacy-Patcher/TROUBLESHOOTING.html#internal-disk-missing-when-building-opencore) for troubleshooting.
+
 ## Booting seamlessly without Boot Picker
 
 To do this, run the OpenCore Patcher and head to Patcher Settings, then uncheck "Show OpenCore Bootpicker" on the Build tab:
 
 
-<div align="center">
+<div align="left">
              <img src="./images/OCLP-GUI-Settings-ShowPicker.png" alt="GUI Settings ShowPicker" width="600" />
 </div>
 
@@ -31,7 +33,9 @@ Once you've toggled it off, build your OpenCore EFI once again and install to yo
 
 ## SIP settings
 
-SIP, or System Integrity Protection, needs to be lowered on systems where root patching is required to patch data on disk. This will vary between OS versions and the model in question. OCLP by default will determine the proper SIP options for the OS version and Mac model, in most cases the user has no need to touch these settings. However, this part explains how the SIP settings work in OCLP, where lowered SIP is needed and where full SIP could be enabled.
+SIP, or System Integrity Protection, needs to be lowered on systems where root patching is required to patch data on disk. This will vary between OS versions and the model in question. 
+
+OCLP by default will determine the proper SIP options for the OS version and Mac model, in most cases the user has no need to touch these settings.
 
 :::warning
 
@@ -39,12 +43,16 @@ If you're unsure whether you should change the SIP settings, leave them as-is. S
 
 :::
 
-SIP settings can be accessed from the Security tab shown in the images. To change SIP settings, make the changes here, return in main menu and rebuild OpenCore using the first option.
-
-| SIP Enabled | SIP Lowered (Root Patching) | SIP Disabled |
+| SIP Enabled | SIP Lowered (OCLP default) | SIP Disabled |
 | :--- | :--- | :--- |
 | ![](./images/OCLP-GUI-Settings-SIP-Enabled.png) | ![](./images/OCLP-GUI-Settings-SIP-Root-Patch.png) | ![](./images/OCLP-GUI-Settings-SIP-Disabled.png) |
 
+
+The guide in the dropdown below explains how the SIP settings work in OCLP, where lowered SIP is needed and where full SIP could be enabled.
+
+::: details Configuring SIP manually (click to expand)
+
+SIP settings can be accessed from the Security tab shown in the images. To change SIP settings, make the changes here, return in main menu and rebuild OpenCore using the first option.
 
 In the cases where SIP can be enabled, manually enabling it is needed. 
 
@@ -65,7 +73,20 @@ Pre-2012 systems, also known as "non-Metal", as well as NVIDIA Kepler and Intel 
 All Metal capable systems from 2012 onward (incl. NVIDIA Kepler and Intel HD 4000) as well as Mac Pros with upgraded GPU can run with full SIP enabled. 
 Non-Metal systems still require lowered SIP.
 
+:::
+
 ## Applying Post Install Volume Patches
+
+Post Install Volume Patches, sometimes also called root patches, are patches that have to be installed to disk for some older Macs to gain back functionality.
+
+OCLP will automatically root patch your system during a first time install **if the USB install media was created within OCLP and the proper model was selected before installer creation.** Users will also be prompted to install these patches after macOS updates or whenever patches are not detected on the system. We recommend rebuilding OpenCore with the latest version of OCLP to take advantage of these new features.
+
+Users can also see whether applicable patches have been installed, date and version the system was root patched with in the Post-Install Menu.
+
+- **Note:** In some cases OCLP may require packages to be obtained from the internet, such as KDK or MetallibSupprtPkg if they do not already exist on the system. In these cases OCLP may only install the WiFi driver on first patch run to ensure you can connect to the internet, which means no graphics acceleration 
+  after reboot. Root patching has to be ran again manually to install the rest of the required patches after internet connection is established to obtain the required packages.
+
+   Check the affected systems and GPUs from the warnings below.
 
 :::warning
 
@@ -73,36 +94,27 @@ If you need to use Migration Assistant to bring over data to your new macOS inst
 
 Using Migration Assistant while patches are installed can lead to an unbootable system, requiring a reinstall of macOS.
 
+For more information on how to restore a Time Machine backup, [refer to the guide here.](https://dortania.github.io/OpenCore-Legacy-Patcher/TIMEMACHINE.html)
+
 :::
-
-Post Install Volume Patches, sometimes also called root patches, are patches that have to be installed to disk for some older Macs to gain back functionality.
-
-OCLP will automatically root patch your system during a first time install **if the USB install media was created within OCLP.** Users will also be prompted to install these patches after macOS updates or whenever patches are not detected on the system. We recommend rebuilding OpenCore with the latest version of OCLP to take advantage of these new features.
-
-Users can also see whether applicable patches have been installed, date and version the system was root patched with in the Post-Install Menu.
 
 | Automatic install prompt | Status |
 | :--- | :--- |
 | ![](./images/OCLP-GUI-root-patch-update.png) | ![](./images/OCLP-GUI-Root-Patch-Status.png)  |
 
-
-
-### Running Post Install patches manually
-
-If you're using OCLP v0.4.3 or earlier, or need to run the patcher manually, you can do so with the app. There is no harm in trying to run the Patcher, as without compatible hardware, nothing will be done. You can see below on whether your hardware needs root volume patching or not.
-
-There is also an option to remove root patches, which may be required in some situations, such as switching GPUs in Mac Pros or using Migration Assistant.
+You can install and revert Root Patching manually from the app. 
 
 | Listing Patches | Patching Finished |
 | :--- | :--- |
 | ![](./images/OCLP-GUI-Root-Patch.png) | ![](./images/OCLP-GUI-Root-Patch-Finished.png) |
 
 
+
 :::warning
 
-With macOS Sequoia, MetallibSupportPkg is required to be downloaded for all 3802 systems. OCLP will handle this as long as you're connected to the internet.
+With macOS Sequoia, MetallibSupportPkg is required to be downloaded for all 3802-based systems. OCLP will handle this as long as you're connected to the internet.
 
-Such systems include:
+3802 based GPUs:
 
 * NVIDIA
     * Kepler (GTX 600 - 700 series)
@@ -127,7 +139,7 @@ Machines that require this are those with AMD Metal dGPUs:
 
 :::
 
-Below entries represent GPUs no longer natively supported, ie. requiring root volume patching with OCLP-Mod:
+Below entries represent GPUs no longer natively supported, ie. requiring root volume patching with OpenCore Legacy Patcher:
 
 :::details GPUs requiring patching in different macOS versions
 

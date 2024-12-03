@@ -3,7 +3,7 @@ const {
 } = require('../package')
 
 module.exports = {
-    title: 'OCLP-Mod',
+    title: 'OpenCore Legacy Patcher',
     head: [
         ['meta', {
             name: 'theme-color',
@@ -22,7 +22,7 @@ module.exports = {
             href: "/styles/website.css"
         },]
     ],
-    base: '/oclp-mod/',
+    base: '/OpenCore-Legacy-Patcher/',
 
     watch: {
         $page(newPage, oldPage) {
@@ -55,7 +55,7 @@ module.exports = {
 
     themeConfig: {
         lastUpdated: true,
-        repo: 'https://github.com/laobamac/oclp-mod/',
+        repo: 'https://github.com/dortania/OpenCore-Legacy-Patcher/',
         docsDir: 'docs',
         docsBranch: 'main',
         editLinks: true,
@@ -69,77 +69,63 @@ module.exports = {
             children: [
                 'START',
                 'MODELS',
+                'FAQ',
             ]
 
         },
         {
-            title: 'Setting up',
+            title: 'How to install',
             collapsable: false,
             sidebarDepth: 1,
             children: [
                 'INSTALLER',
-                'BUILD',
-            ]
-
-        },
-        {
-            title: 'Installation',
-            collapsable: false,
-            sidebarDepth: 1,
-            children: [
-                'BOOT',
+                'BUILD',                
+		'BOOT',
                 'POST-INSTALL',
             ]
 
         },
         {
-            title: 'macOS Sequoia',
+            title: 'macOS Support',
             collapsable: false,
             sidebarDepth: 1,
             children: [
                 'SEQUOIA-DROP',
+		'SONOMA-DROP',
+		'VENTURA-DROP',
+		'MONTEREY-DROP',
             ]
         },
-        {
-            title: 'macOS Sonoma',
+ {
+            title: 'Application',
             collapsable: false,
             sidebarDepth: 1,
             children: [
-                'SONOMA-DROP',
+                'UPDATE',
+                'UNINSTALL',
+                'PROCESS',
             ]
         },
-
-        {
-            title: 'macOS Ventura',
+	{
+            title: 'Troubleshooting',
             collapsable: false,
             sidebarDepth: 1,
             children: [
-                'VENTURA-DROP',
+		'TROUBLESHOOTING',
+                'ACCEL',
+		'DEBUG',
+                
             ]
-        },
-
-        {
-            title: 'macOS Monterey',
-            collapsable: false,
-            sidebarDepth: 1,
-            children: [
-                'MONTEREY-DROP',
-            ]
-        },
+        },	  
         {
             title: 'Misc',
             collapsable: false,
             sidebarDepth: 1,
             children: [
-                'ACCEL',
-                'TROUBLESHOOTING',
-                'DEBUG',
-                'UPDATE',
-                'UNINSTALL',
+		'TIMEMACHINE',
                 'ICNS',
                 'WINDOWS',
                 'UNIVERSALCONTROL',
-                'PROCESS',
             ]
         },
         {
