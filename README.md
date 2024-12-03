@@ -1,5 +1,5 @@
 <div align="center">
-             <img src="docs/images/OC-Patcher.png" alt="OpenCore Patcher Logo" width="256" />
+             <img src="docs/images/OC-Mod.png" alt="OCLP-Mod Logo" width="256" />
              <h1>OCLP-Mod</h1>
 </div>
 
