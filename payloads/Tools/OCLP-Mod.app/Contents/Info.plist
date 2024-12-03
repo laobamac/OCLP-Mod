@@ -7,9 +7,9 @@
 	<key>CFBundleExecutable</key>
 	<string>OCLP-Mod</string>
 	<key>CFBundleIconFile</key>
-	<string>OC-Patcher.icns</string>
+	<string>AppIcon.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.laobamac.oclp-mod-helper</string>
+	<string>com.laobamac.oclp-mod</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -21,8 +21,10 @@
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2020-2023 laobamac</string>
-	<key>LSUIElement</key>
-	<true/>
+	<string>Copyright © 2020-2024 laobamac</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>NSRequiresAquaSystemAppearance</key>
+	<false/>
 </dict>
 </plist>
