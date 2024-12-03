@@ -1,6 +1,10 @@
 # OCLP-Mod changelog
 
 ## 2.4.4
+- 更新至 OpenCore 1.0.3
+- 添加对AR9485/AR8111/AR9285的支持
+- 修复SN的生成
+- 启用Github Action，以后可在Actions获取最新编译版本（开发测试！生产环境不要使用！）
 
 ## 2.4.3
 - 支持直接运行应用程序（.app）！不再需要pkg安装了！🎉

@@ -49,6 +49,17 @@ UNUSED_DRIVERS = [
     "Dhcp4Dxe.efi",
     "ArpDxe.efi",
     "FirmwareSettingsEntry.efi",
+    "UefiPxeBcDxe.efi",
+    "RngDxe.efi",
+    "TlsDxe.efi",
+    "Hash2DxeCrypto.efi",
+    "Dhcp6Dxe.efi",
+    "Ip6Dxe.efi",
+    "Mtftp4Dxe.efi",
+    "Mtftp6Dxe.efi",
+    "RamDiskDxe.efi",
+    "Udp6Dxe.efi",
+    "OpenNetworkBoot.efi",
 ]
 
 UNUSED_TOOLS = [
@@ -172,7 +183,7 @@ class GenerateOpenCore:
         print(f"   Getting latest {variant} download url...")
         for asset in latest_release["assets"]:
             if asset["name"].endswith(f"{variant}.zip"):
-                download_url = asset["browser_download_url"]
+                download_url = "https://download.simplehac.cn/" + asset["browser_download_url"]
                 print(f"   Download url: {download_url}")
                 break
 
