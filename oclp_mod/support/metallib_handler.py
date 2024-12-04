@@ -16,7 +16,7 @@ from .. import constants
 from ..datasets import os_data
 
 
-METALLIB_INSTALL_PATH: str  = "/Library/Application Support/laobamac/MetallibSupportPkg"
+METALLIB_INSTALL_PATH: str  = "/Library/Application Support/Dortania/MetallibSupportPkg"
 METALLIB_API_LINK:     str  = "https://oclpapi.simplehac.cn/MetallibSupportPkg/manifest.json"
 
 METALLIB_ASSET_LIST:   list = None
