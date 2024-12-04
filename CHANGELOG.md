@@ -1,5 +1,10 @@
 # OCLP-Mod changelog
 
+## 2.4.6
+
+## 2.4.5
+- 修补根修补期间的metallib_install_handle句柄。
+
 ## 2.4.4
 - 更新至 OpenCore 1.0.3
 - 添加对AR9485/AR8111/AR9285的支持
