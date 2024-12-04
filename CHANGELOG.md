@@ -3,7 +3,8 @@
 ## 2.4.6
 
 ## 2.4.5
-- 修补根修补期间的metallib_install_handle句柄。
+- 修复根修补期间的metallib_install_handle句柄。
+- 修复KDK_down_handle错误的尾缀名（*.dmg）。
 
 ## 2.4.4
 - 更新至 OpenCore 1.0.3

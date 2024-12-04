@@ -155,7 +155,7 @@ class DownloadKDKFrame(wx.Frame):
     def on_download(self, event):
         selected_data = self.list_ctrl.get_selected_data()
         if selected_data:
-            with wx.FileDialog(self, "保存文件", wildcard="PKG Files (*.pkg)|*.pkg", style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT) as dlg:
+            with wx.FileDialog(self, "保存文件", wildcard="PKG Files (*.dmg)|*.dmg", style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT) as dlg:
                 if dlg.ShowModal() == wx.ID_CANCEL:
                     return
                 file_path = dlg.GetPath()
@@ -163,4 +163,4 @@ class DownloadKDKFrame(wx.Frame):
             DPF_Window = DownloadProgressFrame(self, title="下载进度", url=url, file_path=file_path)
             DPF_Window.Show()
         else:
-            wx.MessageBox("请选择一个MetalLib版本进行下载", "提示", wx.OK | wx.ICON_INFORMATION)
+            wx.MessageBox("请选择一个KDK版本进行下载", "提示", wx.OK | wx.ICON_INFORMATION)
