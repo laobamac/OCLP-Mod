@@ -41,7 +41,7 @@ class NetworkUtilities:
         self.url: str = url
 
         if self.url is None:
-            self.url = "https://api.gayhub.ink"
+            self.url = "https://oclpapi.simplehac.cn/"
 
 
     def verify_network_connection(self) -> bool:

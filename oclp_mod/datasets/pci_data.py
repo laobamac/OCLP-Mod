@@ -1428,11 +1428,10 @@ class syskonnect_ids:
 
 class atheros_ids:
     AtherosWifi = [
-        # AirPortAtheros40 IDs
         0x0030,  # AR93xx
         0x002A,  # AR928X
         0x001C,  # AR242x / AR542x
-        0x0023,  # AR5416 - never used by Apple
+        0x0023,  # AR5416
         0x0024,  # AR5418
         0x0034,  # AR94xx
         0x0032,  # AR9485
