@@ -100,8 +100,16 @@ class macOSInstallerDownloadFrame(wx.Frame):
         existing_button.Bind(wx.EVT_BUTTON, self.on_existing)
         existing_button.Centre(wx.HORIZONTAL)
 
+        shdmg_button = wx.Button(frame, label="下载三分区镜像（.dmg）", pos=(-1, existing_button.GetPosition()[1] + existing_button.GetSize()[1] - 5), size=(200, 30))
+        shdmg_button.Bind(wx.EVT_BUTTON, self.on_downdmg)
+        shdmg_button.Centre(wx.HORIZONTAL)
+
+        fldmg_button = wx.Button(frame, label="烧录DMG镜像（.dmg）", pos=(-1, shdmg_button.GetPosition()[1] + shdmg_button.GetSize()[1] - 5), size=(200, 30))
+        fldmg_button.Bind(wx.EVT_BUTTON, self.on_flashdmg)
+        fldmg_button.Centre(wx.HORIZONTAL)
+
         # Button: Return to Main Menu
-        return_button = wx.Button(frame, label="返回", pos=(-1, existing_button.GetPosition()[1] + existing_button.GetSize()[1] + 5), size=(150, 30))
+        return_button = wx.Button(frame, label="返回", pos=(-1, fldmg_button.GetPosition()[1] + fldmg_button.GetSize()[1] + 5), size=(150, 30))
         return_button.Bind(wx.EVT_BUTTON, self.on_return)
         return_button.Centre(wx.HORIZONTAL)
 
@@ -307,7 +315,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
                 if result == wx.ID_CANCEL:
                     return
                 elif result == wx.ID_YES:
-                    webbrowser.open("https://github.com/laobamac/oclp-mod/issues/1021")
+                    webbrowser.open("https://github.com/Dortania/OpenCore-Legacy-Patcher/issues/1021")
                     return
 
             host_space = utilities.get_free_space()
@@ -474,7 +482,18 @@ class macOSInstallerDownloadFrame(wx.Frame):
         for frame in frames:
             if frame:
                 frame.Destroy()
+    
+    def on_downdmg(self, event: wx.Event) -> None:
+        '''
+        Download SimpleHac's DMG
+        '''
+        return()
 
+    def on_flashdmg(self, event: wx.Event) -> None:
+        '''
+        Flash SimpleHac's DMG
+        '''
+        return()
 
     def on_return(self, event: wx.Event) -> None:
         """
