@@ -1,5 +1,8 @@
 # OCLP-Mod changelog
 
+## 2.4.7
+- 添加AX1775*/AX1790*/BE20*/BE401/BE1750*在Sequoia的支持
+
 ## 2.4.6
 
 ## 2.4.5

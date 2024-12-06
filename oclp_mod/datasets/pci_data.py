@@ -1355,6 +1355,8 @@ class intelwl_ids:
         0x7F70,
         # Intel AX211 2x2
         0x7E40,
+        # Intel Wi-Fi 7(802.11be) AX1775*/AX1790*/BE20*/BE401/BE1750* 2x2
+        0x272B,
     ]
 
 class aquantia_ids:
