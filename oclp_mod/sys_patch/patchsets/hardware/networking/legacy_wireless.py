@@ -34,6 +34,11 @@ class LegacyWireless(BaseHardware):
            and self._computer.wifi.chipset in [device_probe.Broadcom.Chipsets.AirPortBrcm4331, device_probe.Broadcom.Chipsets.AirPortBrcm43224]
        ):
            return f"{self.hardware_variant()}: Broadcom无线网卡"
+       elif (
+           isinstance(self._computer.wifi, device_probe.Realtek)
+           and self._computer.wifi.chipset == device_probe.Realtek.Chipsets.RealtekRTL88xx
+       ):
+           return f"{self.hardware_variant()}: Realtek无线网卡"
        else:
            return f"{self.hardware_variant()}: 未知无线网卡"
 
@@ -51,6 +56,12 @@ class LegacyWireless(BaseHardware):
         if (
             isinstance(self._computer.wifi, device_probe.Atheros)
             and self._computer.wifi.chipset == device_probe.Atheros.Chipsets.AirPortAtheros40
+        ):
+            return True
+        
+        if (
+            isinstance(self._computer.wifi, device_probe.Realtek)
+            and self._computer.wifi.chipset == device_probe.Realtek.Chipsets.RealtekRTL88xx
         ):
             return True
 

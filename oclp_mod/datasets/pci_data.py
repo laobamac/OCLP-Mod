@@ -1218,6 +1218,22 @@ class broadcom_ids:
         0x1686,  # BCM57766
     ]
 
+class rtlwl_ids:
+    RealtekWirelessIDs= [
+    # Realtek RTL8188C_8171
+    0x8171,
+    # Realtek RTL8188C_8172
+    0x8172,
+    # Realtek RTL8188C_8173
+    0x8173,
+    # Realtek RTL8188C_8175
+    0x8175,
+    # Realtek RTL8188C_8176
+    0x8176,
+    ############
+    0xC822, #Realtel RTL8822CE
+    ]
+
 class intelwl_ids:
     IntelWirelessIDs = [
         # Dual Band Wireless AC 7260

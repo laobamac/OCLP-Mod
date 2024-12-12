@@ -583,6 +583,23 @@ class Atheros(WirelessCard):
         else:
             self.chipset = Atheros.Chipsets.Unknown
 
+@dataclass
+class Realtek(WirelessCard):
+    VENDOR_ID: ClassVar[int] = 0x10EC
+
+    class Chipsets(enum.Enum):
+        # pylint: disable=invalid-name
+        # Well there's only one model but
+        RealtekRTL88xx = "RealtekRTL88xx supported"
+        Unknown = "Unknown"
+
+    chipset: Chipsets = field(init=False)
+
+    def detect_chipset(self):
+        if self.device_id in pci_data.rtlwl_ids.RealtekWirelessIDs:
+            self.chipset = Realtek.Chipsets.RealtekRTL88xx
+        else:
+            self.chipset = Realtek.Chipsets.Unknown
 
 @dataclass
 class Aquantia(EthernetController):

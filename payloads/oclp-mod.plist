@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>OCLP-Mod</key>
+	<string>v2.4.7</string>
+	<key>PatcherSupportPkg</key>
+	<string>v1.8.4</string>
+	<key>Time Patched</key>
+	<string>December 09, 2024 @ 23:56:29</string>
+	<key>Commit URL</key>
+	<string></string>
+	<key>Kernel Debug Kit Used</key>
+	<string>Not applicable</string>
+	<key>Metal Library Used</key>
+	<string>Not applicable</string>
+	<key>OS Version</key>
+	<string>24.2 (24C5089c)</string>
+	<key>Custom Signature</key>
+	<true/>
+	<key>Legacy Wireless</key>
+	<dict>
+		<key>Overwrite System Volume</key>
+		<dict>
+			<key>/usr/libexec</key>
+			<dict>
+				<key>airportd</key>
+				<string>11.7.10-Sandbox</string>
+			</dict>
+			<key>/System/Library/CoreServices</key>
+			<dict>
+				<key>WiFiAgent.app</key>
+				<string>11.7.10</string>
+			</dict>
+		</dict>
+		<key>Overwrite Data Volume</key>
+		<dict>
+			<key>/Library/Application Support/SkyLightPlugins</key>
+			<dict/>
+		</dict>
+	</dict>
+	<key>Legacy Wireless Extended</key>
+	<dict>
+		<key>Overwrite System Volume</key>
+		<dict>
+			<key>/usr/libexec</key>
+			<dict>
+				<key>wps</key>
+				<string>12.7.2</string>
+				<key>wifip2pd</key>
+				<string>12.7.2</string>
+			</dict>
+		</dict>
+		<key>Merge System Volume</key>
+		<dict>
+			<key>/System/Library/Frameworks</key>
+			<dict>
+				<key>CoreWLAN.framework</key>
+				<string>12.7.2</string>
+			</dict>
+			<key>/System/Library/PrivateFrameworks</key>
+			<dict>
+				<key>CoreWiFi.framework</key>
+				<string>12.7.2</string>
+				<key>IO80211.framework</key>
+				<string>12.7.2</string>
+				<key>WiFiPeerToPeer.framework</key>
+				<string>12.7.2</string>
+			</dict>
+		</dict>
+	</dict>
+</dict>
+</plist>
