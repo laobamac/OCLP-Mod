@@ -124,7 +124,7 @@ class PatcherValidation:
             minor_kernel (int): Minor kernel version
         """
 
-        patch_type_merge_exempt     = ["MechanismPlugins"]
+        patch_type_merge_exempt     = ["MechanismPlugins", "ModulePlugins"]
         patch_type_overwrite_exempt = []
 
         patchset = HardwarePatchsetDetection(self.constants, xnu_major=major_kernel, xnu_minor=minor_kernel, validation=True).patches
@@ -162,11 +162,11 @@ class PatcherValidation:
                                     self.active_patchset_files.append(source_file)
 
         logging.info(f"Validating against Darwin {major_kernel}.{minor_kernel}")
-        if not sys_patch_helpers.SysPatchHelpers(self.constants).generate_patchset_plist(patchset, f"oclp-mod-{major_kernel}.{minor_kernel}.plist", None, None):
+        if not sys_patch_helpers.SysPatchHelpers(self.constants).generate_patchset_plist(patchset, f"OpenCore-Legacy-Patcher-{major_kernel}.{minor_kernel}.plist", None, None):
             raise Exception("Failed to generate patchset plist")
 
         # Remove the plist file after validation
-        Path(self.constants.payload_path / f"oclp-mod-{major_kernel}.{minor_kernel}.plist").unlink()
+        Path(self.constants.payload_path / f"OpenCore-Legacy-Patcher-{major_kernel}.{minor_kernel}.plist").unlink()
 
 
     def _unmount_dmg(self) -> None:
@@ -202,7 +202,7 @@ class PatcherValidation:
         """
 
         if not Path(self.constants.payload_local_binaries_root_path_dmg).exists():
-            dl_obj = network_handler.DownloadObject(f"https://github.com/laobamac/PatcherSupportPkg/releases/download/{self.constants.patcher_support_pkg_version}/Universal-Binaries.dmg", self.constants.payload_local_binaries_root_path_dmg)
+            dl_obj = network_handler.DownloadObject(f"https://github.com/dortania/PatcherSupportPkg/releases/download/{self.constants.patcher_support_pkg_version}/Universal-Binaries.dmg", self.constants.payload_local_binaries_root_path_dmg)
             dl_obj.download(spawn_thread=False)
             if dl_obj.download_complete is False:
                 logging.info("Failed to download Universal-Binaries.dmg")
