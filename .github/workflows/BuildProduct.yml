@@ -60,13 +60,13 @@ jobs:
       - name: Prepare App for Upload
         run: |
           zip -r ./dist/OCLP-Mod.zip -j ./dist/OCLP-Mod.app
-          /bin/mv ./dist/OCLP-Mod.zip ./OCLP-Mod.app.zip
+          /bin/mv ./dist/OCLP-Mod.zip ./OCLP-Mod-GUI.app.zip
 
       - name: Upload App to Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: OCLP-Mod.app (GUI)
-          path: OCLP-Mod.app.zip
+          path: OCLP-Mod-GUI.app.zip
 
       - name: Upload AutoPkg Package to Artifacts
         uses: actions/upload-artifact@v4
@@ -91,7 +91,7 @@ jobs:
         uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: OCLP-Mod.app.zip
+          file: OCLP-Mod-GUI.app.zip
           tag: ${{ github.ref }}
           file_glob: true
 
