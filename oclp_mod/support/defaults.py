@@ -444,5 +444,5 @@ class GenerateDefaults:
                     global_settings.GlobalEnviromentSettings().delete_property(key)
                     continue
 
-                logging.info(f"Setting {constants_key} to {plist[key]}")
+                logging.info(f"设置 {constants_key} 到 {plist[key]}")
                 setattr(self.constants, constants_key, plist[key])

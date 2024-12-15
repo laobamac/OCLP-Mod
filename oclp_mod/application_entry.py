@@ -52,11 +52,11 @@ class OpenCoreLegacyPatcher:
         _test_dir = None
         try:
             _test_dir = Path.cwd()
-            logging.info(f"Current working directory: {_test_dir}")
+            logging.info(f"当前运行目录: {_test_dir}")
         except FileNotFoundError:
             _test_dir = Path(__file__).parent.parent.resolve()
             os.chdir(_test_dir)
-            logging.warning(f"Current working directory was invalid, switched to: {_test_dir}")
+            logging.warning(f"当前运行目录无效,切换到: {_test_dir}")
 
 
     def _generate_base_data(self) -> None:
@@ -120,7 +120,7 @@ class OpenCoreLegacyPatcher:
             self.constants.cli_mode = False
             return
 
-        logging.info("Detected arguments, switching to CLI mode")
+        logging.info("无效参数,切换到命令行模式")
         self.constants.gui_mode = True  # Assumes no user interaction is required
 
         ignore_args = ["--auto_patch", "--gui_patch", "--gui_unpatch", "--update_installed"]

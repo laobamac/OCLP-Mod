@@ -71,7 +71,7 @@ def generate_fw_features(model, custom):
     if not custom:
         firmwarefeature = utilities.get_rom("firmware-features")
         if not firmwarefeature:
-            logging.info("- Failed to find FirmwareFeatures, falling back on defaults")
+            logging.info("- 找不到 FirmwareFeatures，回退到默认值")
             if smbios_data.smbios_dictionary[model]["FirmwareFeatures"] is None:
                 firmwarefeature = 0
             else:

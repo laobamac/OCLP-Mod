@@ -126,12 +126,12 @@ class PatchSysVolume:
 
         return False
 
-
+class fyhubrfve:
     def _unmount_root_vol(self) -> None:
         """
         Unmount root volume
         """
-        logging.info("- Unmounting root volume")
+        logging.info("- 卸载根卷")
         self.mount_obj.unmount(ignore_errors=True)
 
 
@@ -139,24 +139,24 @@ class PatchSysVolume:
         """
         Run sanity check before continuing patching
         """
-        logging.info("- Running sanity checks before patching")
+        logging.info("- 在继续打补丁之前运行完整性检查")
 
         mounted_system_version = Path(self.mount_location) / "System/Library/CoreServices/SystemVersion.plist"
 
         if not mounted_system_version.exists():
-            logging.error("- Failed to find SystemVersion.plist on mounted root volume")
+            logging.error("- 在已挂载的根卷上未找到 SystemVersion.plist")
             return False
 
         try:
             mounted_data = plistlib.load(open(mounted_system_version, "rb"))
             if mounted_data["ProductBuildVersion"] != self.constants.detected_os_build:
                 logging.error(
-                    f"- SystemVersion.plist build version mismatch: found {mounted_data['ProductVersion']} ({mounted_data['ProductBuildVersion']}), expected {self.constants.detected_os_version} ({self.constants.detected_os_build})"
+                    f"- SystemVersion.plist 构建版本不匹配：发现 {mounted_data['ProductVersion']} ({mounted_data['ProductBuildVersion']}), 预期 {self.constants.detected_os_version} ({self.constants.detected_os_build})"
                     )
-                logging.error("An update is in progress on your machine and patching cannot continue until it is cancelled or finished")
+                logging.error("您的机器上正在进行更新，打补丁无法继续，直到取消或完成更新")
                 return False
         except:
-            logging.error("- Failed to parse SystemVersion.plist")
+            logging.error("- 解析 SystemVersion.plist 失败")
             return False
 
         return True
@@ -196,7 +196,7 @@ class PatchSysVolume:
         ).clean_auxiliary_kc()
 
         self.constants.root_patcher_succeeded = True
-        logging.info("- Un补丁完成")
+        logging.info("- 卸载补丁完成")
         logging.info("\n请重启系统使补丁生效")
 
 
@@ -226,7 +226,7 @@ class PatchSysVolume:
         logging.info("\n请重启系统使补丁生效")
 
         if self.needs_kmutil_exemptions is True:
-            logging.info("Note: Apple will require you to open System Preferences -> Security to allow the new kernel extensions to be loaded")
+            logging.info("注意：Apple 将要求您打开“系统偏好设置”->“安全性”，以允许加载新的内核扩展")
 
         self.constants.root_patcher_succeeded = True
 
@@ -272,7 +272,7 @@ class PatchSysVolume:
 
         if self.constants.detected_os > os_data.os_data.catalina:
             return
-        logging.info("- Rebuilding dyld shared cache")
+        logging.info("- 重建 dyld 共享缓存")
         subprocess_wrapper.run_as_root_and_verify(["/usr/bin/update_dyld_shared_cache", "-root", f"{self.mount_location}/"])
 
 
@@ -283,7 +283,7 @@ class PatchSysVolume:
         """
 
         if self.constants.detected_os == os_data.os_data.catalina:
-            logging.info("- Rebuilding preboot kernel cache")
+            logging.info("- 重建预启动内核缓存")
             subprocess_wrapper.run_as_root_and_verify(["/usr/sbin/kcditto"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 
@@ -293,11 +293,11 @@ class PatchSysVolume:
         """
 
         if (Path(self.mount_application_support) / Path("SkyLightPlugins/")).exists():
-            logging.info("- Found SkylightPlugins folder, removing old plugins")
+            logging.info("- 找到 SkylightPlugins 文件夹，正在删除旧插件")
             subprocess_wrapper.run_as_root_and_verify(["/bin/rm", "-Rf", f"{self.mount_application_support}/SkyLightPlugins"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             subprocess_wrapper.run_as_root_and_verify(["/bin/mkdir", f"{self.mount_application_support}/SkyLightPlugins"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         else:
-            logging.info("- Creating SkylightPlugins folder")
+            logging.info("- 创建 SkylightPlugins 文件夹")
             subprocess_wrapper.run_as_root_and_verify(["/bin/mkdir", "-p", f"{self.mount_application_support}/SkyLightPlugins/"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 
@@ -310,7 +310,7 @@ class PatchSysVolume:
         for arg in ["useMetal", "useIOP"]:
             result = subprocess.run(["/usr/bin/defaults", "read", "/Library/Preferences/com.apple.CoreDisplay", arg], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout.decode("utf-8").strip()
             if result in ["0", "false", "1", "true"]:
-                logging.info(f"- Removing non-Metal Enforcement Preference: {arg}")
+                logging.info(f"- 删除非 Metal 强制渲染首选项: {arg}")
                 subprocess_wrapper.run_as_root(["/usr/bin/defaults", "delete", "/Library/Preferences/com.apple.CoreDisplay", arg])
 
 
@@ -326,7 +326,7 @@ class PatchSysVolume:
         file_name = "oclp-mod.plist"
         destination_path_file = f"{destination_path}/{file_name}"
         if sys_patch_helpers.SysPatchHelpers(self.constants).generate_patchset_plist(patchset, file_name, self.kdk_path, self.metallib_path):
-            logging.info("- Writing patchset information to Root Volume")
+            logging.info("- 将补丁集信息写入根卷")
             if Path(destination_path_file).exists():
                 subprocess_wrapper.run_as_root_and_verify(["/bin/rm", destination_path_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             subprocess_wrapper.run_as_root_and_verify(generate_copy_arguments(f"{self.constants.payload_path}/{file_name}", destination_path), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -337,7 +337,7 @@ class PatchSysVolume:
         Patch root volume
         """
 
-        logging.info(f"- Running patches for {self.model}")
+        logging.info(f"- 为 {self.model} 运行补丁")
         if self.patch_set_dictionary != {}:
             self._execute_patchset(self.patch_set_dictionary)
         else:
@@ -369,11 +369,11 @@ class PatchSysVolume:
         source_files_path = str(self.constants.payload_local_binaries_root_path)
         required_patches = self._preflight_checks(required_patches, source_files_path)
         for patch in required_patches:
-            logging.info("- Installing Patchset: " + patch)
+            logging.info("- 安装补丁集: " + patch)
             for method_remove in [PatchType.REMOVE_SYSTEM_VOLUME, PatchType.REMOVE_DATA_VOLUME]:
                 if method_remove in required_patches[patch]:
                     for remove_patch_directory in required_patches[patch][method_remove]:
-                        logging.info("- Remove Files at: " + remove_patch_directory)
+                        logging.info("- 删除文件路径: " + remove_patch_directory)
                         for remove_patch_file in required_patches[patch][method_remove][remove_patch_directory]:
                             if method_remove == PatchType.REMOVE_SYSTEM_VOLUME:
                                 destination_folder_path = str(self.mount_location) + remove_patch_directory
@@ -387,10 +387,10 @@ class PatchSysVolume:
                     continue
 
                 for install_patch_directory in list(required_patches[patch][method_install]):
-                    logging.info(f"- Handling Installs in: {install_patch_directory}")
+                    logging.info(f"- 处理安装路径: {install_patch_directory}")
                     for install_file in list(required_patches[patch][method_install][install_patch_directory]):
                         source_folder_path = required_patches[patch][method_install][install_patch_directory][install_file] + install_patch_directory
-                        # Check whether to source from root
+                        # 检查是否从根目录源
                         if not required_patches[patch][method_install][install_patch_directory][install_file].startswith("/"):
                             source_folder_path = source_files_path + "/" + source_folder_path
 
@@ -410,7 +410,7 @@ class PatchSysVolume:
                                 self.constants.needs_to_open_preferences = True
 
                         if destination_folder_path != updated_destination_folder_path:
-                            # Update required_patches to reflect the new destination folder path
+                            # 更新 required_patches 以反映新的目标文件夹路径
                             if updated_destination_folder_path not in required_patches[patch][method_install]:
                                 required_patches[patch][method_install].update({updated_destination_folder_path: {}})
                             required_patches[patch][method_install][updated_destination_folder_path].update({install_file: required_patches[patch][method_install][install_patch_directory][install_file]})
@@ -422,13 +422,13 @@ class PatchSysVolume:
 
             if PatchType.EXECUTE in required_patches[patch]:
                 for process in required_patches[patch][PatchType.EXECUTE]:
-                    # Some processes need sudo, however we cannot directly call sudo in some scenarios
-                    # Instead, call elevated funtion if string's boolean is True
+                    # 有些进程需要 sudo，然而我们不能直接在某些场景中调用 sudo
+                    # 相反，如果字符串的布尔值为 True，则调用提升权限函数
                     if required_patches[patch][PatchType.EXECUTE][process] is True:
-                        logging.info(f"- Running Process as Root:\n{process}")
+                        logging.info(f"- 以 root 运行进程:\n{process}")
                         subprocess_wrapper.run_as_root_and_verify(process.split(" "), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                     else:
-                        logging.info(f"- Running Process:\n{process}")
+                        logging.info(f"- 运行进程:\n{process}")
                         subprocess_wrapper.run_and_verify(process, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
 
         if any(x in required_patches for x in ["AMD Legacy GCN", "AMD Legacy Polaris", "AMD Legacy Vega"]):
@@ -445,27 +445,27 @@ class PatchSysVolume:
         """
         metallib_obj = metallib_handler.MetalLibraryObject(self.constants, self.constants.detected_os_build, self.constants.detected_os_version)
         if metallib_obj.success is False:
-            logging.error(f"Failed to find MetalLibSupportPkg: {metallib_obj.error_msg}")
-            raise Exception(f"Failed to find MetalLibSupportPkg: {metallib_obj.error_msg}")
+            logging.error(f"无法找到 MetalLibSupportPkg: {metallib_obj.error_msg}")
+            raise Exception(f"无法找到 MetalLibSupportPkg: {metallib_obj.error_msg}")
 
         metallib_download_obj = metallib_obj.retrieve_download()
         if not metallib_download_obj:
-            # Already downloaded, return path
-            logging.info(f"Using MetalLibSupportPkg: {metallib_obj.metallib_installed_path}")
+            # 已经下载，返回路径
+            logging.info(f"使用 MetalLibSupportPkg: {metallib_obj.metallib_installed_path}")
             self.metallib_path = metallib_obj.metallib_installed_path
             return str(metallib_obj.metallib_installed_path)
 
         metallib_download_obj.download(spawn_thread=False)
         if metallib_download_obj.download_complete is False:
             error_msg = metallib_download_obj.error_msg
-            logging.error(f"Could not download MetalLibSupportPkg: {error_msg}")
-            raise Exception(f"Could not download MetalLibSupportPkg: {error_msg}")
+            logging.error(f"无法下载 MetalLibSupportPkg: {error_msg}")
+            raise Exception(f"无法下载 MetalLibSupportPkg: {error_msg}")
 
         if metallib_obj.install_metallib() is False:
-            logging.error("Failed to install MetalLibSupportPkg")
-            raise Exception("Failed to install MetalLibSupportPkg")
+            logging.error("无法安装 MetalLibSupportPkg")
+            raise Exception("无法安装 MetalLibSupportPkg")
 
-        # After install, check if it's present
+        # 安装后，检查是否存在
         return self._resolve_metallib_support_pkg()
 
 
@@ -477,7 +477,7 @@ class PatchSysVolume:
         if variant == DynamicPatchset.MetallibSupportPkg:
             return self._resolve_metallib_support_pkg()
 
-        raise Exception(f"Unknown Dynamic Patchset: {variant}")
+        raise Exception(f"未知动态补丁集: {variant}")
 
 
     def _preflight_checks(self, required_patches: dict, source_files_path: Path) -> dict:
@@ -492,10 +492,10 @@ class PatchSysVolume:
             dict: Updated patchset dictionary
         """
 
-        logging.info("- Running Preflight Checks before patching")
+        logging.info("- 在打补丁前运行预检")
 
         for patch in required_patches:
-            # Check if all files are present
+            # 检查所有文件是否存在
             for method_type in [PatchType.OVERWRITE_SYSTEM_VOLUME, PatchType.OVERWRITE_DATA_VOLUME, PatchType.MERGE_SYSTEM_VOLUME, PatchType.MERGE_DATA_VOLUME]:
                 if method_type not in required_patches[patch]:
                     continue
@@ -509,33 +509,33 @@ class PatchSysVolume:
 
                         source_file = required_patches[patch][method_type][install_patch_directory][install_file] + install_patch_directory + "/" + install_file
 
-                        # Check whether to source from root
+                        # 检查是否从根目录源
                         if not required_patches[patch][method_type][install_patch_directory][install_file].startswith("/"):
                             source_file = source_files_path + "/" + source_file
                         if not Path(source_file).exists():
-                            raise Exception(f"Failed to find {source_file}")
+                            raise Exception(f"无法找到 {source_file}")
 
-        # Make sure old SkyLight plugins aren't being used
+        # 确保没有使用旧的 Skylight 插件
         self._clean_skylight_plugins()
 
-        # Make sure non-Metal Enforcement preferences are not present
+        # 确保没有非 Metal 强制渲染首选项
         self._delete_nonmetal_enforcement()
 
-        # Make sure we clean old kexts in /L*/E* that are not in the patchset
+        # 确保清理不在补丁集中的旧 kexts 在 /L*/E*
         kernelcache.KernelCacheSupport(
             mount_location_data=self.mount_location_data,
             detected_os=self.constants.detected_os,
             skip_root_kmutil_requirement=self.skip_root_kmutil_requirement
         ).clean_auxiliary_kc()
 
-        # Make sure SNB kexts are compatible with the host
+        # 确保 SNB kexts 与主机兼容
         if "Intel Sandy Bridge" in required_patches:
             sys_patch_helpers.SysPatchHelpers(self.constants).snb_board_id_patch(source_files_path)
 
-        # Ensure KDK is properly installed
+        # 确保 KDK 正确安装
         self._merge_kdk_with_root(save_hid_cs=True if "Legacy USB 1.1" in required_patches else False)
 
-        logging.info("- Finished Preflight, starting patching")
+        logging.info("- 完成预检，开始打补丁")
 
         return required_patches
 
@@ -546,34 +546,34 @@ class PatchSysVolume:
         Entry function for the patching process
         """
 
-        logging.info("- Starting Patch Process")
-        logging.info(f"- Determining Required Patch set for Darwin {self.constants.detected_os}")
+        logging.info("- 开始打补丁过程")
+        logging.info(f"- 确定适用于 Darwin {self.constants.detected_os} 的所需补丁集")
         patchset_obj = HardwarePatchsetDetection(self.constants)
         self.patch_set_dictionary = patchset_obj.patches
 
         if self.patch_set_dictionary == {}:
-            logging.info("- No Root Patches required for your machine!")
+            logging.info("- 您的机器不需要任何根卷补丁！")
             return
 
-        logging.info("- Verifying whether Root Patching possible")
+        logging.info("- 验证根补丁是否可用...")
         if patchset_obj.can_patch is False:
             logging.error("- Cannot continue with patching!!!")
             patchset_obj.detailed_errors()
             return
 
-        logging.info("- Patcher is capable of patching")
+        logging.info("- 可以进行补丁！")
         if PatcherSupportPkgMount(self.constants).mount() is False:
-            logging.error("- Critical resources missing, cannot continue with patching!!!")
+            logging.error("- 依赖丢失，无法继续")
             return
 
         if self._mount_root_vol() is False:
-            logging.error("- Failed to mount root volume, cannot continue with patching!!!")
+            logging.error("- 未能挂载根目录，无法继续")
             return
 
         if self._run_sanity_checks() is False:
             self._unmount_root_vol()
-            logging.error("- Failed sanity checks, cannot continue with patching!!!")
-            logging.error("- Please ensure that you do not have any updates pending")
+            logging.error("- 完整性检查失败，无法继续修补!!")
+            logging.error("- 请确保您没有任何待处理的更新")
             return
 
         self._patch_root_vol()
@@ -584,15 +584,15 @@ class PatchSysVolume:
         Entry function for unpatching the root volume
         """
 
-        logging.info("- Starting Unpatch Process")
+        logging.info("- 开始卸载进程")
         patchset_obj = HardwarePatchsetDetection(self.constants)
         if patchset_obj.can_unpatch is False:
-            logging.error("- Cannot continue with unpatching!!!")
+            logging.error("- 未能卸载补丁")
             patchset_obj.detailed_errors()
             return
 
         if self._mount_root_vol() is False:
-            logging.error("- Failed to mount root volume, cannot continue with unpatching!!!")
+            logging.error("- 无法挂载根目录，无法继续")
             return
 
         self._unpatch_root_vol()

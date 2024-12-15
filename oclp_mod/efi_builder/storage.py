@@ -59,11 +59,11 @@ class BuildStorage:
             for controller in sata_devices:
                 # https://linux-hardware.org/?id=pci:1179-010b-1b4b-9183
                 if controller.vendor_id == 0x1179 and controller.device_id == 0x010b:
-                    logging.info("- Enabling AHCI SSD patch")
+                    logging.info("- 启用 AHCI SSD 补丁")
                     support.BuildSupport(self.model, self.constants, self.config).enable_kext("MonteAHCIPort.kext", self.constants.monterey_ahci_version, self.constants.monterey_ahci_path)
                     break
         elif self.model in ["MacBookAir6,1", "MacBookAir6,2"]:
-            logging.info("- Enabling AHCI SSD patch")
+            logging.info("- 启用 AHCI SSD 补丁")
             support.BuildSupport(self.model, self.constants, self.config).enable_kext("MonteAHCIPort.kext", self.constants.monterey_ahci_version, self.constants.monterey_ahci_path)
 
         # ThirdPartyDrives Check
@@ -76,11 +76,11 @@ class BuildStorage:
                 if drive in smbios_data.smbios_dictionary[self.model]["Stock Storage"]:
                     if not self.constants.custom_model:
                         if self.computer.third_party_sata_ssd is True:
-                            logging.info("- Adding SATA Hibernation Patch")
+                            logging.info("- 添加 SATA 休眠补丁")
                             self.config["Kernel"]["Quirks"]["ThirdPartyDrives"] = True
                             break
                     else:
-                        logging.info("- Adding SATA Hibernation Patch")
+                        logging.info("- 添加 SATA 休眠补丁")
                         self.config["Kernel"]["Quirks"]["ThirdPartyDrives"] = True
                         break
 
@@ -109,11 +109,11 @@ class BuildStorage:
             # Use Innie's same logic:
             # https://github.com/cdf/Innie/blob/v1.3.0/Innie/Innie.cpp#L90-L97
             for i, controller in enumerate(self.computer.storage):
-                logging.info(f"- Fixing PCIe Storage Controller ({i + 1}) reporting")
+                logging.info(f"- 修复 PCIe 存储控制器 ({i + 1}) 报告")
                 if controller.pci_path:
                     self.config["DeviceProperties"]["Add"][controller.pci_path] = {"built-in": 1}
                 else:
-                    logging.info(f"- Failed to find Device path for PCIe Storage Controller {i}, falling back to Innie")
+                    logging.info(f"- 未能找到 PCIe 存储控制器 {i} 的设备路径，回退到 Innie")
                     support.BuildSupport(self.model, self.constants, self.config).enable_kext("Innie.kext", self.constants.innie_version, self.constants.innie_path)
 
         if not self.constants.custom_model:
@@ -122,51 +122,51 @@ class BuildStorage:
                 for i, controller in enumerate(nvme_devices):
                     if controller.vendor_id == 0x106b:
                         continue
-                    logging.info(f"- Found 3rd Party NVMe SSD ({i + 1}): {utilities.friendly_hex(controller.vendor_id)}:{utilities.friendly_hex(controller.device_id)}")
+                    logging.info(f"- 找到第三方 NVMe SSD ({i + 1}): {utilities.friendly_hex(controller.vendor_id)}:{utilities.friendly_hex(controller.device_id)}")
                     self.config["#Revision"][f"Hardware-NVMe-{i}"] = f"{utilities.friendly_hex(controller.vendor_id)}:{utilities.friendly_hex(controller.device_id)}"
 
-                    # Disable Bit 0 (L0s), enable Bit 1 (L1)
+                    # 禁用位 0 (L0s)，启用位 1 (L1)
                     nvme_aspm = (controller.aspm & (~0b11)) | 0b10
 
                     if controller.pci_path:
-                        logging.info(f"- Found NVMe ({i}) at {controller.pci_path}")
+                        logging.info(f"- 找到 NVMe ({i}) 在 {controller.pci_path}")
                         self.config["DeviceProperties"]["Add"].setdefault(controller.pci_path, {})["pci-aspm-default"] = nvme_aspm
                         self.config["DeviceProperties"]["Add"][controller.pci_path.rpartition("/")[0]] = {"pci-aspm-default": nvme_aspm}
                     else:
                         if "-nvmefaspm" not in self.config["NVRAM"]["Add"]["7C436110-AB2A-4BBB-A880-FE41995C9F82"]["boot-args"]:
-                            logging.info("- Falling back to -nvmefaspm")
+                            logging.info("- 回退到 -nvmefaspm")
                             self.config["NVRAM"]["Add"]["7C436110-AB2A-4BBB-A880-FE41995C9F82"]["boot-args"] += " -nvmefaspm"
 
                     if (controller.vendor_id != 0x144D and controller.device_id != 0xA804):
-                        # Avoid injecting NVMeFix when a native Apple NVMe drive is present
+                        # 避免在存在原生 Apple NVMe 驱动时注入 NVMeFix
                         # https://github.com/acidanthera/NVMeFix/blob/1.0.9/NVMeFix/NVMeFix.cpp#L220-L225
                         support.BuildSupport(self.model, self.constants, self.config).enable_kext("NVMeFix.kext", self.constants.nvmefix_version, self.constants.nvmefix_path)
 
             if any((controller.vendor_id == 0x106b and controller.device_id in [0x2001, 0x2003]) for controller in nvme_devices):
-                # Restore S1X/S3X NVMe support removed in 14.0 Beta 2
-                # - APPLE SSD AP0128H, AP0256H, etc
-                # - APPLE SSD AP0128J, AP0256J, etc
+                # 恢复在 macOS 14.0 Beta 2 中移除的 S1X/S3X NVMe 支持
+                # - APPLE SSD AP0128H, AP0256H, 等
+                # - APPLE SSD AP0128J, AP0256J, 等
                 support.BuildSupport(self.model, self.constants, self.config).enable_kext("IOS3XeFamily.kext", self.constants.s3x_nvme_version, self.constants.s3x_nvme_path)
 
-        # Restore S1X/S3X NVMe support removed in 14.0 Beta 2
-        # Apple's usage of the S1X and S3X is quite sporadic and inconsistent, so we'll try a catch all for units with NVMe drives
-        # Additionally expanded to cover all Mac models with the 12+16 pin SSD layout, for older machines with newer drives
+        # 恢复在 macOS 14.0 Beta 2 中移除的 S1X/S3X NVMe 支持
+        # Apple 对 S1X 和 S3X 的使用相当随意且不一致，因此我们将尝试为所有带有 NVMe 驱动的机型恢复支持
+        # 此外扩展到覆盖所有使用 12+16 引脚 SSD 布局的 Mac 机型，以支持较旧的机器上使用较新的驱动
         if self.constants.custom_model and self.model in smbios_data.smbios_dictionary:
             if "CPU Generation" in smbios_data.smbios_dictionary[self.model]:
                 if (cpu_data.CPUGen.haswell <= smbios_data.smbios_dictionary[self.model]["CPU Generation"] <= cpu_data.CPUGen.kaby_lake) or self.model in [ "MacPro6,1" ]:
                     support.BuildSupport(self.model, self.constants, self.config).enable_kext("IOS3XeFamily.kext", self.constants.s3x_nvme_version, self.constants.s3x_nvme_path)
 
-        # Apple RAID Card check
+        # Apple RAID Card 检查
         if not self.constants.custom_model:
             if self.computer.storage:
                 for storage_controller in self.computer.storage:
                     if storage_controller.vendor_id == 0x106b and storage_controller.device_id == 0x008A:
-                        # AppleRAIDCard.kext only supports pci106b,8a
+                        # AppleRAIDCard.kext 仅支持 pci106b,8a
                         support.BuildSupport(self.model, self.constants, self.config).enable_kext("AppleRAIDCard.kext", self.constants.apple_raid_version, self.constants.apple_raid_path)
                         break
         elif self.model.startswith("Xserve"):
-            # For Xserves, assume RAID is present
-            # Namely due to Xserve2,1 being limited to 10.7, thus no hardware detection
+            # 对于 Xserves，假设存在 RAID
+            # 主要是由于 Xserve2,1 仅限于 10.7，因此无法进行硬件检测
             support.BuildSupport(self.model, self.constants, self.config).enable_kext("AppleRAIDCard.kext", self.constants.apple_raid_version, self.constants.apple_raid_path)
 
 
@@ -180,8 +180,8 @@ class BuildStorage:
         if not "CPU Generation" in smbios_data.smbios_dictionary[self.model]:
             return
 
-        # With macOS Monterey, Apple's SDXC driver requires the system to support VT-D
-        # However pre-Ivy Bridge don't support this feature
+        # 自 macOS Monterey 起，Apple 的 SDXC 驱动程序要求系统支持 VT-D
+        # 然而，预 Ivy Bridge 的系统不支持此功能
         if smbios_data.smbios_dictionary[self.model]["CPU Generation"] <= cpu_data.CPUGen.sandy_bridge.value:
             if (self.constants.computer.sdxc_controller and not self.constants.custom_model) or (self.model.startswith("MacBookPro8") or self.model.startswith("Macmini5")):
                 support.BuildSupport(self.model, self.constants, self.config).enable_kext("BigSurSDXC.kext", self.constants.bigsursdxc_version, self.constants.bigsursdxc_path)
@@ -193,5 +193,5 @@ class BuildStorage:
         """
 
         if self.constants.apfs_trim_timeout is False:
-            logging.info(f"- Disabling APFS TRIM timeout")
+            logging.info(f"- 禁用 APFS TRIM 超时")
             self.config["Kernel"]["Quirks"]["SetApfsTrimTimeout"] = 0

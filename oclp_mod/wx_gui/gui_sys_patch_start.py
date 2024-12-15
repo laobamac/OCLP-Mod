@@ -40,7 +40,7 @@ class SysPatchStartFrame(wx.Frame):
     Uses a Modal Dialog for smoother transition from other frames
     """
     def __init__(self, parent: wx.Frame, title: str, global_constants: constants.Constants, screen_location: tuple = None, patches: dict = {}):
-        logging.info("Initializing 正在安装驱动补丁 Frame")
+        logging.info("初始化 安装驱动补丁 窗口")
 
         self.title = title
         self.constants: constants.Constants = global_constants

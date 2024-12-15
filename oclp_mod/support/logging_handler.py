@@ -1,5 +1,5 @@
 """
-logging_handler.py: Initialize logging framework for program
+logging_handler.py: 初始化程序的日志框架
 """
 
 import os
@@ -24,21 +24,21 @@ from . import (
 
 class InitializeLoggingSupport:
     """
-    Initialize logging framework for program
+    初始化程序的日志框架
 
-    Primary responsibilities:
-    - Determine where to store log file
-    - Clean log file if it's near the max file size
-    - Initialize logging framework configuration
-    - Implement custom traceback handler
-    - Implement error handling for file write
+    主要职责：
+    - 确定日志文件的存储位置
+    - 如果日志文件接近最大文件大小，则清理日志文件
+    - 初始化日志框架配置
+    - 实现自定义回溯处理器
+    - 实现文件写入错误处理
 
-    Usage:
+    使用方法：
     >>> from resources.logging_handler import InitializeLoggingSupport
     >>> InitializeLoggingSupport()
 
-    FOR DEVELOPERS:
-    - Do not invoke logging until after '_attempt_initialize_logging_configuration()' has been invoked
+    开发者注意：
+    - 在调用'_attempt_initialize_logging_configuration()'之后才可调用日志记录
 
     """
 
@@ -54,7 +54,7 @@ class InitializeLoggingSupport:
         self.original_thread_excepthook: threading = threading.excepthook
 
         self.max_file_size:     int = 1024 * 1024               # 1 MB
-        self.file_size_redline: int = 1024 * 1024 - 1024 * 100  # 900 KB, when to start cleaning log file
+        self.file_size_redline: int = 1024 * 1024 - 1024 * 100  # 900 KB, 当达到此值时开始清理日志文件
 
         self._initialize_logging_path()
         self._attempt_initialize_logging_configuration()
@@ -65,21 +65,21 @@ class InitializeLoggingSupport:
 
     def _initialize_logging_path(self) -> None:
         """
-        Initialize logging framework storage path
+        初始化日志框架存储路径
         """
 
         base_path = Path("~/Library/Logs").expanduser()
         if not base_path.exists() or str(base_path).startswith("/var/root/"):
-            # Likely in an installer environment, store in /Users/Shared
+            # 可能处于安装环境，存储在 /Users/Shared
             base_path = Path("/Users/Shared")
         else:
-            # create laobamac folder if it doesn't exist
+            # 如果 laobamac 文件夹不存在则创建
             base_path = base_path / "laobamac"
             if not base_path.exists():
                 try:
                     base_path.mkdir()
                 except Exception as e:
-                    print(f"Failed to create laobamac folder: {e}")
+                    print(f"创建 laobamac 文件夹失败: {e}")
                     base_path = Path("/Users/Shared")
 
         self.log_filepath = Path(f"{base_path}/{self.log_filename}").expanduser()
@@ -87,14 +87,14 @@ class InitializeLoggingSupport:
 
     def _clean_prior_version_logs(self) -> None:
         """
-        Clean logs from old Patcher versions
+        清理旧版本 Patcher 的日志
 
-        Keep 10 latest logs
+        保留最新的 10 个日志
         """
 
         paths = [
             self.log_filepath.parent,        # ~/Library/Logs/laobamac
-            self.log_filepath.parent.parent, # ~/Library/Logs (old location)
+            self.log_filepath.parent.parent, # ~/Library/Logs (旧位置)
         ]
 
         logs = []
@@ -118,18 +118,18 @@ class InitializeLoggingSupport:
             try:
                 log.unlink()
             except Exception as e:
-                logging.error(f"Failed to delete log file: {e}")
+                logging.error(f"删除日志文件失败: {e}")
 
 
     def _initialize_logging_configuration(self, log_to_file: bool = True) -> None:
         """
-        Initialize logging framework configuration
+        初始化日志框架配置
 
-        StreamHandler's format is used to mimic the default behavior of print()
-        While FileHandler's format is for more in-depth logging
+        StreamHandler 的格式用于模仿 print() 的默认行为
+        而 FileHandler 的格式用于更详细的日志记录
 
-        Parameters:
-            log_to_file (bool): Whether to log to file or not
+        参数：
+            log_to_file (bool): 是否将日志记录到文件
 
         """
 
@@ -148,22 +148,22 @@ class InitializeLoggingSupport:
 
     def _attempt_initialize_logging_configuration(self) -> None:
         """
-        Attempt to initialize logging framework configuration
+        尝试初始化日志框架配置
 
-        If we fail to initialize the logging framework, we will disable logging to file
+        如果我们无法初始化日志框架，我们将禁用文件日志记录
         """
 
         try:
             self._initialize_logging_configuration()
         except Exception as e:
-            print(f"Failed to initialize logging framework: {e}")
-            print("Retrying without logging to file...")
+            print(f"初始化日志框架失败: {e}")
+            print("重试不记录文件日志...")
             self._initialize_logging_configuration(log_to_file=False)
 
 
     def _start_logging(self):
         """
-        Start logging, used as easily identifiable start point in logs
+        开始日志记录，作为日志中的易于识别的起点
         """
 
         str_msg = f"# OCLP-Mod ({self.constants.patcher_version}) #"
@@ -173,9 +173,9 @@ class InitializeLoggingSupport:
         logging.info(str_msg)
         logging.info('#' * str_len)
 
-        logging.info("Log file set:")
+        logging.info("日志文件设置:")
         logging.info(f"  {self.log_filepath}")
-        # Display relative path to avoid disclosing user's username
+        # 显示相对路径以避免泄露用户名
         try:
             path = self.log_filepath.relative_to(Path.home())
             logging.info(f"~/{path}")
@@ -185,25 +185,25 @@ class InitializeLoggingSupport:
 
     def _implement_custom_traceback_handler(self) -> None:
         """
-        Reroute traceback to logging module
+        将回溯重定向到日志模块
         """
 
         def custom_excepthook(type, value, tb) -> None:
             """
-            Reroute traceback in main thread to logging module
+            将主线程中的回溯重定向到日志模块
             """
-            logging.error("Uncaught exception in main thread", exc_info=(type, value, tb))
+            logging.error("主线程中未捕获的异常", exc_info=(type, value, tb))
             self._display_debug_properties()
 
             if "wx/" in "".join(traceback.format_exception(type, value, tb)):
-                # Likely a GUI error, don't display error dialog
+                # 可能是 GUI 错误，不显示错误对话框
                 return
 
             if self.constants.cli_mode is True:
                 threading.Thread(target=analytics_handler.Analytics(self.constants).send_crash_report, args=(self.log_filepath,)).start()
                 return
 
-            error_msg = f"OCLP-Mod encountered the following internal error:\n\n"
+            error_msg = f"OCLP-Mod 遇到了以下内部错误:\n\n"
             error_msg += f"{type.__name__}: {value}"
             if tb:
                 error_msg += f"\n\n{traceback.extract_tb(tb)[-1]}"
@@ -216,15 +216,15 @@ class InitializeLoggingSupport:
                 cant_log = True
 
             if cant_log is True:
-                error_msg += "\n\nReveal log file?"
+                error_msg += "\n\n显示日志文件？"
             else:
-                error_msg += "\n\nSend crash report to laobamac?"
+                error_msg += "\n\n向 laobamac 发送崩溃报告？"
 
-            # Ask user if they want to send crash report
+            # 询问用户是否要发送崩溃报告
             try:
                 result = applescript.AppleScript(f'display dialog "{error_msg}" with title "OCLP-Mod ({self.constants.patcher_version})" buttons {{"Yes", "No"}} default button "Yes" with icon caution').run()
             except Exception as e:
-                logging.error(f"Failed to display crash report dialog: {e}")
+                logging.error(f"显示崩溃报告对话框失败: {e}")
                 return
 
             if result[applescript.AEType(b'bhit')] != "Yes":
@@ -239,9 +239,9 @@ class InitializeLoggingSupport:
 
         def custom_thread_excepthook(args) -> None:
             """
-            Reroute traceback in spawned thread to logging module
+            将生成的线程中的回溯重定向到日志模块
             """
-            logging.error("Uncaught exception in spawned thread", exc_info=(args))
+            logging.error("生成的线程中未捕获的异常", exc_info=(args))
 
         sys.excepthook = custom_excepthook
         threading.excepthook = custom_thread_excepthook
@@ -249,7 +249,7 @@ class InitializeLoggingSupport:
 
     def _restore_original_excepthook(self) -> None:
         """
-        Restore original traceback handlers
+        恢复原始的回溯处理器
         """
 
         sys.excepthook = self.original_excepthook
@@ -258,19 +258,19 @@ class InitializeLoggingSupport:
 
     def _display_debug_properties(self) -> None:
         """
-        Display debug properties, primarily after main thread crash
+        显示调试属性，主要用于主线程崩溃后
         """
-        logging.info("Host Properties:")
-        logging.info(f"  XNU Version: {self.constants.detected_os}.{self.constants.detected_os_minor}")
-        logging.info(f"  XNU Build: {self.constants.detected_os_build}")
-        logging.info(f"  macOS Version: {self.constants.detected_os_version}")
-        logging.info("Debug Properties:")
-        logging.info(f"  Effective User ID: {os.geteuid()}")
-        logging.info(f"  Effective Group ID: {os.getegid()}")
-        logging.info(f"  Real User ID: {os.getuid()}")
-        logging.info(f"  Real Group ID: {os.getgid()}")
-        logging.info("  Arguments passed to Patcher:")
+        logging.info("主机属性:")
+        logging.info(f"  XNU 版本: {self.constants.detected_os}.{self.constants.detected_os_minor}")
+        logging.info(f"  XNU 构建: {self.constants.detected_os_build}")
+        logging.info(f"  macOS 版本: {self.constants.detected_os_version}")
+        logging.info("调试属性:")
+        logging.info(f"  有效用户 ID: {os.geteuid()}")
+        logging.info(f"  有效组 ID: {os.getegid()}")
+        logging.info(f"  真实用户 ID: {os.getuid()}")
+        logging.info(f"  真实组 ID: {os.getgid()}")
+        logging.info("  传递给 Patcher 的参数:")
         for arg in sys.argv:
             logging.info(f"    {arg}")
 
-        logging.info(f"Host Properties:\n{pprint.pformat(self.constants.computer.__dict__, indent=4)}")
+        logging.info(f"主机属性:\n{pprint.pformat(self.constants.computer.__dict__, indent=4)}")

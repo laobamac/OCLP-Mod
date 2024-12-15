@@ -23,7 +23,7 @@ class OSUpdateFrame(wx.Frame):
     Create a modal frame for displaying information to the user before an update is applied
     """
     def __init__(self, parent: wx.Frame, title: str, global_constants: constants.Constants, screen_location: tuple = None):
-        logging.info("Initializing Prepare Update Frame")
+        logging.info("正在初始化准备更新窗口")
 
         if parent:
             self.frame = parent
@@ -37,9 +37,9 @@ class OSUpdateFrame(wx.Frame):
 
         os_data = utilities.fetch_staged_update(variant="Preflight")
         if os_data[0] is None:
-            logging.info("No staged update found")
+            logging.info("未找到已暂存的更新")
             self._exit()
-        logging.info(f"Staged update found: {os_data[0]} ({os_data[1]})")
+        logging.info(f"找到已暂存的更新: {os_data[0]} ({os_data[1]})")
         self.os_data = os_data
 
         # Check if we need to patch the system volume
@@ -52,13 +52,13 @@ class OSUpdateFrame(wx.Frame):
         ).device_properties
 
         if results[HardwarePatchsetSettings.KERNEL_DEBUG_KIT_REQUIRED] is True:
-            logging.info("KDK required")
+            logging.info("需要内核调试工具包")
         if results[HardwarePatchsetSettings.METALLIB_SUPPORT_PKG_REQUIRED] is True:
             # TODO: Download MetalLibSupportPkg
-            logging.info("MetallibSupportPkg required")
+            logging.info("需要MetalLib支持包")
 
         if not any([results[HardwarePatchsetSettings.KERNEL_DEBUG_KIT_REQUIRED], results[HardwarePatchsetSettings.METALLIB_SUPPORT_PKG_REQUIRED]]):
-            logging.info("No additional resources required")
+            logging.info("不需要额外资源")
             self._exit()
 
         self._generate_ui()
@@ -141,7 +141,7 @@ class OSUpdateFrame(wx.Frame):
         """
         Handle KDK installation
         """
-        logging.info("KDK download complete, validating with hdiutil")
+        logging.info("KDK下载完成，正在使用hdiutil进行校验")
         self.kdk_checksum_result = False
         def _validate_kdk_checksum_thread():
             self.kdk_checksum_result = kdk_obj.validate_kdk_checksum()
@@ -153,16 +153,16 @@ class OSUpdateFrame(wx.Frame):
             wx.Yield()
 
         if self.kdk_checksum_result is False:
-            logging.error("KDK checksum validation failed")
+            logging.error("KDK校验失败")
             logging.error(kdk_obj.error_msg)
             self._exit()
 
 
-        logging.info("KDK checksum validation passed")
+        logging.info("KDK校验通过")
 
-        logging.info("Mounting KDK")
+        logging.info("正在安装KDK")
         if not Path(self.constants.kdk_download_path).exists():
-            logging.error("KDK download path does not exist")
+            logging.error("KDK下载路径不存在")
             return
 
         self.kdk_install_result = False
@@ -176,10 +176,10 @@ class OSUpdateFrame(wx.Frame):
             wx.Yield()
 
         if self.kdk_install_result is False:
-            logging.info("Failed to install KDK")
+            logging.info("KDK安装失败")
             return
 
-        logging.info("KDK installed successfully")
+        logging.info("KDK安装成功")
 
 
 
@@ -198,10 +198,10 @@ class OSUpdateFrame(wx.Frame):
             wx.Yield()
 
         if self.metallib_install_result is False:
-            logging.info("Failed to install Metallib")
+            logging.info("Metallib安装失败")
             return
 
-        logging.info("Metallib installed successfully")
+        logging.info("Metallib安装成功")
 
 
     def _generate_ui(self) -> None:
@@ -214,7 +214,7 @@ class OSUpdateFrame(wx.Frame):
                This may take a few minutes.
         """
 
-        header = wx.StaticText(self.frame, label="Preparing for macOS Software Update", pos=(-1,5))
+        header = wx.StaticText(self.frame, label="正在为macOS软件更新做准备", pos=(-1,5))
         header.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         header.Centre(wx.HORIZONTAL)
 
@@ -224,7 +224,7 @@ class OSUpdateFrame(wx.Frame):
         label.Centre(wx.HORIZONTAL)
 
         # this may take a few minutes
-        label = wx.StaticText(self.frame, label="This may take a few minutes.", pos=(-1, 55))
+        label = wx.StaticText(self.frame, label="这可能需要几分钟时间。", pos=(-1, 55))
         label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         label.Centre(wx.HORIZONTAL)
 
@@ -249,13 +249,13 @@ class OSUpdateFrame(wx.Frame):
         """
         Notify user of what OCLP is doing
         """
-        message=f"OCLP-Mod has detected that a macOS update is being downloaded:\n{self.os_data[0]} ({self.os_data[1]})\n\nThe patcher needs to prepare the system for the update, and will download any additional resources it may need post-update.\n\nThis may take a few minutes, the patcher will exit when it is done."
+        message=f"OCLP-Mod检测到正在下载macOS更新:\n{self.os_data[0]} ({self.os_data[1]})\n\n补丁程序需要为更新做准备，并将在更新后下载任何可能需要的额外资源。\n\n这可能需要几分钟时间，补丁程序完成后将退出。"
         # Yes/No for caching
         dlg = wx.MessageDialog(self.frame, message=message, caption="OCLP-Mod", style=wx.YES_NO | wx.ICON_INFORMATION)
-        dlg.SetYesNoLabels("&Ok", "&Cancel")
+        dlg.SetYesNoLabels("&确定", "&取消")
         result = dlg.ShowModal()
         if result == wx.ID_NO:
-            logging.info("User cancelled OS caching")
+            logging.info("用户取消了系统缓存")
             if hasattr(self, "download_obj"):
                 self.download_obj.stop()
             self.did_cancel = 1

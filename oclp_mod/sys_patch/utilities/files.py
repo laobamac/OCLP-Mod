@@ -30,30 +30,30 @@ def install_new_file(source_folder: Path, destination_folder: Path, file_name: s
     file_name_str = str(file_name)
 
     if not Path(destination_folder).exists():
-        logging.info(f"  - Skipping {file_name}, cannot locate {source_folder}")
+        logging.info(f"  - 跳过 {file_name}，无法找到 {source_folder}")
         return
 
     if method in [PatchType.MERGE_SYSTEM_VOLUME, PatchType.MERGE_DATA_VOLUME]:
         # merge with rsync
-        logging.info(f"  - Installing: {file_name}")
+        logging.info(f"  - 安装: {file_name}")
         subprocess_wrapper.run_as_root(["/usr/bin/rsync", "-r", "-i", "-a", f"{source_folder}/{file_name}", f"{destination_folder}/"], stdout=subprocess.PIPE)
         fix_permissions(destination_folder + "/" + file_name)
     elif Path(source_folder + "/" + file_name_str).is_dir():
         # Applicable for .kext, .app, .plugin, .bundle, all of which are directories
         if Path(destination_folder + "/" + file_name).exists():
-            logging.info(f"  - Found existing {file_name}, overwriting...")
+            logging.info(f"  - 找到现有 {file_name}，正在覆盖...")
             subprocess_wrapper.run_as_root_and_verify(["/bin/rm", "-R", f"{destination_folder}/{file_name}"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         else:
-            logging.info(f"  - Installing: {file_name}")
+            logging.info(f"  - 安装: {file_name}")
         subprocess_wrapper.run_as_root_and_verify(generate_copy_arguments(f"{source_folder}/{file_name}", destination_folder), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         fix_permissions(destination_folder + "/" + file_name)
     else:
         # Assume it's an individual file, replace as normal
         if Path(destination_folder + "/" + file_name).exists():
-            logging.info(f"  - Found existing {file_name}, overwriting...")
+            logging.info(f"  - 找到现有 {file_name}，正在覆盖...")
             subprocess_wrapper.run_as_root_and_verify(["/bin/rm", f"{destination_folder}/{file_name}"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         else:
-            logging.info(f"  - Installing: {file_name}")
+            logging.info(f"  - 安装: {file_name}")
         subprocess_wrapper.run_as_root_and_verify(generate_copy_arguments(f"{source_folder}/{file_name}", destination_folder), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         fix_permissions(destination_folder + "/" + file_name)
 
@@ -68,7 +68,7 @@ def remove_file(destination_folder: Path, file_name: str) -> None:
     """
 
     if Path(destination_folder + "/" + file_name).exists():
-        logging.info(f"  - Removing: {file_name}")
+        logging.info(f"  - 删除: {file_name}")
         if Path(destination_folder + "/" + file_name).is_dir():
             subprocess_wrapper.run_as_root_and_verify(["/bin/rm", "-R", f"{destination_folder}/{file_name}"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         else:

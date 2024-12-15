@@ -373,7 +373,7 @@ class HardwarePatchsetDetection:
 
         if metal_3802_gpu_present and metal_31001_gpu_present and self._xnu_major >= os_data.sequoia.value:
             if metal_31001_name != "Graphics: AMD Legacy GCN":
-                logging.error("Cannot mix Metal 3802 and Metal 31001 GPUs on macOS Sequoia or newer")
+                logging.error("Cannot mix Metal 3802 and Metal 31001 GPUs on macOS Sequoia 或更新版本")
                 logging.error("Stripping out Metal 3802 GPUs")
                 for hardware in list(present_hardware):
                     if hardware.hardware_variant_graphics_subclass() == HardwareVariantGraphicsSubclass.METAL_3802_GRAPHICS:
@@ -389,16 +389,16 @@ class HardwarePatchsetDetection:
         """
         if self._can_patch(requirements, ignore_keys=[HardwarePatchsetValidation.MISSING_NETWORK_CONNECTION]) is False:
             return requirements, device_properties
-        logging.info("Network connection missing, checking whether network patches are applicable")
+        logging.info("网络连接缺失，检查是否适用网络补丁")
         if self._already_has_networking_patches() is True:
-            logging.info("Network patches are already applied, requiring network connection")
+            logging.info("网络补丁已应用，需要网络连接")
             return requirements, device_properties
 
         if not any([key.startswith("Networking:") for key in device_properties.keys()]):
-            logging.info("Network patches are not applicable, requiring network connection")
+            logging.info("网络补丁不适用，需要网络连接")
             return requirements, device_properties
 
-        logging.info("Network patches are applicable, removing other patches")
+        logging.info("网络补丁适用，移除其他补丁")
         for key in list(device_properties.keys()):
             if key.startswith("Networking:"):
                 continue
@@ -419,7 +419,7 @@ class HardwarePatchsetDetection:
         """
         current_sip_status  = hex(py_sip_xnu.SipXnu().get_sip_status().value)
         expected_sip_status = hex(self._convert_required_sip_config_to_int(required_sip_configs))
-        sip_string = f"Validation: Booted SIP: {current_sip_status} vs expected: {expected_sip_status}"
+        sip_string = f"Validation: 启动时SIP: {current_sip_status} vs 期望: {expected_sip_status}"
         index = list(requirements.keys()).index(HardwarePatchsetValidation.SIP_ENABLED)
         return dict(list(requirements.items())[:index+1] + [(sip_string, True)] + list(requirements.items())[index+1:])
 

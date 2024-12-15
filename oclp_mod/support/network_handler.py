@@ -208,10 +208,10 @@ class DownloadObject:
 
         """
         self.status = DownloadStatus.DOWNLOADING
-        logging.info(f"Starting download: {self.filename}")
+        logging.info(f"开始下载: {self.filename}")
         if spawn_thread:
             if self.active_thread:
-                logging.error("Download already in progress")
+                logging.error("下载正在进行中")
                 return
             self.should_checksum = verify_checksum
             self.active_thread = threading.Thread(target=self._download, args=(display_progress,))
@@ -269,10 +269,10 @@ class DownloadObject:
             if 'Content-Length' in result.headers:
                 self.total_file_size = float(result.headers['Content-Length'])
             else:
-                raise Exception("Content-Length missing from headers")
+                raise Exception("Content-Length 头部缺失")
         except Exception as e:
-            logging.error(f"Error determining file size {self.url}: {str(e)}")
-            logging.error("Assuming file size is 0")
+            logging.error(f"确定文件大小时出错 {self.url}: {str(e)}")
+            logging.error("假设文件大小为0")
             self.total_file_size = 0.0
 
 
@@ -299,17 +299,17 @@ class DownloadObject:
 
         try:
             if Path(path).exists():
-                logging.info(f"Deleting existing file: {path}")
+                logging.info(f"删除现有文件: {path}")
                 Path(path).unlink()
                 return True
 
             if not Path(path).parent.exists():
-                logging.info(f"Creating directory: {Path(path).parent}")
+                logging.info(f"创建目录: {Path(path).parent}")
                 Path(path).parent.mkdir(parents=True, exist_ok=True)
 
             available_space = utilities.get_free_space(Path(path).parent)
             if self.total_file_size > available_space:
-                msg = f"Not enough free space to download {self.filename}, need {utilities.human_fmt(self.total_file_size)}, have {utilities.human_fmt(available_space)}"
+                msg = f"没有足够的可用空间下载 {self.filename}，需要 {utilities.human_fmt(self.total_file_size)}，现有 {utilities.human_fmt(available_space)}"
                 logging.error(msg)
                 raise Exception(msg)
 
@@ -317,10 +317,10 @@ class DownloadObject:
             self.error = True
             self.error_msg = str(e)
             self.status = DownloadStatus.ERROR
-            logging.error(f"Error preparing working directory {path}: {self.error_msg}")
+            logging.error(f"准备工作目录时出错 {path}: {self.error_msg}")
             return False
 
-        logging.info(f"- Directory ready: {path}")
+        logging.info(f"- 目录已准备好: {path}")
         return True
 
 
@@ -338,7 +338,7 @@ class DownloadObject:
 
         try:
             if not self.has_network:
-                raise Exception("No network connection")
+                raise Exception("没有网络连接")
 
             if self._prepare_working_directory(self.filepath) is False:
                 raise Exception(self.error_msg)
@@ -349,30 +349,30 @@ class DownloadObject:
                 atexit.register(self.stop)
                 for i, chunk in enumerate(response.iter_content(1024 * 1024 * 4)):
                     if self.should_stop:
-                        raise Exception("Download stopped")
+                        raise Exception("下载已停止")
                     if chunk:
                         file.write(chunk)
                         self.downloaded_file_size += len(chunk)
                         if self.should_checksum:
                             self._update_checksum(chunk)
                         if display_progress and i % 100:
-                            # Don't use logging here, as we'll be spamming the log file
+                            # 不要在这里使用日志记录，因为我们会向日志文件中大量写入
                             if self.total_file_size == 0.0:
-                                print(f"Downloaded {utilities.human_fmt(self.downloaded_file_size)} of {self.filename}")
+                                print(f"已下载 {utilities.human_fmt(self.downloaded_file_size)} 的 {self.filename}")
                             else:
-                                print(f"Downloaded {self.get_percent():.2f}% of {self.filename} ({utilities.human_fmt(self.get_speed())}/s) ({self.get_time_remaining():.2f} seconds remaining)")
+                                print(f"已下载 {self.get_percent():.2f}% 的 {self.filename} ({utilities.human_fmt(self.get_speed())}/秒) ({self.get_time_remaining():.2f} 秒剩余)")
                 self.download_complete = True
-                logging.info(f"Download complete: {self.filename}")
-                logging.info("Stats:")
-                logging.info(f"- Downloaded size: {utilities.human_fmt(self.downloaded_file_size)}")
-                logging.info(f"- Time elapsed: {(time.time() - self.start_time):.2f} seconds")
-                logging.info(f"- Speed: {utilities.human_fmt(self.downloaded_file_size / (time.time() - self.start_time))}/s")
-                logging.info(f"- Location: {self.filepath}")
+                logging.info(f"下载完成: {self.filename}")
+                logging.info("统计信息:")
+                logging.info(f"- 已下载大小: {utilities.human_fmt(self.downloaded_file_size)}")
+                logging.info(f"- 经过时间: {(time.time() - self.start_time):.2f} 秒")
+                logging.info(f"- 速度: {utilities.human_fmt(self.downloaded_file_size / (time.time() - self.start_time))}/秒")
+                logging.info(f"- 位置: {self.filepath}")
         except Exception as e:
             self.error = True
             self.error_msg = str(e)
             self.status = DownloadStatus.ERROR
-            logging.error(f"Error downloading {self.url}: {self.error_msg}")
+            logging.error(f"下载时出错 {self.url}: {self.error_msg}")
 
         self.status = DownloadStatus.COMPLETE
         utilities.enable_sleep_after_running()

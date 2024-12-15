@@ -1,7 +1,7 @@
 """
-integrity_verification.py: Validate the integrity of Apple downloaded files via .chunklist and .integrityDataV1 files
+integrity_verification.py: 验证通过 .chunklist 和 .integrityDataV1 文件下载的 Apple 文件完整性
 
-Based off of chunklist.py:
+基于 chunklist.py:
 - https://gist.github.com/dhinakg/cbe30edf31ddc153fd0b0c0570c9b041
 """
 
@@ -19,7 +19,7 @@ CHUNK_LENGTH = 4 + 32
 
 class ChunklistStatus(enum.Enum):
     """
-    Chunklist status
+    Chunklist 状态
     """
     IN_PROGRESS = 0
     SUCCESS     = 1
@@ -28,19 +28,19 @@ class ChunklistStatus(enum.Enum):
 
 class ChunklistVerification:
     """
-    Library to validate Apple's files against their chunklist format
-    Supports both chunklist and integrityDataV1 files
-    - Ref: https://github.com/apple-oss-distributions/xnu/blob/xnu-8020.101.4/bsd/kern/chunklist.h
+    库，用于根据 chunklist 格式验证 Apple 的文件
+    支持 chunklist 和 integrityDataV1 文件
+    - 参考: https://github.com/apple-oss-distributions/xnu/blob/xnu-8020.101.4/bsd/kern/chunklist.h
 
-    Parameters:
-        file_path      (Path): Path to the file to validate
-        chunklist_path (Path): Path to the chunklist file
+    参数:
+        file_path      (Path): 要验证的文件路径
+        chunklist_path (Path): chunklist 文件路径
 
-    Usage:
+    使用方法:
         >>> chunk_obj = ChunklistVerification("InstallAssistant.pkg", "InstallAssistant.pkg.integrityDataV1")
         >>> chunk_obj.validate()
         >>> while chunk_obj.status == ChunklistStatus.IN_PROGRESS:
-        ...     print(f"Validating {chunk_obj.current_chunk} of {chunk_obj.total_chunks}")
+        ...     print(f"正在验证 {chunk_obj.current_chunk} of {chunk_obj.total_chunks}")
 
         >>> if chunk_obj.status == ChunklistStatus.FAILURE:
         ...     print(chunk_obj.error_msg)
@@ -64,15 +64,15 @@ class ChunklistVerification:
 
     def _generate_chunks(self, chunklist: Union[Path, bytes]) -> dict:
         """
-        Generate a dictionary of the chunklist header and chunks
+        生成包含 chunklist 头和块的字典
 
-        Parameters:
-            chunklist (Path | bytes): Path to the chunklist file or the chunklist file itself
+        参数:
+            chunklist (Path | bytes): chunklist 文件路径或 chunklist 文件本身
         """
 
         chunklist: bytes = chunklist if isinstance(chunklist, bytes) else chunklist.read_bytes()
 
-        # Ref: https://github.com/apple-oss-distributions/xnu/blob/xnu-8020.101.4/bsd/kern/chunklist.h#L59-L69
+        # 参考: https://github.com/apple-oss-distributions/xnu/blob/xnu-8020.101.4/bsd/kern/chunklist.h#L59-L69
         header: dict = {
             "magic":       chunklist[:4],
             "length":      int.from_bytes(chunklist[4:8], "little"),
@@ -95,7 +95,7 @@ class ChunklistVerification:
 
     def _validate(self) -> None:
         """
-        Validates provided file against chunklist
+        验证提供的文件是否符合 chunklist
         """
 
         if self.chunks is None:
@@ -103,13 +103,13 @@ class ChunklistVerification:
             return
 
         if not Path(self.file_path).exists():
-            self.error_msg = f"File {self.file_path} does not exist"
+            self.error_msg = f"文件 {self.file_path} 不存在"
             self.status = ChunklistStatus.FAILURE
             logging.info(self.error_msg)
             return
 
         if not Path(self.file_path).is_file():
-            self.error_msg = f"File {self.file_path} is not a file"
+            self.error_msg = f"文件 {self.file_path} 不是文件"
             self.status = ChunklistStatus.FAILURE
             logging.info(self.error_msg)
             return
@@ -119,7 +119,7 @@ class ChunklistVerification:
                 self.current_chunk += 1
                 status = hashlib.sha256(f.read(chunk["length"])).digest()
                 if status != chunk["checksum"]:
-                    self.error_msg = f"Chunk {self.current_chunk} checksum status FAIL: chunk sum {binascii.hexlify(chunk['checksum']).decode()}, calculated sum {binascii.hexlify(status).decode()}"
+                    self.error_msg = f"块 {self.current_chunk} 校验和状态失败: 块校验和 {binascii.hexlify(chunk['checksum']).decode()}, 计算校验和 {binascii.hexlify(status).decode()}"
                     self.status = ChunklistStatus.FAILURE
                     logging.info(self.error_msg)
                     return
@@ -129,6 +129,6 @@ class ChunklistVerification:
 
     def validate(self) -> None:
         """
-        Spawns _validate() thread
+        启动 _validate() 线程
         """
         threading.Thread(target=self._validate).start()

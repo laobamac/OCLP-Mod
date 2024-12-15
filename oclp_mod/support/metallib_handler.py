@@ -65,7 +65,7 @@ class MetalLibraryObject:
 
         global METALLIB_ASSET_LIST
 
-        logging.info("Pulling metallib list from MetallibSupportPkg API")
+        logging.info("从 MetallibSupportPkg API 拉取 metallib 列表")
         if METALLIB_ASSET_LIST:
             return METALLIB_ASSET_LIST
 
@@ -78,11 +78,11 @@ class MetalLibraryObject:
                 timeout=5
             )
         except (requests.exceptions.Timeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError):
-            logging.info("Could not contact MetallibSupportPkg API")
+            logging.info("无法联系 MetallibSupportPkg API")
             return None
 
         if results.status_code != 200:
-            logging.info("Could not fetch Metallib list")
+            logging.info("无法获取 Metallib 列表")
             return None
 
         METALLIB_ASSET_LIST = results.json()
@@ -98,13 +98,13 @@ class MetalLibraryObject:
         parsed_version = cast(packaging.version.Version, packaging.version.parse(self.host_version))
 
         if os_data.os_conversion.os_to_kernel(str(parsed_version.major)) < os_data.os_data.sequoia:
-            self.error_msg = "MetallibSupportPkg is not required for macOS Sonoma or older"
+            self.error_msg = "macOS Sonoma 或更早版本不需要 MetallibSupportPkg"
             logging.warning(f"{self.error_msg}")
             return
 
         self.metallib_installed_path = self._local_metallib_installed()
         if self.metallib_installed_path:
-            logging.info(f"metallib already installed ({Path(self.metallib_installed_path).name}), skipping")
+            logging.info(f"已安装 metallib ({Path(self.metallib_installed_path).name})，跳过")
             self.metallib_already_installed = True
             self.success = True
             return
@@ -112,36 +112,36 @@ class MetalLibraryObject:
         remote_metallib_version = self._get_remote_metallibs()
 
         if remote_metallib_version is None:
-            logging.warning("Failed to fetch metallib list, falling back to local metallib matching")
+            logging.warning("无法获取 metallib 列表，回退到本地 metallib 匹配")
 
-            # First check if a metallib matching the current macOS version is installed
-            # ex. 13.0.1 vs 13.0
+            # 首先检查是否安装了与当前 macOS 版本匹配的 metallib
+            # 例如 13.0.1 vs 13.0
             loose_version = f"{parsed_version.major}.{parsed_version.minor}"
-            logging.info(f"Checking for metallibs loosely matching {loose_version}")
+            logging.info(f"检查宽松匹配的 metallibs {loose_version}")
             self.metallib_installed_path = self._local_metallib_installed(match=loose_version, check_version=True)
             if self.metallib_installed_path:
-                logging.info(f"Found matching metallib: {Path(self.metallib_installed_path).name}")
+                logging.info(f"找到匹配的 metallib: {Path(self.metallib_installed_path).name}")
                 self.metallib_already_installed = True
                 self.success = True
                 return
 
             older_version = f"{parsed_version.major}.{parsed_version.minor - 1 if parsed_version.minor > 0 else 0}"
-            logging.info(f"Checking for metallibs matching {older_version}")
+            logging.info(f"检查匹配的 metallibs {older_version}")
             self.metallib_installed_path = self._local_metallib_installed(match=older_version, check_version=True)
             if self.metallib_installed_path:
-                logging.info(f"Found matching metallib: {Path(self.metallib_installed_path).name}")
+                logging.info(f"找到匹配的 metallib: {Path(self.metallib_installed_path).name}")
                 self.metallib_already_installed = True
                 self.success = True
                 return
 
-            logging.warning(f"Couldn't find metallib matching {self.host_version} or {older_version}, please install one manually")
+            logging.warning(f"找不到匹配 {self.host_version} 或 {older_version} 的 metallib，请手动安装一个")
 
-            self.error_msg = f"Could not contact MetallibSupportPkg API, and no metallib matching {self.host_version} ({self.host_build}) or {older_version} was installed.\nPlease ensure you have a network connection or manually install a metallib."
+            self.error_msg = f"无法联系 MetallibSupportPkg API，并且没有安装匹配 {self.host_version} ({self.host_build}) 或 {older_version} 的 metallib。\n请确保您有网络连接或手动安装一个 metallib."
 
             return
 
 
-        # First check exact match
+        # 首先检查精确匹配
         for metallib in remote_metallib_version:
             if (metallib["build"] != self.host_build):
                 continue
@@ -151,7 +151,7 @@ class MetalLibraryObject:
             self.metallib_url_is_exactly_match = True
             break
 
-        # If no exact match, check for closest match
+        # 如果没有精确匹配，检查最接近的匹配
         if self.metallib_url == "":
             for metallib in remote_metallib_version:
                 metallib_version = cast(packaging.version.Version, packaging.version.parse(metallib["version"]))
@@ -162,7 +162,7 @@ class MetalLibraryObject:
                 if metallib_version.minor not in range(parsed_version.minor - 1, parsed_version.minor + 1):
                     continue
 
-                # The metallib list is already sorted by version then date, so the first match is the closest
+                # metallib 列表已经按版本然后日期排序，所以第一个匹配的就是最接近的
                 self.metallib_closest_match_url = metallib["url"]
                 self.metallib_closest_match_url_build = metallib["build"]
                 self.metallib_closest_match_url_version = metallib["version"]
@@ -171,30 +171,30 @@ class MetalLibraryObject:
 
         if self.metallib_url == "":
             if self.metallib_closest_match_url == "":
-                logging.warning(f"No metallibs found for {self.host_build} ({self.host_version})")
-                self.error_msg = f"No metallibs found for {self.host_build} ({self.host_version})"
+                logging.warning(f"未找到 {self.host_build} ({self.host_version}) 的 metallibs")
+                self.error_msg = f"未找到 {self.host_build} ({self.host_version}) 的 metallibs"
                 return
-            logging.info(f"No direct match found for {self.host_build}, falling back to closest match")
-            logging.info(f"Closest Match: {self.metallib_closest_match_url_build} ({self.metallib_closest_match_url_version})")
+            logging.info(f"未找到 {self.host_build} 的直接匹配，回退到最接近的匹配")
+            logging.info(f"最接近的匹配: {self.metallib_closest_match_url_build} ({self.metallib_closest_match_url_version})")
 
             self.metallib_url = self.metallib_closest_match_url
             self.metallib_url_build = self.metallib_closest_match_url_build
             self.metallib_url_version = self.metallib_closest_match_url_version
         else:
-            logging.info(f"Direct match found for {self.host_build} ({self.host_version})")
+            logging.info(f"找到 {self.host_build} ({self.host_version}) 的直接匹配")
 
 
-        # Check if this metallib is already installed
+        # 检查此 metallib 是否已安装
         self.metallib_installed_path = self._local_metallib_installed(match=self.metallib_url_build)
         if self.metallib_installed_path:
-            logging.info(f"metallib already installed ({Path(self.metallib_installed_path).name}), skipping")
+            logging.info(f"已安装 metallib ({Path(self.metallib_installed_path).name})，跳过")
             self.metallib_already_installed = True
             self.success = True
             return
 
-        logging.info("Following metallib is recommended:")
-        logging.info(f"- metallib Build: {self.metallib_url_build}")
-        logging.info(f"- metallib Version: {self.metallib_url_version}")
+        logging.info("推荐的 metallib 如下:")
+        logging.info(f"- metallib 构建: {self.metallib_url_build}")
+        logging.info(f"- metallib 版本: {self.metallib_url_version}")
         logging.info(f"- metallib URL: {self.metallib_url}")
 
         self.success = True
@@ -235,16 +235,16 @@ class MetalLibraryObject:
         self.error_msg = ""
 
         if self.metallib_already_installed:
-            logging.info("No download required, metallib already installed")
+            logging.info("无需下载，已安装 metallib")
             self.success = True
             return None
 
         if self.metallib_url == "":
-            self.error_msg = "Could not retrieve metallib catalog, no metallib to download"
+            self.error_msg = "无法检索 metallib 目录，没有 metallib 可下载"
             logging.error(self.error_msg)
             return None
 
-        logging.info(f"Returning DownloadObject for metallib: {Path(self.metallib_url).name}")
+        logging.info(f"返回 metallib 的 DownloadObject: {Path(self.metallib_url).name}")
         self.success = True
 
         metallib_download_path = self.constants.metallib_download_path if override_path == "" else Path(override_path)
@@ -257,11 +257,11 @@ class MetalLibraryObject:
         """
 
         if not self.success:
-            logging.error("Cannot install metallib, no metallib was successfully retrieved")
+            logging.error("无法安装 metallib，没有成功检索到 metallib")
             return False
 
         if self.metallib_already_installed:
-            logging.info("No installation required, metallib already installed")
+            logging.info("无需安装，已安装 metallib")
             return True
 
         result = subprocess_wrapper.run_as_root([

@@ -36,7 +36,7 @@ class GlobalEnviromentSettings:
             try:
                 plist = plistlib.load(Path(self.global_settings_plist).open("rb"))
             except Exception as e:
-                logging.error("Error: Unable to read global settings file")
+                logging.error("错误: 无法读取全局设置文件")
                 logging.error(e)
                 return None
             if property_name in plist:
@@ -52,7 +52,7 @@ class GlobalEnviromentSettings:
             try:
                 plist = plistlib.load(Path(self.global_settings_plist).open("rb"))
             except Exception as e:
-                logging.error("Error: Unable to read global settings file")
+                logging.error("错误: 无法读取全局设置文件")
                 logging.error(e)
                 return
             if property_name in plist:
@@ -60,7 +60,7 @@ class GlobalEnviromentSettings:
                 try:
                     plistlib.dump(plist, Path(self.global_settings_plist).open("wb"))
                 except PermissionError:
-                    logging.info("Failed to write to global settings")
+                    logging.info("写入全局设置文件失败")
 
 
     def write_property(self, property_name: str, property_value) -> None:
@@ -72,14 +72,14 @@ class GlobalEnviromentSettings:
             try:
                 plist = plistlib.load(Path(self.global_settings_plist).open("rb"))
             except Exception as e:
-                logging.error("Error: Unable to read global settings file")
+                logging.error("错误: 无法读取全局设置文件")
                 logging.error(e)
                 return
             plist[property_name] = property_value
             try:
                 plistlib.dump(plist, Path(self.global_settings_plist).open("wb"))
             except PermissionError:
-                logging.info("Failed to write to global settings file")
+                logging.info("写入全局设置文件失败")
 
 
     def _generate_settings_file(self) -> None:
@@ -88,7 +88,7 @@ class GlobalEnviromentSettings:
         try:
             plistlib.dump({"Developed by laobamac": True,}, Path(self.global_settings_plist).open("wb"))
         except PermissionError:
-            logging.info("Permission error: Unable to write to global settings file")
+            logging.info("权限错误: 无法写入全局设置文件")
 
 
     def _convert_defaults_to_global_settings(self) -> None:
@@ -105,19 +105,19 @@ class GlobalEnviromentSettings:
                 defaults_plist = plistlib.load(Path(defaults_path).open("rb"))
                 global_settings_plist = plistlib.load(Path(self.global_settings_plist).open("rb"))
             except Exception as e:
-                logging.error("Error: Unable to read global settings file")
+                logging.error("错误: 无法读取全局设置文件")
                 logging.error(e)
                 return
             global_settings_plist.update(defaults_plist)
             try:
                 plistlib.dump(global_settings_plist, Path(self.global_settings_plist).open("wb"))
             except PermissionError:
-                logging.info("Permission error: Unable to write to global settings file")
+                logging.info("权限错误: 无法写入全局设置文件")
                 return
 
             # delete defaults plist
             try:
                 Path(defaults_path).unlink()
             except Exception as e:
-                logging.error("Error: Unable to delete defaults plist")
+                logging.error("错误: 无法删除defaults plist")
                 logging.error(e)

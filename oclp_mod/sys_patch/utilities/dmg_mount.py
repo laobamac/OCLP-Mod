@@ -1,5 +1,5 @@
 """
-dmg_mount.py: PatcherSupportPkg DMG Mounting. Handles Universal-Binaries and laobamacInternalResources DMGs.
+dmg_mount.py: PatcherSupportPkg DMG 挂载。处理 Universal-Binaries 和 laobamacInternalResources DMGs。
 """
 
 import logging
@@ -25,7 +25,7 @@ class PatcherSupportPkgMount:
         Mount PatcherSupportPkg's Universal-Binaries.dmg
         """
         if not Path(self.constants.payload_local_binaries_root_path_dmg).exists():
-            logging.info("- PatcherSupportPkg resources missing, Patcher likely corrupted!!!")
+            logging.info("- PatcherSupportPkg 资源缺失，Patcher 可能已损坏!!!")
             return False
 
         output = subprocess.run(
@@ -39,11 +39,11 @@ class PatcherSupportPkgMount:
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         )
         if output.returncode != 0:
-            logging.info("- Failed to mount Universal-Binaries.dmg")
+            logging.info("- 挂载 Universal-Binaries.dmg 失败")
             subprocess_wrapper.log(output)
             return False
 
-        logging.info("- Mounted Universal-Binaries.dmg")
+        logging.info("- 已挂载 Universal-Binaries.dmg")
         return True
 
 
@@ -58,7 +58,7 @@ class PatcherSupportPkgMount:
         if self.constants.cli_mode is True:
             return True
 
-        logging.info("- Found laobamacInternal resources, mounting...")
+        logging.info("- 找到 laobamacInternal 资源，正在挂载...")
 
         for i in range(3):
             key = self._request_decryption_key(i)
@@ -72,7 +72,7 @@ class PatcherSupportPkgMount:
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT
             )
             if output.returncode != 0:
-                logging.info("- Failed to mount laobamacInternal resources")
+                logging.info("- 挂载 laobamacInternal 资源失败")
                 subprocess_wrapper.log(output)
 
                 if "Authentication error" not in output.stdout.decode():
@@ -84,7 +84,7 @@ class PatcherSupportPkgMount:
                 continue
             break
 
-        logging.info("- Mounted laobamacInternal resources")
+        logging.info("- 已挂载 laobamacInternal 资源")
         return self._merge_laobamac_internal_resources()
 
 
@@ -99,7 +99,7 @@ class PatcherSupportPkgMount:
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         )
         if result.returncode != 0:
-            logging.info("- Failed to merge laobamacInternal resources")
+            logging.info("- 合并 laobamacInternal 资源失败")
             subprocess_wrapper.log(result)
             return False
 
@@ -116,9 +116,9 @@ class PatcherSupportPkgMount:
                 return Path("~/.laobamac_developer_key").expanduser().read_text().strip()
 
         password = ""
-        msg = "Welcome to the laobamacInternal Program, please provide the decryption key to access internal resources. Press cancel to skip."
+        msg = "欢迎使用 laobamacInternal 计划，请提供解密密钥以访问内部资源。点击取消以跳过。"
         if attempt > 0:
-            msg = f"Decryption failed, please try again. {2 - attempt} attempts remaining. "
+            msg = f"解密失败，请重试。剩余尝试次数 {2 - attempt} 次。 "
 
         try:
             password = applescript.AppleScript(
@@ -141,7 +141,7 @@ class PatcherSupportPkgMount:
         try:
             applescript.AppleScript(
                 f"""
-                display dialog "Failed to mount laobamacInternal resources, please file an internal radar." with title "OCLP-Mod" with icon file "{self.icon_path}"
+                display dialog "挂载 laobamacInternal 资源失败，请提交内部雷达。" with title "OCLP-Mod" with icon file "{self.icon_path}"
                 """
             ).run()
         except Exception as e:
@@ -155,7 +155,7 @@ class PatcherSupportPkgMount:
         try:
             applescript.AppleScript(
                 f"""
-                display dialog "Failed to mount laobamacInternal resources, too many incorrect passwords. If this continues with the correct decryption key, please file an internal radar." with title "OCLP-Mod" with icon file "{self.icon_path}"
+                display dialog "挂载 laobamacInternal 资源失败，密码错误次数过多。如果继续出现此问题且使用了正确的解密密钥，请提交内部雷达。" with title "OCLP-Mod" with icon file "{self.icon_path}"
                 """
             ).run()
         except Exception as e:
@@ -171,7 +171,7 @@ class PatcherSupportPkgMount:
         """
         # If already mounted, skip
         if Path(self.constants.payload_local_binaries_root_path).exists():
-            logging.info("- Local PatcherSupportPkg resources available, continuing...")
+            logging.info("- 本地 PatcherSupportPkg 资源可用，继续...")
             return True
 
         if self._mount_universal_binaries_dmg() is False:

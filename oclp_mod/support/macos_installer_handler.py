@@ -45,78 +45,77 @@ class InstallerCreation():
             bool: True if successful, False otherwise
         """
 
-        logging.info("Extracting macOS installer from InstallAssistant.pkg")
+        logging.info("从 InstallAssistant.pkg 提取 macOS 安装程序")
         result = subprocess_wrapper.run_as_root(["/usr/sbin/installer", "-pkg", f"{Path(download_path)}/InstallAssistant.pkg", "-target", "/"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if result.returncode != 0:
-            logging.info("Failed to install InstallAssistant")
+            logging.info("安装 InstallAssistant 失败")
             subprocess_wrapper.log(result)
             return False
 
-        logging.info("InstallAssistant installed")
+        logging.info("InstallAssistant 已安装")
         return True
 
 
     def generate_installer_creation_script(self, tmp_location: str, installer_path: str, disk: str) -> bool:
         """
-        Creates installer.sh to be piped to OCLP-Helper and run as admin
+        创建要传递给 OCLP-Helper 并以管理员身份运行的 installer.sh
 
-        Script includes:
-        - Format provided disk as HFS+ GPT
-        - Run createinstallmedia on provided disk
+        脚本包括：
+        - 将提供的磁盘格式化为 HFS+ GPT
+        - 在提供的磁盘上运行 createinstallmedia
 
-        Implementing this into a single installer.sh script allows us to only call
-        OCLP-Helper once to avoid nagging the user about permissions
+        将此实现为单个 installer.sh 脚本允许我们只需调用 OCLP-Helper 一次，以避免不断提示用户权限
 
         Parameters:
-            tmp_location (str): Path to temporary directory
-            installer_path (str): Path to InstallAssistant.pkg
-            disk (str): Disk to install to
+            tmp_location (str): 临时目录路径
+            installer_path (str): InstallAssistant.pkg 路径
+            disk (str): 要安装的磁盘
 
         Returns:
-            bool: True if successful, False otherwise
+            bool: 如果成功则为 True，否则为 False
         """
 
         additional_args = ""
         script_location = Path(tmp_location) / Path("Installer.sh")
 
-        # Due to a bug in createinstallmedia, running from '/Applications' may sometimes error:
+        # 由于 createinstallmedia 中存在一个错误，在 '/Applications' 运行时可能会出错：
         #   'Failed to extract AssetData/boot/Firmware/Manifests/InstallerBoot/*'
-        # This affects native Macs as well even when manually invoking createinstallmedia
+        # 这会影响原生 Mac 电脑，即使手动调用 createinstallmedia 也是如此
 
-        # To resolve, we'll copy into our temp directory and run from there
+        # 为了解决这个问题，我们将复制到我们的临时目录并从那里运行
 
-        # Create a new tmp directory
-        # Our current one is a disk image, thus CoW will not work
+        # 创建一个新的临时目录
+        # 我们的当前目录是一个磁盘镜像，因此 CoW 不会生效
         global tmp_dir
         ia_tmp = tmp_dir.name
 
-        logging.info(f"Creating temporary directory at {ia_tmp}")
-        # Delete all files in tmp_dir
+        logging.info(f"在 {ia_tmp} 创建临时目录")
+        # 删除 tmp_dir 中的所有文件
         for file in Path(ia_tmp).glob("*"):
             subprocess.run(["/bin/rm", "-rf", str(file)])
 
-        # Copy installer to tmp
+        # 将安装程序复制到临时目录
         if can_copy_on_write(installer_path, ia_tmp) is False:
-            # Ensure we have enough space for the duplication when CoW is not supported
+            # 确保在不支持 CoW 的情况下有足够的空间进行复制
             space_available = utilities.get_free_space()
             space_needed = Path(ia_tmp).stat().st_size
             if space_available < space_needed:
-                logging.info("Not enough free space to create installer.sh")
-                logging.info(f"{utilities.human_fmt(space_available)} available, {utilities.human_fmt(space_needed)} required")
+                logging.info("没有足够的可用空间创建 installer.sh")
+                logging.info(f"{utilities.human_fmt(space_available)} 可用, {utilities.human_fmt(space_needed)} 所需")
                 return False
 
         subprocess.run(generate_copy_arguments(installer_path, ia_tmp))
 
-        # Adjust installer_path to point to the copied installer
+        # 调整 installer_path 指向复制的安装程序
         installer_path = Path(ia_tmp) / Path(Path(installer_path).name)
         if not Path(installer_path).exists():
-            logging.info(f"Failed to copy installer to {ia_tmp}")
+            logging.info(f"无法将安装程序复制到 {ia_tmp}")
             return False
 
-        # Verify code signature before executing
+        # 在执行前验证代码签名
         createinstallmedia_path = str(Path(installer_path) / Path("Contents/Resources/createinstallmedia"))
         if subprocess.run(["/usr/bin/codesign", "-v", "-R=anchor apple", createinstallmedia_path]).returncode != 0:
-            logging.info(f"Installer has broken code signature")
+            logging.info(f"安装程序的代码签名已损坏")
             return False
 
         plist_path = str(Path(installer_path) / Path("Contents/Info.plist"))
@@ -147,50 +146,50 @@ fi
 
     def list_disk_to_format(self) -> dict:
         """
-        List applicable disks for macOS installer creation
-        Only lists disks that are:
-        - 14GB or larger
-        - External
+        列出适用于 macOS 安装程序创建的磁盘
+        仅列出以下磁盘：
+        - 14GB 或更大
+        - 外部
 
-        Current limitations:
-        - Does not support PCIe based SD cards readers
+        当前限制：
+        - 不支持基于 PCIe 的 SD 卡读卡器
 
         Returns:
-            dict: Dictionary of disks
+            dict: 磁盘字典
         """
 
         all_disks:  dict = {}
         list_disks: dict = {}
 
-        # TODO: AllDisksAndPartitions is not supported in Snow Leopard and older
+        # TODO: AllDisksAndPartitions 在 Snow Leopard 及更早版本中不受支持
         try:
-            # High Sierra and newer
+            # High Sierra 及更新版本
             disks = plistlib.loads(subprocess.run(["/usr/sbin/diskutil", "list", "-plist", "physical"], stdout=subprocess.PIPE).stdout.decode().strip().encode())
         except ValueError:
-            # Sierra and older
+            # Sierra 及更早版本
             disks = plistlib.loads(subprocess.run(["/usr/sbin/diskutil", "list", "-plist"], stdout=subprocess.PIPE).stdout.decode().strip().encode())
 
         for disk in disks["AllDisksAndPartitions"]:
             try:
                 disk_info = plistlib.loads(subprocess.run(["/usr/sbin/diskutil", "info", "-plist", disk["DeviceIdentifier"]], stdout=subprocess.PIPE).stdout.decode().strip().encode())
             except:
-                # Chinesium USB can have garbage data in MediaName
+                # Chinesium USB 可能在 MediaName 中有垃圾数据
                 diskutil_output = subprocess.run(["/usr/sbin/diskutil", "info", "-plist", disk["DeviceIdentifier"]], stdout=subprocess.PIPE).stdout.decode().strip()
                 ungarbafied_output = re.sub(r'(<key>MediaName</key>\s*<string>).*?(</string>)', r'\1\2', diskutil_output).encode()
                 disk_info = plistlib.loads(ungarbafied_output)
             try:
                 all_disks[disk["DeviceIdentifier"]] = {"identifier": disk_info["DeviceNode"], "name": disk_info.get("MediaName", "Disk"), "size": disk_info["TotalSize"], "removable": disk_info["Internal"], "partitions": {}}
             except KeyError:
-                # Avoid crashing with CDs installed
+                # 避免安装 CD 时崩溃
                 continue
 
         for disk in all_disks:
-            # Strip disks that are under 14GB (15,032,385,536 bytes)
-            # createinstallmedia isn't great at detecting if a disk has enough space
+            # 剔除小于 14GB（15,032,385,536 字节）的磁盘
+            # createinstallmedia 在检测磁盘是否有足够空间方面不是很好
             if not any(all_disks[disk]['size'] > 15032385536 for partition in all_disks[disk]):
                 continue
-            # Strip internal disks as well (avoid user formatting their SSD/HDD)
-            # Ensure user doesn't format their boot drive
+            # 剔除内部磁盘（避免用户格式化他们的 SSD/HDD）
+            # 确保用户不会格式化他们的启动驱动器
             if not any(all_disks[disk]['removable'] is False for partition in all_disks[disk]):
                 continue
 
@@ -207,7 +206,7 @@ fi
 
 class LocalInstallerCatalog:
     """
-    Finds all macOS installers on the local machine.
+    查找本地机器上的所有 macOS 安装程序。
     """
 
     def __init__(self) -> None:
@@ -216,25 +215,25 @@ class LocalInstallerCatalog:
 
     def _list_local_macOS_installers(self) -> dict:
         """
-        Searches for macOS installers in /Applications
+        在 /Applications 中搜索 macOS 安装程序
 
         Returns:
-            dict: A dictionary of macOS installers found on the local machine.
+            dict: 包含本地机器上找到的 macOS 安装程序的字典。
 
-            Example:
+            示例：
                 "Install macOS Big Sur Beta.app": {
                     "Short Name": "Big Sur Beta",
                     "Version": "11.0",
                     "Build": "20A5343i",
                     "Path": "/Applications/Install macOS Big Sur Beta.app",
                 },
-                etc...
+                等等...
         """
 
         application_list: dict = {}
 
         for application in Path(APPLICATION_SEARCH_PATH).iterdir():
-            # Certain Microsoft Applications have strange permissions disabling us from reading them
+            # 某些 Microsoft 应用程序具有奇怪的权限，阻止我们读取它们
             try:
                 if not (Path(APPLICATION_SEARCH_PATH) / Path(application) / Path("Contents/Resources/createinstallmedia")).exists():
                     continue
@@ -268,19 +267,19 @@ class LocalInstallerCatalog:
             min_required = os_data.os_conversion.os_to_kernel(min_required) if min_required != "Unknown" else 0
 
             if min_required == os_data.os_data.sierra and kernel == os_data.os_data.ventura:
-                # Ventura's installer requires El Capitan minimum
-                # Ref: https://github.com/laobamac/oclp-mod/discussions/1038
+                # Ventura 的安装程序要求最低为 El Capitan
+                # 参考: https://github.com/laobamac/oclp-mod/discussions/1038
                 min_required = os_data.os_data.el_capitan
 
-            # app_version can sometimes report GM instead of the actual version
-            # This is a workaround to get the actual version
+            # app_version 有时会报告 GM 而不是实际版本
+            # 这是一个解决方法来获取实际版本
             if app_version.startswith("GM"):
                 if kernel == 0:
                     app_version = "Unknown"
                 else:
                     app_version = os_data.os_conversion.kernel_to_os(kernel)
 
-            # Check if App Version is High Sierra or newer
+            # 检查应用程序版本是否为 High Sierra 或更高版本
             if kernel < os_data.os_data.high_sierra:
                 continue
 
@@ -301,21 +300,21 @@ class LocalInstallerCatalog:
                 }
             })
 
-        # Sort Applications by version
+        # 按版本对应用程序进行排序
         application_list = {k: v for k, v in sorted(application_list.items(), key=lambda item: item[1]["Version"])}
         return application_list
 
 
     def _parse_sharedsupport_version(self, sharedsupport_path: Path) -> tuple:
         """
-        Determine true version of macOS installer by parsing SharedSupport.dmg
-        This is required due to Info.plist reporting the application version, not the OS version
+        通过解析 SharedSupport.dmg 确定 macOS 安装程序的真实版本
+        这是必需的，因为 Info.plist 报告的是应用程序版本而不是操作系统版本
 
         Parameters:
-            sharedsupport_path (Path): Path to SharedSupport.dmg
+            sharedsupport_path (Path): SharedSupport.dmg 路径
 
         Returns:
-            tuple: Tuple containing the build and OS version
+            tuple: 包含构建和操作系统版本的元组
         """
 
         detected_build: str = None
@@ -328,7 +327,7 @@ class LocalInstallerCatalog:
             return (detected_build, detected_os)
 
 
-        # Create temporary directory to extract SharedSupport.dmg to
+        # 创建临时目录以提取 SharedSupport.dmg
         with tempfile.TemporaryDirectory() as tmpdir:
 
             output = subprocess.run(
@@ -359,7 +358,7 @@ class LocalInstallerCatalog:
                     if "OSVersion" in plist["Assets"][0]:
                         detected_os = plist["Assets"][0]["OSVersion"]
 
-            # Unmount SharedSupport.dmg
+            # 卸载 SharedSupport.dmg
             subprocess.run(["/usr/bin/hdiutil", "detach", tmpdir], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
         return (detected_build, detected_os)

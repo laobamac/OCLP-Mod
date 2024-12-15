@@ -1,5 +1,5 @@
 """
-boot_system.py: Boot and System Kernel Collection management
+boot_system.py: 启动和系统内核集合管理
 """
 
 import logging
@@ -20,8 +20,7 @@ class BootSystemKernelCollections(BaseKernelCache):
 
     def _kmutil_arguments(self) -> list[str]:
         """
-        Generate kmutil arguments for creating or updating
-        the boot, system and auxiliary kernel collections
+        生成用于创建或更新启动、系统和辅助内核集合的kmutil参数
         """
 
         args = ["/usr/bin/kmutil"]
@@ -41,8 +40,7 @@ class BootSystemKernelCollections(BaseKernelCache):
         args.append("release")
 
         if self.auxiliary_kc is True:
-            # Following arguments are supposed to skip kext consent
-            # prompts when creating auxiliary KCs with SIP disabled
+            # 以下参数用于在禁用SIP时创建辅助KC时跳过kext同意提示
             args.append("--no-authentication")
             args.append("--no-authorization")
 
@@ -50,9 +48,9 @@ class BootSystemKernelCollections(BaseKernelCache):
 
 
     def rebuild(self) -> bool:
-        logging.info(f"- Rebuilding {'Boot and System' if self.auxiliary_kc is False else 'Boot, System and Auxiliary'} Kernel Collections")
+        logging.info(f"- 重建 {'启动和系统' if self.auxiliary_kc is False else '启动、系统和辅助'} 内核集合")
         if self.auxiliary_kc is True:
-            logging.info("  (You will get a prompt by System Preferences, ignore for now)")
+            logging.info("  (您将收到系统偏好设置的提示，暂时忽略)")
 
         result = subprocess_wrapper.run_as_root(self._kmutil_arguments(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if result.returncode != 0:

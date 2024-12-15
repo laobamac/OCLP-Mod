@@ -76,24 +76,22 @@ class arguments:
         if self.args.auto_patch:
             self._sys_patch_auto_handler()
             return
-
-
     def _validation_handler(self) -> None:
         """
-        Enter validation mode
+        进入验证模式
         """
-        logging.info("Set Validation Mode")
+        logging.info("设置验证模式")
         validation.PatcherValidation(self.constants)
 
 
     def _sys_patch_handler(self) -> None:
         """
-        Start root volume patching
+        开始根卷修补
         """
 
-        logging.info("Set System Volume patching")
+        logging.info("设置系统卷修补")
         if "Library/InstallerSandboxes/" in str(self.constants.payload_path):
-            logging.info("- Running from Installer Sandbox, blocking OS updaters")
+            logging.info("- 从安装沙盒运行，阻止操作系统更新程序")
             thread = threading.Thread(target=sys_patch.PatchSysVolume(self.constants.custom_model or self.constants.computer.real_model, self.constants, None).start_patch)
             thread.start()
             while thread.is_alive():
@@ -105,47 +103,47 @@ class arguments:
 
     def _sys_unpatch_handler(self) -> None:
         """
-        Start root volume unpatching
+        开始根卷取消修补
         """
-        logging.info("Set System Volume unpatching")
+        logging.info("设置系统卷取消修补")
         sys_patch.PatchSysVolume(self.constants.custom_model or self.constants.computer.real_model, self.constants, None).start_unpatch()
 
 
     def _sys_patch_auto_handler(self) -> None:
         """
-        Start root volume auto patching
+        开始根卷自动修补
         """
 
-        logging.info("Set Auto patching")
+        logging.info("设置自动修补")
         StartAutomaticPatching(self.constants).start_auto_patch()
 
 
     def _prepare_for_update_handler(self) -> None:
         """
-        Prepare host for macOS update
+        准备主机进行macOS更新
         """
-        logging.info("Preparing host for macOS update")
+        logging.info("准备主机进行macOS更新")
 
         os_data = utilities.fetch_staged_update(variant="Update")
         if os_data[0] is None:
-            logging.info("No update staged, skipping")
+            logging.info("没有计划中的更新，跳过")
             return
 
         os_version = os_data[0]
         os_build   = os_data[1]
 
-        logging.info(f"Preparing for update to {os_version} ({os_build})")
+        logging.info(f"准备更新到 {os_version} ({os_build})")
 
         self._clean_le_handler()
 
 
     def _cache_os_handler(self) -> None:
         """
-        Fetch KDK for incoming OS
+        获取即将安装的OS的KDK
         """
         results = subprocess.run(["/bin/ps", "-ax"], stdout=subprocess.PIPE)
         if results.stdout.decode("utf-8").count("OCLP-Mod --cache_os") > 1:
-            logging.info("Another instance of OS caching is running, exiting")
+            logging.info("另一个OS缓存实例正在运行，退出")
             return
 
         gui_entry.EntryPoint(self.constants).start(entry=gui_entry.SupportedEntryPoints.OS_CACHE)
@@ -153,14 +151,14 @@ class arguments:
 
     def _clean_le_handler(self) -> None:
         """
-        Clean /Library/Extensions of problematic kexts
-        Note macOS Ventura and older do this automatically
+        清理/Library/Extensions中的有问题的kext
+        注意macOS Ventura及更早版本会自动执行此操作
         """
 
         if self.constants.detected_os < os_data.os_data.sonoma:
             return
 
-        logging.info("Cleaning /Library/Extensions")
+        logging.info("清理/Library/Extensions")
 
         for kext in Path("/Library/Extensions").glob("*.kext"):
             if not Path(f"{kext}/Contents/Info.plist").exists():
@@ -168,92 +166,92 @@ class arguments:
             try:
                 kext_plist = plistlib.load(open(f"{kext}/Contents/Info.plist", "rb"))
             except Exception as e:
-                logging.info(f"  - Failed to load plist for {kext.name}: {e}")
+                logging.info(f"  - 无法加载{kext.name}的plist: {e}")
                 continue
             if "GPUCompanionBundles" not in kext_plist:
                 continue
-            logging.info(f"  - Removing {kext.name}")
+            logging.info(f"  - 移除{kext.name}")
             subprocess_wrapper.run_as_root(["/bin/rm", "-rf", kext])
 
 
     def _build_handler(self) -> None:
         """
-        Start config building process
+        开始配置构建过程
         """
-        logging.info("Set OpenCore Build")
+        logging.info("设置OpenCore构建")
 
         if self.args.model:
             if self.args.model:
-                logging.info(f"- Using custom model: {self.args.model}")
+                logging.info(f"- 使用自定义型号: {self.args.model}")
                 self.constants.custom_model = self.args.model
                 defaults.GenerateDefaults(self.constants.custom_model, False, self.constants)
             elif self.constants.computer.real_model not in model_array.SupportedSMBIOS and self.constants.allow_oc_everywhere is False:
                 logging.info(
-                    """Your model is not supported by this patcher for running unsupported OSes!"
+                    """您的型号不支持此补丁程序以运行不受支持的操作系统！
 
-If you plan to create the USB for another machine, please select the "Change Model" option in the menu."""
+如果您打算为另一台机器创建USB，请在菜单中选择“更改型号”选项。"""
                 )
                 sys.exit(1)
             else:
-                logging.info(f"- Using detected model: {self.constants.computer.real_model}")
+                logging.info(f"- 使用检测到的型号: {self.constants.computer.real_model}")
                 defaults.GenerateDefaults(self.constants.custom_model, True, self.constants)
 
         if self.args.verbose:
-            logging.info("- Set verbose configuration")
+            logging.info("- 设置详细配置")
             self.constants.verbose_debug = True
         else:
-            self.constants.verbose_debug = False  # Override Defaults detected
+            self.constants.verbose_debug = False  # 覆盖默认检测
 
         if self.args.debug_oc:
-            logging.info("- Set OpenCore DEBUG configuration")
+            logging.info("- 设置OpenCore调试配置")
             self.constants.opencore_debug = True
 
         if self.args.debug_kext:
-            logging.info("- Set kext DEBUG configuration")
+            logging.info("- 设置kext调试配置")
             self.constants.kext_debug = True
 
         if self.args.hide_picker:
-            logging.info("- Set HidePicker configuration")
+            logging.info("- 设置隐藏启动选择器配置")
             self.constants.showpicker = False
 
         if self.args.disable_sip:
-            logging.info("- Set Disable SIP configuration")
+            logging.info("- 设置禁用SIP配置")
             self.constants.sip_status = False
         else:
-            self.constants.sip_status = True  # Override Defaults detected
+            self.constants.sip_status = True  # 覆盖默认检测
 
         if self.args.disable_smb:
-            logging.info("- Set Disable SecureBootModel configuration")
+            logging.info("- 设置禁用安全启动模型配置")
             self.constants.secure_status = False
         else:
-            self.constants.secure_status = True  # Override Defaults detected
+            self.constants.secure_status = True  # 覆盖默认检测
 
         if self.args.vault:
-            logging.info("- Set Vault configuration")
+            logging.info("- 设置Vault配置")
             self.constants.vault = True
 
         if self.args.firewire:
-            logging.info("- Set FireWire Boot configuration")
+            logging.info("- 设置FireWire启动配置")
             self.constants.firewire_boot = True
 
         if self.args.nvme:
-            logging.info("- Set NVMe Boot configuration")
+            logging.info("- 设置NVMe启动配置")
             self.constants.nvme_boot = True
 
         if self.args.wlan:
-            logging.info("- Set Wake on WLAN configuration")
+            logging.info("- 设置Wake on WLAN配置")
             self.constants.enable_wake_on_wlan = True
 
         if self.args.disable_tb:
-            logging.info("- Set Disable Thunderbolt configuration")
+            logging.info("- 设置禁用Thunderbolt配置")
             self.constants.disable_tb = True
 
         if self.args.force_surplus:
-            logging.info("- Forcing SurPlus override configuration")
+            logging.info("- 强制SurPlus覆盖配置")
             self.constants.force_surplus = True
 
         if self.args.moderate_smbios:
-            logging.info("- Set Moderate SMBIOS Patching configuration")
+            logging.info("- 设置中度SMBIOS修补配置")
             self.constants.serial_settings = "Moderate"
 
         if self.args.smbios_spoof:
@@ -264,10 +262,10 @@ If you plan to create the USB for another machine, please select the "Change Mod
             elif self.args.smbios_spoof == "Advanced":
                 self.constants.serial_settings = "Advanced"
             else:
-                logging.info(f"- Unknown SMBIOS arg passed: {self.args.smbios_spoof}")
+                logging.info(f"- 传递了未知的SMBIOS参数: {self.args.smbios_spoof}")
 
         if self.args.support_all:
-            logging.info("- Building for natively supported model")
+            logging.info("- 为原生支持的型号构建")
             self.constants.allow_oc_everywhere = True
             self.constants.serial_settings = "None"
 

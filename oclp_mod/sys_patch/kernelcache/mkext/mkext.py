@@ -22,7 +22,7 @@ class MKext(BaseKernelCache):
 
 
     def rebuild(self) -> None:
-        logging.info("- Rebuilding MKext cache")
+        logging.info("- 重建MKext缓存")
         result = subprocess_wrapper.run_as_root(self._mkext_arguments(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
         if result.returncode != 0:

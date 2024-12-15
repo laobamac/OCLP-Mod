@@ -49,7 +49,7 @@ class KernelCacheSupport:
         except PermissionError:
             pass
 
-        logging.info(f"  - {kext_name} requires authentication in System Preferences")
+        logging.info(f"  - {kext_name} 需要在系统偏好设置中进行身份验证")
 
         return True
 
@@ -90,7 +90,7 @@ class KernelCacheSupport:
 
         updated_install_location = str(self.mount_location_data) + "/Library/Extensions"
 
-        logging.info(f"  - Adding AuxKC support to {install_file}")
+        logging.info(f"  - 为 {install_file} 添加 AuxKC 支持")
         plist_path = Path(Path(source_folder_path) / Path(install_file) / Path("Contents/Info.plist"))
         plist_data = plistlib.load((plist_path).open("rb"))
 
@@ -121,7 +121,7 @@ class KernelCacheSupport:
         if self.detected_os < os_data.os_data.big_sur:
             return
 
-        logging.info("- Cleaning Auxiliary Kernel Collection")
+        logging.info("- 清理辅助内核集合")
         oclp_path = "/System/Library/CoreServices/oclp-mod.plist"
         if Path(oclp_path).exists():
             oclp_plist_data = plistlib.load(Path(oclp_path).open("rb"))
@@ -139,7 +139,7 @@ class KernelCacheSupport:
                                 continue
                             if not Path(f"/Library/Extensions/{file}").exists():
                                 continue
-                            logging.info(f"  - Removing {file}")
+                            logging.info(f"  - 删除 {file}")
                             subprocess_wrapper.run_as_root(["/bin/rm", "-Rf", f"/Library/Extensions/{file}"])
 
         # Handle situations where users migrated from older OSes with a lot of garbage in /L*/E*
@@ -155,7 +155,7 @@ class KernelCacheSupport:
         for file in Path("/Library/Extensions").glob("*.kext"):
             try:
                 if datetime.fromtimestamp(file.stat().st_mtime) < datetime(2021, 10, 1):
-                    logging.info(f"  - Relocating {file.name} kext to {relocation_path}")
+                    logging.info(f"  - 将 {file.name} kext 移动到 {relocation_path}")
                     if Path(relocation_path) / Path(file.name).exists():
                         subprocess_wrapper.run_as_root(["/bin/rm", "-Rf", relocation_path / Path(file.name)])
                     subprocess_wrapper.run_as_root(["/bin/mv", file, relocation_path])

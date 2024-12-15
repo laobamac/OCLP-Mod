@@ -34,10 +34,10 @@ class RoutePayloadDiskImage:
         """
 
         if self.constants.wxpython_variant is True and not self.constants.launcher_script:
-            logging.info("Running in compiled binary, switching to tmp directory")
+            logging.info("以编译二进制形式运行，切换到临时目录")
             self.temp_dir = tempfile.TemporaryDirectory()
-            logging.info(f"New payloads location: {self.temp_dir.name}")
-            logging.info("Creating payloads directory")
+            logging.info(f"新的 payloads 位置: {self.temp_dir.name}")
+            logging.info("创建 payloads 目录")
             Path(self.temp_dir.name / Path("payloads")).mkdir(parents=True, exist_ok=True)
             self._unmount_active_dmgs(unmount_all_active=False)
             output = subprocess.run(
@@ -51,12 +51,12 @@ class RoutePayloadDiskImage:
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT
             )
             if output.returncode == 0:
-                logging.info("Mounted payloads.dmg")
+                logging.info("已挂载 payloads.dmg")
                 self.constants.current_path = Path(self.temp_dir.name)
                 self.constants.payload_path = Path(self.temp_dir.name) / Path("payloads")
                 atexit.register(self._unmount_active_dmgs, unmount_all_active=False)
             else:
-                logging.info("Failed to mount payloads.dmg")
+                logging.info("挂载 payloads.dmg 失败")
                 subprocess_wrapper.log(output)
 
 
@@ -83,13 +83,13 @@ class RoutePayloadDiskImage:
                         # Check that only our personal payloads.dmg is unmounted
                         if "shadow-path" in image:
                             if self.temp_dir.name in image["shadow-path"]:
-                                logging.info(f"Unmounting personal {variant}")
+                                logging.info(f"卸载个人 {variant}")
                                 subprocess.run(
                                     ["/usr/bin/hdiutil", "detach", image["system-entities"][0]["dev-entry"], "-force"],
                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT
                                 )
                     else:
-                        logging.info(f"Unmounting {variant} at: {image['system-entities'][0]['dev-entry']}")
+                        logging.info(f"卸载 {variant} 在: {image['system-entities'][0]['dev-entry']}")
                         subprocess.run(
                             ["/usr/bin/hdiutil", "detach", image["system-entities"][0]["dev-entry"], "-force"],
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT

@@ -28,12 +28,12 @@ class PrelinkedKernel(BaseKernelCache):
         if not Path("/usr/sbin/kcditto").exists():
             return
 
-        logging.info("- Syncing Kernel Cache to Preboot")
+        logging.info("- 同步内核缓存到 Preboot")
         subprocess_wrapper.run_as_root_and_verify(["/usr/sbin/kcditto"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 
     def rebuild(self) -> None:
-        logging.info("- Rebuilding Prelinked Kernel")
+        logging.info("- 重建 Prelinked 内核")
         result = subprocess_wrapper.run_as_root(self._kextcache_arguments(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
         # kextcache notes:
