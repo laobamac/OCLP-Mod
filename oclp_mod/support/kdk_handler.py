@@ -91,6 +91,8 @@ class KernelDebugKitObject:
         self.error_msg: str = ""
 
         self._get_latest_kdk()
+
+
     def _get_remote_kdks(self) -> list:
         """
         Fetches a list of available KDKs from the KdkSupportPkg API
@@ -129,13 +131,13 @@ class KernelDebugKitObject:
 
     def _get_latest_kdk(self, host_build: str = None, host_version: str = None) -> None:
         """
-        Fetches the latest KDK for the current macOS version
+        获取当前 macOS 版本的最新 KDK
 
         Parameters:
-            host_build (str, optional):   The build version of the current macOS version.
-                                          If empty, will use the host_build from the class. Defaults to None.
-            host_version (str, optional): The version of the current macOS version.
-                                          If empty, will use the host_version from the class. Defaults to None.
+            host_build (str, optional):   当前 macOS 版本的构建版本。
+                                          如果为空，则使用类中的 host_build。默认为 None。
+            host_version (str, optional): 当前 macOS 版本。
+                                          如果为空，则使用类中的 host_version。默认为 None。
         """
 
         if host_build is None and host_version is None:
@@ -161,10 +163,10 @@ class KernelDebugKitObject:
         if remote_kdk_version is None:
             logging.warning("无法获取 KDK 列表，回退到本地 KDK 匹配")
 
-            # First check if a KDK matching the current macOS version is installed
-            # ex. 13.0.1 vs 13.0
+            # 首先检查是否安装了与当前 macOS 版本匹配的 KDK
+            # 例如 13.0.1 对应 13.0
             loose_version = f"{parsed_version.major}.{parsed_version.minor}"
-            logging.info(f"检查是否安装了与 {loose_version} 松散匹配的 KDK")
+            logging.info(f"检查松散匹配的 KDK {loose_version}")
             self.kdk_installed_path = self._local_kdk_installed(match=loose_version, check_version=True)
             if self.kdk_installed_path:
                 logging.info(f"找到匹配的 KDK: {Path(self.kdk_installed_path).name}")
@@ -173,7 +175,7 @@ class KernelDebugKitObject:
                 return
 
             older_version = f"{parsed_version.major}.{parsed_version.minor - 1 if parsed_version.minor > 0 else 0}"
-            logging.info(f"检查是否安装了与 {older_version} 匹配的 KDK")
+            logging.info(f"检查匹配的 KDK {older_version}")
             self.kdk_installed_path = self._local_kdk_installed(match=older_version, check_version=True)
             if self.kdk_installed_path:
                 logging.info(f"找到匹配的 KDK: {Path(self.kdk_installed_path).name}")
@@ -181,13 +183,13 @@ class KernelDebugKitObject:
                 self.success = True
                 return
 
-            logging.warning(f"找不到与 {host_version} 或 {older_version} 匹配的 KDK，请手动安装一个")
+            logging.warning(f"找不到匹配 {host_version} 或 {older_version} 的 KDK，请手动安装一个")
 
-            self.error_msg = f"无法联系 KdkSupportPkg API，并且没有安装与 {host_version} ({host_build}) 或 {older_version} 匹配的 KDK。\n请确保您有网络连接或手动安装一个 KDK."
+            self.error_msg = f"无法联系 KdkSupportPkg API，并且没有安装匹配 {host_version} ({host_build}) 或 {older_version} 的 KDK。\n请确保您有网络连接或手动安装一个 KDK."
 
             return
 
-        # First check exact match
+        # 首先检查精确匹配
         for kdk in remote_kdk_version:
             if (kdk["build"] != host_build):
                 continue
@@ -198,7 +200,7 @@ class KernelDebugKitObject:
             self.kdk_url_is_exactly_match = True
             break
 
-        # If no exact match, check for closest match
+        # 如果没有精确匹配，检查最接近的匹配
         if self.kdk_url == "":
             for kdk in remote_kdk_version:
                 kdk_version = cast(packaging.version.Version, packaging.version.parse(kdk["version"]))
@@ -209,7 +211,7 @@ class KernelDebugKitObject:
                 if kdk_version.minor not in range(parsed_version.minor - 1, parsed_version.minor + 1):
                     continue
 
-                # The KDK list is already sorted by version then date, so the first match is the closest
+                # KDK 列表已经按版本和日期排序，因此第一个匹配的是最接近的匹配
                 self.kdk_closest_match_url = kdk["url"]
                 self.kdk_closest_match_url_build = kdk["build"]
                 self.kdk_closest_match_url_version = kdk["version"]
@@ -222,18 +224,18 @@ class KernelDebugKitObject:
                 logging.warning(f"未找到适用于 {host_build} ({host_version}) 的 KDK")
                 self.error_msg = f"未找到适用于 {host_build} ({host_version}) 的 KDK"
                 return
-            logging.info(f"未找到 {host_build} 的直接匹配项，回退到最接近的匹配项")
-            logging.info(f"最接近的匹配项: {self.kdk_closest_match_url_build} ({self.kdk_closest_match_url_version})")
+            logging.info(f"未找到 {host_build} 的直接匹配，回退到最接近的匹配")
+            logging.info(f"最接近的匹配: {self.kdk_closest_match_url_build} ({self.kdk_closest_match_url_version})")
 
             self.kdk_url = self.kdk_closest_match_url
             self.kdk_url_build = self.kdk_closest_match_url_build
             self.kdk_url_version = self.kdk_closest_match_url_version
             self.kdk_url_expected_size = self.kdk_closest_match_url_expected_size
         else:
-            logging.info(f"找到 {host_build} ({host_version}) 的直接匹配项")
+            logging.info(f"找到 {host_build} ({host_version}) 的直接匹配")
 
 
-        # Check if this KDK is already installed
+        # 检查此 KDK 是否已安装
         self.kdk_installed_path = self._local_kdk_installed(match=self.kdk_url_build)
         if self.kdk_installed_path:
             logging.info(f"KDK 已安装 ({Path(self.kdk_installed_path).name})，跳过")
@@ -251,13 +253,13 @@ class KernelDebugKitObject:
 
     def retrieve_download(self, override_path: str = "") -> network_handler.DownloadObject:
         """
-        Returns a DownloadObject for the KDK
+        返回 KDK 的 DownloadObject
 
         Parameters:
-            override_path (str): Override the default download path
+            override_path (str): 覆盖默认下载路径
 
         Returns:
-            DownloadObject: DownloadObject for the KDK, None if no download required
+            DownloadObject: KDK 的 DownloadObject，如果没有下载要求则返回 None
         """
 
         self.success = False
@@ -285,7 +287,7 @@ class KernelDebugKitObject:
 
     def _generate_kdk_info_plist(self, plist_path: str) -> None:
         """
-        Generates a KDK Info.plist
+        生成 KDK Info.plist
 
         """
 
@@ -304,7 +306,6 @@ class KernelDebugKitObject:
         except Exception as e:
             logging.error(f"生成 KDK Info.plist 失败: {e}")
 
-class erfrfr:
     def _local_kdk_valid(self, kdk_path: Path) -> bool:
         """
         Validates provided KDK, ensure no corruption
@@ -445,7 +446,7 @@ class erfrfr:
                     return self._local_kdk_installed(match=match, check_version=check_version)
             else:
                 # When in passive mode, we're just checking if a KDK could be restored
-                logging.info("由于处于被动模式，跳过KDK恢复")
+                logging.info("KDK恢复被跳过，处于被动模式")
                 return kdk_pkg
 
         return None
@@ -540,7 +541,7 @@ class erfrfr:
         if result.returncode != 0:
             logging.info("错误: 内核调试工具包校验和验证失败！")
             subprocess_wrapper.log(result)
-            msg = "内核调试工具包校验和验证失败，请重试。\n\n如果此问题持续存在，请确保您在一个稳定的网络连接上下载（例如以太网）"
+            msg = "内核调试工具包校验和验证失败，请重试。\n\n如果此问题持续存在，请确保您在稳定的网络连接（例如以太网）上下载"
             logging.info(f"{msg}")
 
             self.error_msg = msg
@@ -574,7 +575,7 @@ class KernelDebugKitUtilities:
         """
 
         logging.info(f"安装KDK包: {kdk_path.name}")
-        logging.info(f"- 这可能需要一些时间...")
+        logging.info(f"- 这可能需要一段时间...")
 
         # TODO: Check whether enough disk space is available
 
@@ -601,7 +602,7 @@ class KernelDebugKitUtilities:
         with tempfile.TemporaryDirectory() as mount_point:
             result = subprocess_wrapper.run_as_root(["/usr/bin/hdiutil", "attach", kdk_path, "-mountpoint", mount_point, "-nobrowse"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             if result.returncode != 0:
-                logging.info("KDK挂载失败:")
+                logging.info("挂载KDK失败:")
                 subprocess_wrapper.log(result)
                 return False
 
@@ -643,16 +644,16 @@ class KernelDebugKitUtilities:
         """
 
         if not kdk_path.exists():
-            logging.warning("KDK不存在，无法创建备份")
+            logging.warning("KDK does not exist, cannot create backup")
             return
         if not kdk_info_plist.exists():
-            logging.warning("KDK Info.plist不存在，无法创建备份")
+            logging.warning("KDK Info.plist does not exist, cannot create backup")
             return
 
         kdk_info_dict = plistlib.load(kdk_info_plist.open("rb"))
 
         if 'version' not in kdk_info_dict or 'build' not in kdk_info_dict:
-            logging.warning("提供的KDK Info.plist格式不正确，无法创建备份")
+            logging.warning("Malformed KDK Info.plist provided, cannot create backup")
             return
 
         if not Path(KDK_INSTALL_PATH).exists():
@@ -661,12 +662,12 @@ class KernelDebugKitUtilities:
         kdk_dst_name = f"KDK_{kdk_info_dict['version']}_{kdk_info_dict['build']}.pkg"
         kdk_dst_path = Path(f"{KDK_INSTALL_PATH}/{kdk_dst_name}")
 
-        logging.info(f"创建备份: {kdk_dst_name}")
+        logging.info(f"Creating backup: {kdk_dst_name}")
         if kdk_dst_path.exists():
-            logging.info("备份已存在，跳过")
+            logging.info("Backup already exists, skipping")
             return
 
         result = subprocess_wrapper.run_as_root(generate_copy_arguments(kdk_path, kdk_dst_path), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if result.returncode != 0:
-            logging.info("创建KDK备份失败:")
+            logging.info("Failed to create KDK backup:")
             subprocess_wrapper.log(result)
