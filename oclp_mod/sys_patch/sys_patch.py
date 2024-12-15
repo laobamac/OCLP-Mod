@@ -126,7 +126,6 @@ class PatchSysVolume:
 
         return False
 
-class fyhubrfve:
     def _unmount_root_vol(self) -> None:
         """
         Unmount root volume

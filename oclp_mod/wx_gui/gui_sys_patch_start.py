@@ -1,5 +1,5 @@
 """
-gui_sys_patch_start.py: 正在安装驱动补丁 Frame
+gui_sys_patch_start.py: 正在安装驱动补丁 窗口
 """
 
 import wx
