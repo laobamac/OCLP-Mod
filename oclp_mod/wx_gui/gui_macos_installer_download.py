@@ -7,6 +7,11 @@ import locale
 import logging
 import threading
 import webbrowser
+import json
+import requests
+import time
+import urllib.parse
+import hashlib
 
 from pathlib import Path
 
@@ -24,7 +29,8 @@ from ..wx_gui import (
     gui_main_menu,
     gui_support,
     gui_download,
-    gui_macos_installer_flash
+    gui_macos_installer_flash,
+    gui_simplehac_dmg_flash
 )
 from ..support import (
     macos_installer_handler,
@@ -48,6 +54,9 @@ class macOSInstallerDownloadFrame(wx.Frame):
 
         self.available_installers = None
         self.available_installers_latest = None
+        self.available_simplehac_dmgs = None
+        self.fetched_aes_key = None
+        self.fetched_aes_key_status = None
 
         self.catalog_seed: sucatalog.SeedType = sucatalog.SeedType.DeveloperSeed
 
@@ -164,7 +173,189 @@ class macOSInstallerDownloadFrame(wx.Frame):
         progress_bar.Hide()
         self._display_available_installers()
 
+    def _generate_dmg_frame(self) -> None:
+        """
+        生成显示可用DMG的框架。
+        """
+        super(macOSInstallerDownloadFrame, self).__init__(None, title=self.title, size=(300, 200), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
+        gui_support.GenerateMenubar(self, self.constants).generate()
+        self.Centre()
 
+        # 标题: 正在查找可下载的版本
+        title_label = wx.StaticText(self, label="正在查找可下载的DMG镜像", pos=(-1, 5))
+        title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
+        title_label.Centre(wx.HORIZONTAL)
+
+        # 进度条
+        progress_bar = wx.Gauge(self, range=100, pos=(-1, title_label.GetPosition()[1] + title_label.GetSize()[1] + 5), size=(250, 30))
+        progress_bar.Centre(wx.HORIZONTAL)
+        progress_bar_animation = gui_support.GaugePulseCallback(self.constants, progress_bar)
+        progress_bar_animation.start_pulse()
+
+        # 设置窗口大小
+        self.SetSize((-1, progress_bar.GetPosition()[1] + progress_bar.GetSize()[1] + 40))
+
+        self.Show()
+
+        def _fetch_dmg():
+            apiurl = "https://oclpapi.simplehac.cn/DMG?token=oclpmod"
+            aesurl = "https://oclpapi.simplehac.cn/DMG/aeskey.json"
+
+            try:
+                # 发送 GET 请求
+                response = requests.get(apiurl)
+                aes = requests.get(aesurl)
+
+                # 检查响应状态码是否为 200
+                if response.status_code == 200:
+                    # 解析 JSON 数据
+                    dmgdata = response.json()  # 自动将 JSON 字符串解析为 Python 字典
+                    logging.info("返回的 JSON 数据:")
+                    dmgwell = json.dumps(dmgdata, indent=4, ensure_ascii=False)
+                    logging.info(dmgwell)  # 格式化输出 JSON 数据
+                    if aes.status_code == 200:
+                        self.fetched_aes_key = aes.text.strip()
+                        self.fetched_aes_key_status = aes.status_code
+                        logging.info(self.fetched_aes_key_status)
+                        logging.info(self.fetched_aes_key)
+                    else:
+                        logging.error(f"请求失败，状态码: {aes.status_code}")
+                else:
+                    logging.info(f"请求失败，状态码: {response.status_code}")
+            except requests.exceptions.RequestException as e:
+                logging.info(f"请求发生异常: {e}")
+            finally:
+                if dmgdata is not None:
+                    logging.info("Got it!")
+                    self.available_simplehac_dmgs = dmgdata
+                    self.dmgs = dmgdata
+                    logging.info(type(dmgdata))
+                else:
+                    logging.error("Lost it!")
+
+        thread = threading.Thread(target=_fetch_dmg, args=())
+        thread.start()
+
+        while thread.is_alive():
+            wx.Yield()
+
+        progress_bar_animation.stop_pulse()
+        progress_bar.Hide()
+        self._display_available_dmgs()
+
+    def generate_signed_url(self, download_url, aeskey):
+        API_URL = 'https://oclpapi.simplehac.cn/DMG/down.php'
+
+        parsed_url = urllib.parse.urlparse(download_url)
+        file_name = urllib.parse.unquote(parsed_url.path.split('/')[-1])
+
+        timestamp = int(time.time())
+        expire_time = timestamp + 300  # 秒
+
+        sign_data = f"oclpmod{file_name}{expire_time}{aeskey}"
+        sign = hashlib.md5(sign_data.encode('utf-8')).hexdigest()
+
+        signed_url = f"{API_URL}?origin={urllib.parse.quote(file_name)}&sign={sign}&t={expire_time}"
+        return signed_url
+
+    def _display_available_dmgs(self, event: wx.Event = None, show_full: bool = False) -> None:
+        """
+        在框架中显示可用的DMG
+        """
+        bundles = [wx.BitmapBundle.FromBitmaps(icon) for icon in self.icons]
+
+        self.frame_modal.Destroy()
+        self.frame_modal = wx.Dialog(self, title="选择SimpleHac DMG镜像", size=(505, 500))
+
+        title_label = wx.StaticText(self.frame_modal, label="选择此镜像 由SimpleHac提供支持", pos=(-1, -1))
+        title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
+
+        id = wx.NewIdRef()
+
+        self.list = wx.ListCtrl(self.frame_modal, id, style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_NO_HEADER | wx.BORDER_SUNKEN)
+        self.list.SetSmallImages(bundles)
+
+        self.list.InsertColumn(0, "Title", width=175)
+        self.list.InsertColumn(1, "Version", width=50)
+        self.list.InsertColumn(2, "Build", width=75)
+        self.list.InsertColumn(3, "Size", width=75)
+        self.list.InsertColumn(4, "Release Date", width=100)
+
+        dmgs = self.available_simplehac_dmgs
+
+        if dmgs:
+            locale.setlocale(locale.LC_TIME, '')
+            for idx, item in enumerate(dmgs['dmgFiles'], start=1):
+                logging.info(item)
+                if isinstance(item, dict):
+                    # 提取字段，带默认值
+                    title = str(item.get('title', 'Unknown Title'))
+                    version = str(item.get('version', 'Unknown Version'))
+                    build = str(item.get('build', 'Unknown Build'))
+                    size = str(item.get('size', 'Unknown Size'))
+                    release_date = str(item.get('releaseDate', 'Unknown Date'))
+                    download_url = str(item.get('downloadUrl', '#'))
+
+                    # 在 GUI 列表中插入数据
+                    index = self.list.InsertItem(self.list.GetItemCount(), title)
+                    self.list.SetItemImage(index, self._macos_version_to_icon(int(build[:2])))
+                    self.list.SetItem(index, 1, version)
+                    self.list.SetItem(index, 2, build)
+                    self.list.SetItem(index, 3, size)
+                    self.list.SetItem(index, 4, release_date)
+                else:
+                    print(f"数据格式错误: {item}")
+            if self.fetched_aes_key_status != 200:
+                logging.info(f"无法获取到密钥 {self.fetched_aes_key_status}")
+                wx.MessageDialog(self.frame_modal, "未能获取到密钥，请联系laobamac", "错误", wx.OK | wx.ICON_ERROR).ShowModal()
+                self.on_return_to_main_menu()
+        else:
+            logging.error("No dmgs found")
+            wx.MessageDialog(self.frame_modal, "未能获取到DMG信息，请联系laobamac", "错误", wx.OK | wx.ICON_ERROR).ShowModal()
+            self.on_return_to_main_menu()
+
+        if not show_full:
+            self.list.Select(-1)
+
+        self.list.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.on_select_list)
+        self.list.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_select_list)
+
+        self.select_button = wx.Button(self.frame_modal, label="下载", pos=(-1, -1), size=(150, -1))
+        self.select_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
+        self.select_button.Bind(wx.EVT_BUTTON, lambda event, installers=dmgs: self.on_download_dmg(installers))
+        self.dmgs = dmgs
+        self.select_button.SetToolTip("下载选定的DMG")
+        self.select_button.SetDefault()
+        if show_full:
+            self.select_button.Disable()
+
+        self.copy_button = wx.Button(self.frame_modal, label="复制链接", pos=(-1, -1), size=(80, -1))
+        self.copy_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
+        if show_full:
+            self.copy_button.Disable()
+        self.copy_button.SetToolTip("复制选定DMG的下载链接")
+        self.copy_button.Bind(wx.EVT_BUTTON, lambda event, installers=dmgs: self.on_copy_dmg_link(installers))
+
+        return_button = wx.Button(self.frame_modal, label="返回", pos=(-1, -1), size=(150, -1))
+        return_button.Bind(wx.EVT_BUTTON, self.on_return_to_main_menu)
+        return_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
+
+        rectbox = wx.StaticBox(self.frame_modal, -1)
+        rectsizer = wx.StaticBoxSizer(rectbox, wx.HORIZONTAL)
+        rectsizer.Add(self.copy_button, 0, wx.EXPAND | wx.RIGHT, 5)
+        rectsizer.Add(self.select_button, 0, wx.EXPAND | wx.LEFT, 5)
+
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.AddSpacer(10)
+        sizer.Add(title_label, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
+        sizer.Add(self.list, 1, wx.EXPAND | wx.ALL, 10)
+        sizer.Add(rectsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
+        sizer.AddSpacer(10)
+        sizer.Add(return_button, 0, wx.ALIGN_CENTRE | wx.BOTTOM, 15)
+
+        self.frame_modal.SetSizer(sizer)
+        self.frame_modal.ShowWindowModal()
     def _display_available_installers(self, event: wx.Event = None, show_full: bool = False) -> None:
         """
         Display available installers in frame
@@ -275,6 +466,29 @@ class macOSInstallerDownloadFrame(wx.Frame):
 
             wx.MessageDialog(self.frame_modal, "已复制到剪贴板", "", wx.OK | wx.ICON_INFORMATION).ShowModal()
 
+    def on_copy_dmg_link(self, installers: dict) -> None:
+
+        selected_item = self.list.GetFirstSelected()
+        if selected_item != -1:
+            clipboard = wx.Clipboard.Get()
+
+            if not clipboard.IsOpened():
+                clipboard.Open()
+            
+            item = installers['dmgFiles'][selected_item]
+            origin = item.get('downloadUrl', '')
+
+            if not origin:
+                logging.error(f"Download URL not found for selected item: {item}")
+                clipboard.Close()
+                wx.MessageDialog(self.frame_modal, "未能找到下载链接", "错误", wx.OK | wx.ICON_ERROR).ShowModal()
+                return
+            
+            clipboard.SetData(wx.TextDataObject(self.generate_signed_url(origin, self.fetched_aes_key)))
+
+            clipboard.Close()
+
+            wx.MessageDialog(self.frame_modal, "已复制到剪贴板", "", wx.OK | wx.ICON_INFORMATION).ShowModal()
 
     def on_select_list(self, event):
         if self.list.GetSelectedItemCount() > 0:
@@ -283,6 +497,50 @@ class macOSInstallerDownloadFrame(wx.Frame):
         else:
             self.select_button.Disable()
             self.copy_button.Disable()
+
+    def on_download_dmg(self, installers: dict) -> None:
+        """
+        Download macOS installer
+        """
+
+        selected_item = self.list.GetFirstSelected()
+        if selected_item != -1:
+            selected_installer = installers['dmgFiles'][selected_item]
+
+            logging.info(f"Selected macOS DMG {selected_installer['version']} ({selected_installer['build']})")
+
+            item = installers['dmgFiles'][selected_item]
+            download_url = item.get('downloadUrl', '')
+            title = item.get('title', '')
+            version = item.get('version', '')
+            build = item.get('build', '')
+            size = item.get('size', '')
+
+            self.frame_modal.Close()
+
+            dir_dialog = wx.DirDialog(self, "选择保存目录", "", wx.DD_DIR_MUST_EXIST)
+        
+            if dir_dialog.ShowModal() == wx.ID_OK:
+            # 获取用户选择的目录路径
+                save_path = dir_dialog.GetPath()
+                logging.info(f"选择了目录: {save_path}")
+            dir_dialog.Destroy()
+            file_name = f"/Install+{title}+{version}+{build}+with+OC&FirPE+SimpleHac.dmg"
+
+            download_obj = network_handler.DownloadObject(download_url, save_path+file_name, size)
+
+            gui_download.DownloadFrame(
+                self,
+                title="从SimpleHac OSS下载镜像",
+                global_constants=self.constants,
+                download_obj=download_obj,
+                item_name=f"SimpleHac's macOS {selected_installer['version']}",
+                download_icon=self.constants.icons_path[self._macos_version_to_icon(int(item['build'][:2]))]
+            )
+
+            if download_obj.download_complete is False:
+                self.on_return_to_main_menu()
+                return
 
     def on_download_installer(self, installers: dict) -> None:
         """
@@ -487,13 +745,32 @@ class macOSInstallerDownloadFrame(wx.Frame):
         '''
         Download SimpleHac's DMG
         '''
-        return()
+        self.frame_modal.Close()
+        self.parent.Hide()
+        self._generate_dmg_frame()
+        self.parent.Close()
 
     def on_flashdmg(self, event: wx.Event) -> None:
         '''
         Flash SimpleHac's DMG
         '''
-        return()
+        '''
+        frames = [self, self.frame_modal, self.parent]
+        for frame in frames:
+            if frame:
+                frame.Close()
+        gui_simplehac_dmg_flash.DMGFlashFrame(
+            None,
+            title=self.title,
+            global_constants=self.constants,
+            **({"screen_location": self.GetScreenPosition()} if self else {})
+        )
+        for frame in frames:
+            if frame:
+                frame.Destroy()
+        '''
+        wx.MessageDialog(self.frame_modal, "学业繁忙，此处未完工（gui_simplehac_dmg_flash.py为残品），请下载etcher自行刻录！\n现在为你打开SimpleHac加速镜像下载etcher", "", wx.OK | wx.ICON_INFORMATION).ShowModal()
+        webbrowser.open("https://download.simplehac.cn/https://github.com/balena-io/etcher/releases/download/v1.19.25/balenaEtcher-1.19.25-x64.dmg")
 
     def on_return(self, event: wx.Event) -> None:
         """

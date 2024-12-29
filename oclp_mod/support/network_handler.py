@@ -162,9 +162,10 @@ class DownloadObject:
 
     """
 
-    def __init__(self, url: str, path: str) -> None:
+    def __init__(self, url: str, path: str, size: str = None) -> None:
         self.url:       str = url
         self.status:    str = DownloadStatus.INACTIVE
+        self.size:      str = size
         self.error_msg: str = ""
         self.filename:  str = self._get_filename()
 
@@ -257,6 +258,13 @@ class DownloadObject:
         return Path(self.url).name
 
 
+    def convert_size(self, size_str):
+        units = {'KB': 1024, 'MB': 1024**2, 'GB': 1024**3, 'TB': 1024**4}
+        for unit, factor in units.items():
+            if unit in size_str:
+               return float(size_str.replace(unit, '')) * factor
+        return float(size_str)
+
     def _populate_file_size(self) -> None:
         """
         Get the file size of the file to be downloaded
@@ -268,6 +276,8 @@ class DownloadObject:
             result = SESSION.head(self.url, allow_redirects=True, timeout=5)
             if 'Content-Length' in result.headers:
                 self.total_file_size = float(result.headers['Content-Length'])
+                if self.size != None:
+                    self.total_file_size = self.convert_size(self.size)
             else:
                 raise Exception("Content-Length 头部缺失")
         except Exception as e:

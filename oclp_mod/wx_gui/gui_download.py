@@ -76,10 +76,10 @@ class DownloadFrame(wx.Frame):
                 percentage = 1
 
             if percentage == -1:
-                amount_str = f"{utilities.human_fmt(self.download_obj.downloaded_file_size)} downloaded ({utilities.human_fmt(self.download_obj.get_speed())}/s)"
+                amount_str = f"{utilities.human_fmt(self.download_obj.downloaded_file_size)} 已下载， ({utilities.human_fmt(self.download_obj.get_speed())}/s)"
                 progress_bar.Pulse()
             else:
-                amount_str = f"{utilities.seconds_to_readable_time(self.download_obj.get_time_remaining())}left - {utilities.human_fmt(self.download_obj.downloaded_file_size)} of {utilities.human_fmt(self.download_obj.total_file_size)} ({utilities.human_fmt(self.download_obj.get_speed())}/s)"
+                amount_str = f"还有 {utilities.seconds_to_readable_time(self.download_obj.get_time_remaining())} - {utilities.human_fmt(self.download_obj.downloaded_file_size)} 在 {utilities.human_fmt(self.download_obj.total_file_size)}中， 速度 ({utilities.human_fmt(self.download_obj.get_speed())}/s)"
                 progress_bar.SetValue(int(percentage))
 
             label_amount.SetLabel(amount_str)

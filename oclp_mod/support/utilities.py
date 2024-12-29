@@ -63,9 +63,9 @@ def seconds_to_readable_time(seconds) -> str:
     time = ""
 
     if 0 <= seconds < 60:
-        return "Less than a minute "
+        return "不到一分钟 "
     if seconds < 0:
-        return "Indeterminate time "
+        return "时间 "
 
     years, seconds = divmod(seconds, 31536000)
     days, seconds = divmod(seconds, 86400)
@@ -73,15 +73,15 @@ def seconds_to_readable_time(seconds) -> str:
     minutes, seconds = divmod(seconds, 60)
 
     if years > 0:
-        return "Over a year"
+        return "超过一年"
     if days > 0:
         if days > 31:
-            return "Over a month"
-        time += f"{days}d "
+            return "超过一个月"
+        time += f"{days} 天 "
     if hours > 0:
-        time += f"{hours}h "
+        time += f"{hours} 小时 "
     if minutes > 0:
-        time += f"{minutes}m "
+        time += f"{minutes} 分钟 "
     #if seconds > 0:
     #    time += f"{seconds}s"
     return time

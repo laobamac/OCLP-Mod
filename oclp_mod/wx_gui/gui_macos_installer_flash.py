@@ -256,7 +256,7 @@ class macOSInstallerFlashFrame(wx.Frame):
         warning_label.Centre(wx.HORIZONTAL)
 
         # Label: We will notify you when the installer is ready.
-        warning_label = wx.StaticText(self, label="可以去做其他事情，比如看看SimpleHac论坛或SimpleHac哔哩哔哩，完成会提示你.", pos=(-1, warning_label.GetPosition()[1] + warning_label.GetSize()[1] + 5))
+        warning_label = wx.StaticText(self, label="可以去做其他事情，比如看看SimpleHac资源社，完成会提示你.", pos=(-1, warning_label.GetPosition()[1] + warning_label.GetSize()[1] + 5))
         warning_label.SetFont(gui_support.font_factory(11, wx.FONTWEIGHT_NORMAL))
         warning_label.Centre(wx.HORIZONTAL)
 

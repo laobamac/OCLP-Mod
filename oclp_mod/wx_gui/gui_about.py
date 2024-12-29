@@ -44,7 +44,7 @@ class AboutFrame(wx.Frame):
         description = [
             "这是一个喜欢咕咕的高中生Mod的OCLP",
             "SimpleHac[laobamac]修改并汉化",
-            "SimpleHac论坛：www.simplehac.cn",
+            "SimpleHac资源社：www.simplehac.cn",
             "Q群：965625664",
         ]
         spacer = 5
