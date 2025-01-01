@@ -67,28 +67,28 @@ class HardwarePatchsetSettings(StrEnum):
     """
     Enum for patch settings
     """
-    KERNEL_DEBUG_KIT_REQUIRED     = "Settings: 需要KDK"
-    KERNEL_DEBUG_KIT_MISSING      = "Settings: 未找到KDK"
-    METALLIB_SUPPORT_PKG_REQUIRED = "Settings: 需要MetallibSupportPkg.pkg"
-    METALLIB_SUPPORT_PKG_MISSING  = "Settings: MetallibSupportPkg.pkg未找到"
+    KERNEL_DEBUG_KIT_REQUIRED     = "设置: 需要KDK"
+    KERNEL_DEBUG_KIT_MISSING      = "设置: 未找到KDK"
+    METALLIB_SUPPORT_PKG_REQUIRED = "设置: 需要MetallibSupportPkg.pkg"
+    METALLIB_SUPPORT_PKG_MISSING  = "设置: MetallibSupportPkg.pkg未找到"
 
 
 class HardwarePatchsetValidation(StrEnum):
     """
     Enum for validation settings
     """
-    UNSUPPORTED_HOST_OS           = "Validation: 不支持此系统版本"
-    MISSING_NETWORK_CONNECTION    = "Validation: 网络未连接"
-    FILEVAULT_ENABLED             = "Validation: 文件保险箱已开启"
-    SIP_ENABLED                   = "Validation: SIP已开启"
-    SECURE_BOOT_MODEL_ENABLED     = "Validation: SecureBootModel 已开启"
-    AMFI_ENABLED                  = "Validation: AMFI已开启"
-    WHATEVERGREEN_MISSING         = "Validation: WhateverGreen.kext 未找到"
-    FORCE_OPENGL_MISSING          = "Validation: Force OpenGL参数缺失ß"
-    FORCE_COMPAT_MISSING          = "Validation: Force compat参数缺失"
-    NVDA_DRV_MISSING              = "Validation: nvda_drv(_vrl)启动参数未添加"
-    PATCHING_NOT_POSSIBLE         = "Validation: 无法应用补丁"
-    UNPATCHING_NOT_POSSIBLE       = "Validation: 无法卸载补丁"
+    UNSUPPORTED_HOST_OS           = "验证: 不支持此系统版本"
+    MISSING_NETWORK_CONNECTION    = "验证: 网络未连接"
+    FILEVAULT_ENABLED             = "验证: 文件保险箱已开启"
+    SIP_ENABLED                   = "验证: SIP已开启"
+    SECURE_BOOT_MODEL_ENABLED     = "验证: SecureBootModel 已开启"
+    AMFI_ENABLED                  = "验证: AMFI已开启"
+    WHATEVERGREEN_MISSING         = "验证: WhateverGreen.kext 未找到"
+    FORCE_OPENGL_MISSING          = "验证: Force OpenGL参数缺失"
+    FORCE_COMPAT_MISSING          = "验证: Force compat参数缺失"
+    NVDA_DRV_MISSING              = "验证: nvda_drv(_vrl)启动参数未添加"
+    PATCHING_NOT_POSSIBLE         = "验证: 无法应用补丁"
+    UNPATCHING_NOT_POSSIBLE       = "验证: 无法卸载补丁"
 
 
 class HardwarePatchsetDetection:
@@ -315,7 +315,7 @@ class HardwarePatchsetDetection:
         for key, value in requirements.items():
             if key in ignore_keys:
                 continue
-            if not key.startswith("Validation:"):
+            if not key.startswith("验证:"):
                 continue
             if value is True:
                 return False
@@ -341,7 +341,7 @@ class HardwarePatchsetDetection:
         Notes:
         - Non-Metal GPUs are stripped out if any Metal GPUs are present
         - Metal 3802 GPUs are stripped out if Metal 31001 GPUs are present on macOS Sequoia or newer
-          - Exception is made for "Graphics: AMD Legacy GCN" on Sequoia or newer
+          - Exception is made for "显卡: AMD Legacy GCN" on Sequoia or newer
           - Special handling is done in amd_legacy_gcn.py
         """
         non_metal_gpu_present   = False
@@ -372,8 +372,8 @@ class HardwarePatchsetDetection:
                     present_hardware.remove(hardware)
 
         if metal_3802_gpu_present and metal_31001_gpu_present and self._xnu_major >= os_data.sequoia.value:
-            if metal_31001_name != "Graphics: AMD Legacy GCN":
-                logging.error("Cannot mix Metal 3802 and Metal 31001 GPUs on macOS Sequoia 或更新版本")
+            if metal_31001_name != "显卡: AMD Legacy GCN":
+                logging.error("无法混用 Metal 3802 and Metal 31001 GPUs 在 macOS Sequoia 或更新版本")
                 logging.error("Stripping out Metal 3802 GPUs")
                 for hardware in list(present_hardware):
                     if hardware.hardware_variant_graphics_subclass() == HardwareVariantGraphicsSubclass.METAL_3802_GRAPHICS:
@@ -419,7 +419,7 @@ class HardwarePatchsetDetection:
         """
         current_sip_status  = hex(py_sip_xnu.SipXnu().get_sip_status().value)
         expected_sip_status = hex(self._convert_required_sip_config_to_int(required_sip_configs))
-        sip_string = f"Validation: 启动时SIP: {current_sip_status} vs 期望: {expected_sip_status}"
+        sip_string = f"验证: 启动时SIP: {current_sip_status} vs 期望: {expected_sip_status}"
         index = list(requirements.keys()).index(HardwarePatchsetValidation.SIP_ENABLED)
         return dict(list(requirements.items())[:index+1] + [(sip_string, True)] + list(requirements.items())[index+1:])
 
@@ -466,7 +466,7 @@ class HardwarePatchsetDetection:
             item: BaseHardware
             device_properties[item.name()] = True
 
-            if item.name() == "Graphics: Nvidia Web Drivers":
+            if item.name() == "显卡: Nvidia Web Drivers":
                 has_nvidia_web_drivers = True
 
             for config in item.required_system_integrity_protection_configurations():
@@ -542,10 +542,10 @@ class HardwarePatchsetDetection:
         """
         logging.error("- Breakdown:")
         for key, value in self.device_properties.items():
-            if not key.startswith("Validation:"):
+            if not key.startswith("验证:"):
                 continue
             if key in [HardwarePatchsetValidation.PATCHING_NOT_POSSIBLE, HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE]:
                 continue
             if value is False:
                 continue
-            logging.error(f"  - {key.replace('Validation: ', '')}")
+            logging.error(f"  - {key.replace('验证: ', '')}")

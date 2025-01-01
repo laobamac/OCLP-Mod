@@ -12,7 +12,7 @@ Terms:
   Wireless Model: Driver used for wireless networking
   Bluetooth Model: Chipset model
   Screen Size: Size of the screen in inches (generally lowest size if multiple in same model)
-  UGA Graphics: If model needs UGA to GOP conversion
+  UGA 显卡: If model needs UGA to GOP conversion
   Ethernet Chipset: Vendor of the ethernet chipset (if multiple unique chipset within Vendor, chipset name is used)
   nForce Chipset: If model uses nForce chipset
   Switchable GPUs: If model uses a GMUX

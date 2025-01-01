@@ -109,7 +109,7 @@ class SysPatchDisplayFrame(wx.Frame):
         # can_unpatch: bool = not patches[HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE]
         can_unpatch: bool = not patches.get(HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE, False)
 
-        if not any(not patch.startswith("Settings") and not patch.startswith("Validation") and patches[patch] is True for patch in patches):
+        if not any(not patch.startswith("设置") and not patch.startswith("验证") and patches[patch] is True for patch in patches):
             logging.info("No applicable patches available")
             patches = {}
 
@@ -133,7 +133,7 @@ class SysPatchDisplayFrame(wx.Frame):
             else:
                 longest_patch = ""
                 for patch in patches:
-                    if (not patch.startswith("Settings") and not patch.startswith("Validation") and patches[patch] is True):
+                    if (not patch.startswith("设置") and not patch.startswith("验证") and patches[patch] is True):
                         if len(patch) > len(longest_patch):
                             longest_patch = patch
                 anchor = wx.StaticText(frame, label=longest_patch, pos=(-1, available_label.GetPosition()[1] + 20))
@@ -143,7 +143,7 @@ class SysPatchDisplayFrame(wx.Frame):
 
                 logging.info("Available patches:")
                 for patch in patches:
-                    if (not patch.startswith("Settings") and not patch.startswith("Validation") and patches[patch] is True):
+                    if (not patch.startswith("设置") and not patch.startswith("验证") and patches[patch] is True):
                         i = i + 20
                         logging.info(f"- {patch}")
                         patch_label = wx.StaticText(frame, label=f"- {patch}", pos=(anchor.GetPosition()[0], available_label.GetPosition()[1] + i))
@@ -161,7 +161,7 @@ class SysPatchDisplayFrame(wx.Frame):
 
                 longest_patch = ""
                 for patch in patches:
-                    if not patch.startswith("Validation"):
+                    if not patch.startswith("验证"):
                         continue
                     if patches[patch] is False:
                         continue
@@ -170,21 +170,21 @@ class SysPatchDisplayFrame(wx.Frame):
 
                     if len(patch) > len(longest_patch):
                         longest_patch = patch
-                anchor = wx.StaticText(frame, label=longest_patch.split('Validation: ')[1], pos=(-1, patch_label.GetPosition()[1] + 20))
+                anchor = wx.StaticText(frame, label=longest_patch.split('验证: ')[1], pos=(-1, patch_label.GetPosition()[1] + 20))
                 anchor.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
                 anchor.Centre(wx.HORIZONTAL)
                 anchor.Hide()
 
                 i = 0
                 for patch in patches:
-                    if not patch.startswith("Validation"):
+                    if not patch.startswith("验证"):
                         continue
                     if patches[patch] is False:
                         continue
                     if patch in [HardwarePatchsetValidation.PATCHING_NOT_POSSIBLE, HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE]:
                         continue
 
-                    patch_label = wx.StaticText(frame, label=f"- {patch.split('Validation: ')[1]}", pos=(anchor.GetPosition()[0], anchor.GetPosition()[1] + i))
+                    patch_label = wx.StaticText(frame, label=f"- {patch.split('验证: ')[1]}", pos=(anchor.GetPosition()[0], anchor.GetPosition()[1] + i))
                     patch_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
                     i = i + 20
 
@@ -319,7 +319,7 @@ class SysPatchDisplayFrame(wx.Frame):
 
         oclp_plist_data = plistlib.load(open(oclp_plist, "rb"))
         for patch in patches:
-            if (not patch.startswith("Settings") and not patch.startswith("Validation") and patches[patch] is True):
+            if (not patch.startswith("设置") and not patch.startswith("验证") and patches[patch] is True):
                 # Patches should share the same name as the plist key
                 # See sys_patch/patchsets/base.py for more info
                 if patch.split(": ")[1] not in oclp_plist_data:
