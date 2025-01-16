@@ -47,7 +47,7 @@ class SysPatchDisplayFrame(wx.Frame):
 
         if self.constants.update_stage != gui_support.AutoUpdateStages.INACTIVE:
             if self.available_patches is False:
-                gui_support.RestartHost(self.frame).restart(message="No root patch updates needed!\n\nWould you like to reboot to apply the new OpenCore build?")
+                gui_support.RestartHost(self.frame).restart(message="不需要任何补丁!\n\n你想现在重启来安装OpenCore吗？")
 
 
     def _generate_elements_display_patches(self, frame: wx.Frame = None) -> None:
