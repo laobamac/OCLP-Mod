@@ -65,7 +65,11 @@ class ModernWireless(BaseHardware):
                 device_probe.IntelWirelessCard.Chipsets.IntelWirelessIDs,
         ]
     )
-        return bcmwl_condition or intelwl_condition
+        if self._xnu_major < os_data.sequoia:
+            return bcmwl_condition
+        else:
+            return intelwl_condition or bcmwl_condition
+        
 
 
     def native_os(self) -> bool:
