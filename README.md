@@ -9,7 +9,7 @@ Add Chinese language ,Intel Wireless in Sequoia ,KDK/MetalLib files accelerated 
 
 ----------
 
-![GitHub all releases](https://img.shields.io/github/release/laobamac/OCLP-Mod) ![GitHub top language](https://img.shields.io/github/languages/top/laobamac/OCLP-Mod?color=4B8BBE&style=plastic) ![Github License](https://img.shields.io/github/license/laobamac/OCLP-Mod) [Telegram Group](https://t.me/+Z4xc0Ukl9uE3ZGVl)
+![GitHub all releases](https://img.shields.io/github/release/laobamac/OCLP-Mod) ![GitHub top language](https://img.shields.io/github/languages/top/laobamac/OCLP-Mod?color=4B8BBE&style=plastic) ![Github License](https://img.shields.io/github/license/laobamac/OCLP-Mod) [Telegram Group](https://t.me/simplehac1)
 
 ----------
 
