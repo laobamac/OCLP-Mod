@@ -51,12 +51,6 @@ jobs:
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 Build-Project.command
           --prepare-package
 
-      - name: Upload App to Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: OCLP-Mod.app (GUI)
-          path: OCLP-Mod-GUI.app.zip
-
       - name: Upload AutoPkg Package to Artifacts
         uses: actions/upload-artifact@v4
         with:

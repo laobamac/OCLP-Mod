@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>OCLP-Mod</key>
+	<string>v2.5.3</string>
+	<key>PatcherSupportPkg</key>
+	<string>v1.9.1</string>
+	<key>Time Patched</key>
+	<string>February 22, 2025 @ 09:36:20</string>
+	<key>Commit URL</key>
+	<string></string>
+	<key>Kernel Debug Kit Used</key>
+	<string>Not applicable</string>
+	<key>Metal Library Used</key>
+	<string>Not applicable</string>
+	<key>OS Version</key>
+	<string>24.3 (24D70)</string>
+	<key>Custom Signature</key>
+	<true/>
+	<key>BCM无线网卡</key>
+	<dict>
+		<key>Overwrite System Volume</key>
+		<dict>
+			<key>/usr/libexec</key>
+			<dict>
+				<key>airportd</key>
+				<string>13.7.2-24</string>
+				<key>wifip2pd</key>
+				<string>13.7.2-24</string>
+			</dict>
+			<key>/System/Library/CoreServices</key>
+			<dict>
+				<key>WiFiAgent.app</key>
+				<string>14.7.2</string>
+			</dict>
+		</dict>
+		<key>Merge System Volume</key>
+		<dict>
+			<key>/System/Library/Frameworks</key>
+			<dict>
+				<key>CoreWLAN.framework</key>
+				<string>13.7.2-24</string>
+			</dict>
+			<key>/System/Library/PrivateFrameworks</key>
+			<dict>
+				<key>CoreWiFi.framework</key>
+				<string>13.7.2-24</string>
+				<key>IO80211.framework</key>
+				<string>13.7.2-24</string>
+				<key>WiFiPeerToPeer.framework</key>
+				<string>13.7.2-24</string>
+			</dict>
+		</dict>
+	</dict>
+</dict>
+</plist>

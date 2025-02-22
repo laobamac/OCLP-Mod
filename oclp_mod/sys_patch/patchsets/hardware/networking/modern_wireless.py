@@ -16,6 +16,7 @@ class ModernWireless(BaseHardware):
 
     def __init__(self, xnu_major, xnu_minor, os_build, global_constants: Constants) -> None:
         super().__init__(xnu_major, xnu_minor, os_build, global_constants)
+        self.patchName = ""
 
 
     def name(self) -> str:
@@ -37,12 +38,16 @@ class ModernWireless(BaseHardware):
         )
 
         if intel_detected and bcm_detected:
+            self.patchName = "Intel/BCM双网卡"
             return f"{self.hardware_variant()}: Intel/BCM双网卡"
         elif intel_detected:
+            self.patchName = "Intel无线网卡"
             return f"{self.hardware_variant()}: Intel无线网卡"
         elif bcm_detected:
+            self.patchName = "BCM无线网卡"
             return f"{self.hardware_variant()}: BCM无线网卡"
         else:
+            self.patchName = "未知无线网卡"
             return f"{self.hardware_variant()}: 未知无线网卡"
 
 
@@ -94,7 +99,7 @@ class ModernWireless(BaseHardware):
             return {}
 
         return {
-            "Modern Wireless": {
+            f"{self.patchName}": {
                 PatchType.OVERWRITE_SYSTEM_VOLUME: {
                     "/usr/libexec": {
                         "airportd": f"13.7.2-{self._xnu_major}",
