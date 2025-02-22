@@ -18,6 +18,7 @@ class LegacyWireless(BaseHardware):
 
     def __init__(self, xnu_major, xnu_minor, os_build, global_constants: Constants) -> None:
         super().__init__(xnu_major, xnu_minor, os_build, global_constants)
+        self.patchName = ""
 
 
     def name(self) -> str:
@@ -28,18 +29,22 @@ class LegacyWireless(BaseHardware):
            isinstance(self._computer.wifi, device_probe.Atheros)
            and self._computer.wifi.chipset == device_probe.Atheros.Chipsets.AirPortAtheros40
        ):
+           self.patchName = "Atheros无线网卡"
            return f"{self.hardware_variant()}: Atheros无线网卡"
        elif (
            isinstance(self._computer.wifi, device_probe.Broadcom)
            and self._computer.wifi.chipset in [device_probe.Broadcom.Chipsets.AirPortBrcm4331, device_probe.Broadcom.Chipsets.AirPortBrcm43224]
        ):
+           self.patchName = "Broadcom无线网卡"
            return f"{self.hardware_variant()}: Broadcom无线网卡"
        elif (
            isinstance(self._computer.wifi, device_probe.Realtek)
            and self._computer.wifi.chipset == device_probe.Realtek.Chipsets.RealtekRTL88xx
        ):
+           self.patchName = "Realtek无线网卡"
            return f"{self.hardware_variant()}: Realtek无线网卡"
        else:
+           self.patchName = "未知无线网卡"
            return f"{self.hardware_variant()}: 未知无线网卡"
 
 
@@ -137,7 +142,7 @@ class LegacyWireless(BaseHardware):
             return {}
 
         return {
-            "Legacy Wireless Extended": {
+            f"{self.patchName}": {
                 PatchType.OVERWRITE_SYSTEM_VOLUME: {
                     "/usr/libexec": {
                         "wps":      "12.7.2" if self._xnu_major < os_data.sequoia else f"12.7.2-{self._xnu_major}",
