@@ -13,9 +13,9 @@ from .detections import device_probe
 class Constants:
     def __init__(self) -> None:
         # Patcher Versioning
-        self.patcher_version:                 str = "2.5.3"  # oclp-mod
-        self.patcher_support_pkg_version:     str = "1.9.1"  # PatcherSupportPkg
-        self.copyright_date:                  str = "Copyright © 2020-2024 Dortania and laobamac"
+        self.patcher_version:                 str = "2.5.4"  # oclp-mod
+        self.patcher_support_pkg_version:     str = "1.9.2"  # PatcherSupportPkg
+        self.copyright_date:                  str = "Copyright © 2020-2025 Dortania and laobamac"
         self.patcher_name:                    str = "OCLP-Mod"
 
         # URLs
