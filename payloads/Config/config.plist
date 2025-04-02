@@ -296,6 +296,8 @@
                 <false/>
                 <key>AvoidRuntimeDefrag</key>
                 <false/>
+                <key>ClearTaskSwitchBit</key>
+                <false/>
                 <key>DevirtualiseMmio</key>
                 <false/>
                 <key>DisableSingleUser</key>
@@ -1235,7 +1237,7 @@
                     <key>BundlePath</key>
                     <string>AutoPkgInstaller.kext</string>
                     <key>Comment</key>
-                    <string>Chainload OCLP-Mod installation</string>
+                    <string>Chainload OpenCore-Patcher installation</string>
                     <key>Enabled</key>
                     <false/>
                     <key>ExecutablePath</key>

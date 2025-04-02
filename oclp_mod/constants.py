@@ -13,7 +13,7 @@ from .detections import device_probe
 class Constants:
     def __init__(self) -> None:
         # Patcher Versioning
-        self.patcher_version:                 str = "2.5.4"  # oclp-mod
+        self.patcher_version:                 str = "2.5.5"  # oclp-mod
         self.patcher_support_pkg_version:     str = "1.9.2"  # PatcherSupportPkg
         self.copyright_date:                  str = "Copyright © 2020-2025 Dortania and laobamac"
         self.patcher_name:                    str = "OCLP-Mod"
@@ -28,7 +28,7 @@ class Constants:
 
         # OpenCore Versioning
         # https://github.com/acidanthera/OpenCorePkg
-        self.opencore_version: str = "1.0.3"
+        self.opencore_version: str = "1.0.4"
 
         # Kext Versioning
         ## Acidanthera
