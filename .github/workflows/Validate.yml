@@ -19,6 +19,6 @@ jobs:
         run: |
           pip3 install -r requirements.txt
           pip3 install packaging
-          aria2c -x 12 https://github.com/dortania/PatcherSupportPkg/releases/download/1.9.2/Universal-Binaries.dmg
+          aria2c -x 12 https://github.com/dortania/PatcherSupportPkg/releases/download/1.9.3/Universal-Binaries.dmg
           /Library/Frameworks/Python.framework/Versions/3.13/bin/python3 OCLP-Mod-GUI.command --validate
     
