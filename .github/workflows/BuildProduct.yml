@@ -26,7 +26,7 @@ jobs:
       - name: Install Dependencies
         run: |
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip install -r requirements.txt
-          /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip install wxPython --no-binary wxPython --pre
+          /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip install wxPython --no-binary wxPython
             
 
       - name: Force Universal2 charset for Python
