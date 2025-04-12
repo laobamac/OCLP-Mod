@@ -1,4 +1,4 @@
-name: BuildProduct
+name: CI - Build wxPython
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     name: Build wxPython
-    runs-on: macos-13
+    runs-on: macos-12
     if: github.repository_owner == 'laobamac'
 
     env:
@@ -23,14 +23,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Dependencies
-        run: |
-          /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip install -r requirements.txt
-            
+      # - name: Import Application Signing Certificate
+      #   uses: dhinakg/import-codesign-certs@master
+      #   with:
+      #     p12-file-base64: ${{ secrets.ORG_MAC_DEVELOPER_ID_APPLICATION_CERT_P12_BASE64 }}
+      #     p12-password: ${{ secrets.ORG_MAC_DEVELOPER_ID_APPLICATION_CERT_P12_PASSWORD }}
+
+      # - name: Import Installer Signing Certificate
+      #   uses: dhinakg/import-codesign-certs@master
+      #   with:
+      #     p12-file-base64: ${{ secrets.ORG_MAC_DEVELOPER_ID_INSTALLER_CERT_P12_BASE64 }}
+      #     p12-password: ${{ secrets.ORG_MAC_DEVELOPER_ID_INSTALLER_CERT_P12_PASSWORD }}
+
+      # - name: Install Dependencies
+      #   run: /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip install -r requirements.txt
 
       - name: Force Universal2 charset for Python
         run: |
-          aria2c -x 12 https://github.com/dortania/PatcherSupportPkg/releases/download/1.9.3/Universal-Binaries.dmg
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip uninstall -y charset_normalizer
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip download --platform macosx_10_9_universal2 --only-binary=:all: charset-normalizer
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip install charset_normalizer-*-macosx_10_9_universal2.whl
@@ -38,12 +47,13 @@ jobs:
       - name: Prepare Assets (--prepare-assets)
         run: >
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 Build-Project.command
-          --run-as-individual-steps
+          --run-as-individual-steps --reset-dmg-cache
           --prepare-assets
 
       - name: Prepare Application (--prepare-application)
         run: >
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 Build-Project.command
+          --git-branch "${{ env.branch }}" --git-commit-url "${{ env.commiturl }}" --git-commit-date "${{ env.commitdate }}"
           --reset-pyinstaller-cache
           --run-as-individual-steps
           --prepare-application
