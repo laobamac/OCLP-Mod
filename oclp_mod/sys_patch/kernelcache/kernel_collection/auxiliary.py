@@ -40,10 +40,10 @@ class AuxiliaryKernelCollection(BaseKernelCache):
         collection to be used.
         """
 
-        logging.info("- Forcing Auxiliary Kernel Collection usage")
+        logging.info("- 强制使用辅助内核扩展")
         result = subprocess_wrapper.run_as_root(["/usr/bin/killall", "syspolicyd", "kernelmanagerd"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if result.returncode != 0:
-            logging.info("- Unable to kill syspolicyd and kernelmanagerd")
+            logging.info("- 未能关闭 syspolicyd 和 kernelmanagerd")
             subprocess_wrapper.log(result)
             return False
 
@@ -58,10 +58,10 @@ class AuxiliaryKernelCollection(BaseKernelCache):
 
 
     def rebuild(self) -> None:
-        logging.info("- Building new Auxiliary Kernel Collection")
+        logging.info("- 重建辅助内核扩展")
         result = subprocess_wrapper.run_as_root(self._kmutil_arguments(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if result.returncode != 0:
-            logging.info("- Unable to build Auxiliary Kernel Collection")
+            logging.info("- 重建辅助内核扩展失败")
             subprocess_wrapper.log(result)
             return False
 
