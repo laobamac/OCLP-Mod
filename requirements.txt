@@ -1,4 +1,5 @@
 requests
+packaging
 wxpython
 pyobjc
 pyinstaller
