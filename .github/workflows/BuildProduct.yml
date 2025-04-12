@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     name: Build wxPython
-    runs-on: macos-14
+    runs-on: macos-13
     if: github.repository_owner == 'laobamac'
 
     env:
@@ -26,7 +26,6 @@ jobs:
       - name: Install Dependencies
         run: |
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip install -r requirements.txt
-          /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip install wxPython --no-binary wxPython --pre
             
 
       - name: Force Universal2 charset for Python
