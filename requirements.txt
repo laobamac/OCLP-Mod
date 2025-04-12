@@ -1,4 +1,5 @@
 requests
+wxpython
 pyobjc
 pyinstaller
 packaging
@@ -7,4 +8,3 @@ py-applescript
 markdown2
 macos-pkg-builder
 mac-signing-buddy
-wxpython
