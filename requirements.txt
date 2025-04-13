@@ -1,6 +1,6 @@
 requests
 packaging
-wxPython @ https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/wxPython-4.2.1-cp311-cp311-macosx_10_9_universal2.whl
+wxPython @ https://files.pythonhosted.org/packages/4a/6c/d53b5ae0c039190f07f2cb77715f7b0c3c68588ff922e8f894c0c6b8f9e9/wxPython-4.2.2-cp313-cp313-macosx_10_13_universal2.whl
 pyobjc
 pyinstaller
 packaging
