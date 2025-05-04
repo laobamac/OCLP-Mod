@@ -1,8 +1,9 @@
 <div align="center">
              <img src="docs/images/OC-Mod.png" alt="OCLP-Mod Logo" width="256" />
              <h1>OCLP-Mod</h1>
+             <a href="README_CN.md">中文版README</a>
 </div>
-
+<br>
 A Mod version [OCLP-Mod](https://github.com/laobamac/OCLP-Mod) which based on  Python-based project revolving around [Acidanthera's OpenCorePkg](https://github.com/acidanthera/OpenCorePkg) and [Lilu](https://github.com/acidanthera/Lilu) for both running and unlocking features in macOS on supported and unsupported Macs.
 
 Add Chinese language ,Intel Wireless in Sequoia ,KDK/MetalLib files accelerated download url and so on.
