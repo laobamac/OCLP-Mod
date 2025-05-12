@@ -19,6 +19,6 @@ jobs:
         run: |
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip install -r requirements.txt
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip install packaging
-          aria2c -x 16 https://github.com/dortania/PatcherSupportPkg/releases/download/1.9.3/Universal-Binaries.dmg
+          aria2c -x 16 https://github.com/dortania/PatcherSupportPkg/releases/download/1.9.5/Universal-Binaries.dmg
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 OCLP-Mod-GUI.command --validate
     
