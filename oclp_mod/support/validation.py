@@ -7,6 +7,7 @@ import logging
 import subprocess
 
 from pathlib import Path
+import time
 
 from . import network_handler
 
@@ -209,6 +210,8 @@ class PatcherValidation:
                 raise Exception("Failed to download Universal-Binaries.dmg")
 
         logging.info("Validating Root Patch File integrity")
+
+        time.sleep(2)
 
         self._unmount_dmg()
 

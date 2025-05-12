@@ -14,7 +14,7 @@ class Constants:
     def __init__(self) -> None:
         # Patcher Versioning
         self.patcher_version:                 str = "2.6.3"  # oclp-mod
-        self.patcher_support_pkg_version:     str = "1.9.3"  # PatcherSupportPkg
+        self.patcher_support_pkg_version:     str = "1.9.5"  # PatcherSupportPkg
         self.copyright_date:                  str = "Copyright © 2020-2025 Dortania and laobamac"
         self.patcher_name:                    str = "OCLP-Mod"
 
