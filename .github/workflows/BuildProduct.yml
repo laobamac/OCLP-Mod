@@ -38,6 +38,7 @@ jobs:
       - name: Install Dependencies
         run: |
           rm -rf Univ*
+          rm -rf *pay*.dmg
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip install -r requirements.txt
           aria2c -x 16 https://github.com/dortania/PatcherSupportPkg/releases/download/1.9.5/Universal-Binaries.dmg
 
@@ -50,7 +51,7 @@ jobs:
       - name: Prepare Assets (--prepare-assets)
         run: >
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 Build-Project.command
-          --run-as-individual-steps --reset-dmg-cache
+          --run-as-individual-steps
           --prepare-assets
 
       - name: Prepare Application (--prepare-application)
