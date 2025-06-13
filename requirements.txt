@@ -1,6 +1,6 @@
 requests
 packaging
-wxPython @ https://pypi.tuna.tsinghua.edu.cn/packages/5b/21/d59602847c7e2a577145cb85d0d02a7bb04abd7bcbbc4f316ac54d27a583/wxPython-4.2.2-cp312-cp312-macosx_10_10_universal2.whl#sha256=5d536110a674cb44ff6112d910b26fe6b062d670a6c3840a41036abfe83acc6b
+wxPython @ https://files.pythonhosted.org/packages/48/20/390530466538829eb8aa75256514d6fd976da2f272a068f4d00f90ab8013/wxPython-4.2.2-cp311-cp311-macosx_10_10_universal2.whl
 pyobjc
 pyinstaller
 packaging
