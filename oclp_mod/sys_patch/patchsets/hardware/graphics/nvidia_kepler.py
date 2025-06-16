@@ -27,7 +27,7 @@ class NvidiaKepler(BaseHardware):
         """
         Display name for end users
         """
-        return f"{self.hardware_variant()}: Nvidia Kepler"
+        return f"{self.hardware_variant()}: NVIDIA 开普勒显卡"
 
 
     def present(self) -> bool:
