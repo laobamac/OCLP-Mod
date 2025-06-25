@@ -339,6 +339,10 @@ class SDXCController(PCIDevice):
     CLASS_CODES: ClassVar[list[int]] = [0x080501]
 
 @dataclass
+class HDAController(PCIDevice):
+    CLASS_CODES: ClassVar[list[int]] = [0x030400]
+
+@dataclass
 class NVIDIA(GPU):
     VENDOR_ID: ClassVar[int] = 0x10DE
 
@@ -602,6 +606,22 @@ class Realtek(WirelessCard):
             self.chipset = Realtek.Chipsets.Unknown
 
 @dataclass
+class IntelHDAController(HDAController):
+    VENDOR_ID: ClassVar[int] = 0x8086  # Intel的厂商ID
+
+    class Chipsets(enum.Enum):
+        IntelAudioIDs = "Intel HDA supported"
+        Unknown = "Unknown"
+
+    chipset: Chipsets = field(init=False)
+
+    def detect_chipset(self):
+        if self.device_id in pci_data.intelaudio_ids.IntelAudioIDs:
+            self.chipset = IntelHDAController.Chipsets.IntelAudioIDs
+        else:
+            self.chipset = IntelHDAController.Chipsets.Unknown
+
+@dataclass
 class Aquantia(EthernetController):
     VENDOR_ID: ClassVar[int] = 0x1D6A
 
@@ -667,6 +687,7 @@ class Computer:
     sdxc_controller: list[PCIDevice] = field(default_factory=list)
     ethernet: list[EthernetController] = field(default_factory=list)
     wifi: Optional[WirelessCard] = None
+    hda: Optional[HDAController] = None
     cpu: Optional[CPU] = None
     usb_devices: list[USBDevice] = field(default_factory=list)
     oclp_version: Optional[str] = None

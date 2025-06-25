@@ -41,6 +41,7 @@ from .hardware.misc import (
     gmux,
     keyboard_backlight,
     legacy_audio,
+    modern_audio,
     pcie_webcam,
     t1_security,
     usb11,
@@ -131,6 +132,7 @@ class HardwarePatchsetDetection:
             gmux.GraphicsMultiplexer,
             keyboard_backlight.KeyboardBacklight,
             legacy_audio.LegacyAudio,
+            modern_audio.ModernAudio,
             pcie_webcam.PCIeFaceTimeCamera,
             t1_security.T1SecurityChip,
             usb11.USB11Controller,
@@ -419,7 +421,7 @@ class HardwarePatchsetDetection:
         """
         current_sip_status  = hex(py_sip_xnu.SipXnu().get_sip_status().value)
         expected_sip_status = hex(self._convert_required_sip_config_to_int(required_sip_configs))
-        sip_string = f"验证: 启动时SIP: {current_sip_status} vs 期望: {expected_sip_status}"
+        sip_string = f"验证: 启动时SIP: {current_sip_status} vs 需要: {expected_sip_status}"
         index = list(requirements.keys()).index(HardwarePatchsetValidation.SIP_ENABLED)
         return dict(list(requirements.items())[:index+1] + [(sip_string, True)] + list(requirements.items())[index+1:])
 
