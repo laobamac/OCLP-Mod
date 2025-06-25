@@ -70,8 +70,11 @@ class ModernWireless(BaseHardware):
                 device_probe.IntelWirelessCard.Chipsets.IntelWirelessIDs,
         ]
     )
+    
         if self._xnu_major < os_data.sequoia:
             return bcmwl_condition
+        elif self._xnu_major > os_data.sequoia:
+            return False
         else:
             return intelwl_condition or bcmwl_condition
         

@@ -1242,7 +1242,7 @@ class intelaudio_ids:
 class intelwl_ids:
     IntelWirelessIDs = [
         # Dual Band Wireless AC 7260
-        #0x08b1,
+        0x08b1,
         0x08b2,
         # Dual Band Wireless AC 3160
         0x08b3,
