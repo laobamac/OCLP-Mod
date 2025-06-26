@@ -92,6 +92,12 @@ class ModernWireless(BaseHardware):
         Type of hardware variant
         """
         return HardwareVariant.NETWORKING
+    
+    def requires_kernel_debug_kit(self) -> bool:
+        """
+        Apple no longer provides standalone kexts in the base OS
+        """
+        return self._xnu_major >= os_data.tahoe.value
 
 
     def patches(self) -> dict:

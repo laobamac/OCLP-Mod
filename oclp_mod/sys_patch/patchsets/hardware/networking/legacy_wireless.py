@@ -68,7 +68,7 @@ class LegacyWireless(BaseHardware):
             isinstance(self._computer.wifi, device_probe.Realtek)
             and self._computer.wifi.chipset == device_probe.Realtek.Chipsets.RealtekRTL88xx
         ):
-            return True
+            return False
 
         return False
 
