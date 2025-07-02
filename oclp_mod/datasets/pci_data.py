@@ -1234,11 +1234,6 @@ class rtlwl_ids:
     0xC822, #Realtel RTL8822CE
     ]
 
-class intelaudio_ids:
-    IntelAudioIDs = [
-        0xa2f0,
-    ]
-
 class intelwl_ids:
     IntelWirelessIDs = [
         # Dual Band Wireless AC 7260

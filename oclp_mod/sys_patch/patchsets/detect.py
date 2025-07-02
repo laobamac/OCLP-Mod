@@ -46,6 +46,7 @@ from .hardware.misc import (
     t1_security,
     usb11,
     cpu_missing_avx,
+    legacy_usb_host_res
 )
 
 from ... import constants
@@ -137,6 +138,7 @@ class HardwarePatchsetDetection:
             t1_security.T1SecurityChip,
             usb11.USB11Controller,
             cpu_missing_avx.CPUMissingAVX,
+            legacy_usb_host_res.LegacyUSBHOST,
         ]
 
         self.device_properties = None

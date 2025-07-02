@@ -700,6 +700,18 @@ class SettingsFrame(wx.Frame):
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
+                "允许安装旧版USB环境扩展补丁": {
+                    "type": "checkbox",
+                    "value": self.constants.allow_usb_patch,
+                    "variable": "allow_usb_patch",
+                    "description": [
+                        "允许在Tahoe及以上系统",
+                        "安装旧版USB环境扩展"
+                    ],
+                },
+                "wrap_around 1": {
+                    "type": "wrap_around",
+                },
                 "Non-Metal配置": {
                     "type": "title",
                 },

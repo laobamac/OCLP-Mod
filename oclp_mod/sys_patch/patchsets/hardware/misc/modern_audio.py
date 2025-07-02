@@ -38,7 +38,7 @@ class ModernAudio(BaseHardware):
 
     def native_os(self) -> bool:
         """
-        Only applicable for macOS 15.5 (Tahoe) and newer
+        Only applicable for macOS 26.0 (Tahoe) and newer
         """
         return self._xnu_major < os_data.tahoe.value
 
@@ -47,7 +47,7 @@ class ModernAudio(BaseHardware):
         """
         Type of hardware variant
         """
-        return HardwareVariant.MISCELLANEOUS
+        return HardwareVariant.AUDIO
 
 
     def requires_kernel_debug_kit(self) -> bool:
