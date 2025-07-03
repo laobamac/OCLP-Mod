@@ -23,18 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # - name: Import Application Signing Certificate
-      #   uses: dhinakg/import-codesign-certs@master
-      #   with:
-      #     p12-file-base64: ${{ secrets.ORG_MAC_DEVELOPER_ID_APPLICATION_CERT_P12_BASE64 }}
-      #     p12-password: ${{ secrets.ORG_MAC_DEVELOPER_ID_APPLICATION_CERT_P12_PASSWORD }}
-
-      # - name: Import Installer Signing Certificate
-      #   uses: dhinakg/import-codesign-certs@master
-      #   with:
-      #     p12-file-base64: ${{ secrets.ORG_MAC_DEVELOPER_ID_INSTALLER_CERT_P12_BASE64 }}
-      #     p12-password: ${{ secrets.ORG_MAC_DEVELOPER_ID_INSTALLER_CERT_P12_PASSWORD }}
-
       - name: Install Dependencies
         run: |
           rm -rf Univ*
@@ -84,6 +72,19 @@ jobs:
         with:
           name: OCLP-Mod-Uninstaller.pkg
           path: ./dist/OCLP-Mod-Uninstaller.pkg
+
+      - name: Create Pre-Release on Push
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: push-${{ github.sha }}
+          name: Pre-release for ${{ github.sha }}
+          body: ${{ github.event.head_commit.message }}
+          prerelease: true
+          files: |
+            ./dist/AutoPkg-Assets.pkg
+            ./dist/OCLP-Mod.pkg
+            ./dist/OCLP-Mod-Uninstaller.pkg
 
       - name: Upload AutoPkg Package to Release
         if: github.event_name == 'release'
