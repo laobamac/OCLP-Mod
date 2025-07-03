@@ -243,6 +243,7 @@ class Constants:
         self.apfs_trim_timeout:      bool = True  #  Set APFS Trim timeout
         self.custom_sip_value:        int = None  #  Set custom SIP value
         self.allow_usb_patch:        bool = False #  Allow USB Patch on Tahoe
+        self.allow_hda_patch:        bool = False #  Allow HDA Patch on Tahoe
 
         ## Non-Metal OS support
         self.legacy_accel_support = [

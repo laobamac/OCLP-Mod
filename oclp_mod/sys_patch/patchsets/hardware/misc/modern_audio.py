@@ -7,6 +7,7 @@ from ..base import BaseHardware, HardwareVariant
 from ...base import PatchType
 
 from .....constants import Constants
+from ..... import constants
 from .....detections import device_probe
 from .....datasets.os_data import os_data
 
@@ -15,6 +16,8 @@ class ModernAudio(BaseHardware):
 
     def __init__(self, xnu_major, xnu_minor, os_build, global_constants: Constants) -> None:
         super().__init__(xnu_major, xnu_minor, os_build, global_constants)
+
+        self.constants: constants.Constants = global_constants
 
 
     def name(self) -> str:
@@ -34,7 +37,7 @@ class ModernAudio(BaseHardware):
         ):
             return True
         '''
-        return True
+        return self.constants.allow_hda_patch
 
     def native_os(self) -> bool:
         """

@@ -697,6 +697,16 @@ class SettingsFrame(wx.Frame):
                     "override_function": self._update_global_settings,
                     "condition": not bool(self.constants.computer.real_model not in ["MacBookPro8,2", "MacBookPro8,3"])
                 },
+                "允许安装旧版HDA环境扩展补丁": {
+                    "type": "checkbox",
+                    "value": self.constants.allow_hda_patch,
+                    "variable": "allow_hda_patch",
+                    "description": [
+                        "允许在Tahoe及以上系统",
+                        "启用AppleHDA驱动声卡",
+                        "搭配AppleALC.kext"
+                    ],
+                },
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
