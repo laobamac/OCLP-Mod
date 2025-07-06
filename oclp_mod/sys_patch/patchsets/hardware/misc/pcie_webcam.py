@@ -28,7 +28,10 @@ class PCIeFaceTimeCamera(BaseHardware):
         """
         Targeting PCIe FaceTime Cameras
         """
-        return self._computer.pcie_webcam
+        if self._xnu_major == os_data.tahoe.value:
+            return False
+        else:
+            return self._computer.pcie_webcam
 
 
     def native_os(self) -> bool:
