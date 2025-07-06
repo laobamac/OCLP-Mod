@@ -28,25 +28,25 @@ class Constants:
 
         # OpenCore Versioning
         # https://github.com/acidanthera/OpenCorePkg
-        self.opencore_version: str = "1.0.4"
+        self.opencore_version: str = "1.0.5"
 
         # Kext Versioning
         ## Acidanthera
         ## https://github.com/acidanthera
-        self.lilu_version:               str = "1.7.0"  #      Lilu
-        self.whatevergreen_version:      str = "1.6.9"  #      WhateverGreen
+        self.lilu_version:               str = "1.7.1"  #      Lilu
+        self.whatevergreen_version:      str = "1.7.0"  #      WhateverGreen
         self.whatevergreen_navi_version: str = "1.6.7-Navi"  # WhateverGreen (Navi Patch)
-        self.airportbcrmfixup_version:   str = "2.1.9"  #      AirPortBrcmFixup
-        self.nvmefix_version:            str = "1.1.2"  #      NVMeFix
-        self.applealc_version:           str = "1.6.3"  #      AppleALC
-        self.restrictevents_version:     str = "1.1.5"  #      RestrictEvents
-        self.featureunlock_version:      str = "1.1.7"  #      FeatureUnlock
-        self.debugenhancer_version:      str = "1.1.0"  #      DebugEnhancer
-        self.cpufriend_version:          str = "1.2.9"  #      CPUFriend
-        self.bluetool_version:           str = "2.7.0"  #      BlueToolFixup (BrcmPatchRAM)
+        self.airportbcrmfixup_version:   str = "2.2.0"  #      AirPortBrcmFixup
+        self.nvmefix_version:            str = "1.1.3"  #      NVMeFix
+        self.applealc_version:           str = "1.6.5"  #      AppleALC
+        self.restrictevents_version:     str = "1.1.6"  #      RestrictEvents
+        self.featureunlock_version:      str = "1.1.8"  #      FeatureUnlock
+        self.debugenhancer_version:      str = "1.1.1"  #      DebugEnhancer
+        self.cpufriend_version:          str = "1.3.0"  #      CPUFriend
+        self.bluetool_version:           str = "2.7.1"  #      BlueToolFixup (BrcmPatchRAM)
         self.cslvfixup_version:          str = "2.6.1"  #      CSLVFixup
         self.autopkg_version:            str = "1.0.4"  #      AutoPkgInstaller
-        self.cryptexfixup_version:       str = "1.0.4"  #      CryptexFixup
+        self.cryptexfixup_version:       str = "1.0.5"  #      CryptexFixup
 
         ## Apple
         ## https://www.apple.com
@@ -325,6 +325,10 @@ class Constants:
         return self.payload_path / Path("ACPI/SSDT-DGPU.aml")
 
     # Drivers
+    @property
+    def sequoia_apfs_driver_path(self):
+        return self.payload_path / Path("Drivers/apfs_aligned.efi")
+    
     @property
     def nvme_driver_path(self):
         return self.payload_path / Path("Drivers/NvmExpressDxe.efi")
@@ -687,10 +691,18 @@ class Constants:
     @property
     def map_kext_folder(self):
         return self.kexts_path / Path("USB-Map.kext")
+    
+    @property
+    def map_kext_folder_tahoe(self):
+        return self.kexts_path / Path("USB-Map-Tahoe.kext")
 
     @property
     def map_contents_folder(self):
         return self.map_kext_folder / Path("Contents")
+    
+    @property
+    def map_contents_folder_tahoe(self):
+        return self.map_kext_folder_tahoe / Path("Contents")
 
     @property
     def pp_kext_folder(self):
