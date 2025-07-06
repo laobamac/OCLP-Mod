@@ -1,50 +1,11 @@
-<div align="center">
-             <img src="docs/images/OC-Mod.png" alt="OCLP-Mod Logo" width="256" />
-             <h1>OCLP-Mod</h1>
-             <a href="README_CN.md">中文版README</a>
-</div>
+# OCLP-Mod
+## 这是针对macOS Tahoe的开发版分支，包含最新的提交
+## 这个分支有很多不稳定因素，无调试基础的用户和需要用在生产环境的用户不要下载
+## 此分支不接受issue，仅接受PR
 <br>
 
-A Mod version [OCLP-Mod](https://github.com/laobamac/OCLP-Mod) which based on  Python-based project revolving around [Acidanthera's OpenCorePkg](https://github.com/acidanthera/OpenCorePkg) and [Lilu](https://github.com/acidanthera/Lilu) for both running and unlocking features in macOS on supported and unsupported Macs.
+## This is a development version branch for macOS Tahoe, including the latest submissions.
 
-Add Chinese language ,Intel Wireless in Sequoia ,KDK/MetalLib files accelerated download url and so on.
+## There are many unstable factors in this branch. Users who do not have a debugging foundation and users who need to use it in the production environment should not download it.
 
-----------
-
-![GitHub all releases](https://img.shields.io/github/release/laobamac/OCLP-Mod) ![GitHub top language](https://img.shields.io/github/languages/top/laobamac/OCLP-Mod?color=4B8BBE&style=plastic) ![Github License](https://img.shields.io/github/license/laobamac/OCLP-Mod) [Telegram Group](https://t.me/simplehac1)
-
-----------
-
-Noteworthy features of OCLP-Mod:
-
-* Support for macOS Big Sur, Monterey, Ventura, Sonoma and Sequoia
-* Native Over the Air (OTA) System Updates
-* Supports Penryn and newer Macs
-* Full support for WPA Wi-Fi and Personal Hotspot on BCM943224 and newer wireless chipsets
-* System Integrity Protection, FileVault 2, .im4m Secure Boot and Vaulting
-* Recovery OS, Safe Mode and Single-user Mode booting on non-native OSes
-* Unlocks features such as Sidecar and AirPlay to Mac even on native Macs
-* Enables enhanced SATA and NVMe power management on non-Apple storage devices
-* Zero firmware patching required (ie. APFS ROM patching)
-* Graphics acceleration for both Metal and non-Metal GPUs
-* zh_CN is available.
-* IntelWireless Card is avaliable.
-
-## Support
-
-This project is offered on an AS-IS basis, we do not guarantee support for any issues that may arise. However, there is a community server with other passionate users and developers that can aid you:
-
-* [SimpleHac BBS](https://www.simplehac.cn)
-
-
-## Running from source
-
-To run the project from source, see here: [Build and run from source](./SOURCE.md)
-
-## Credits
-
-* [Acidanthera](https://github.com/Acidanthera)
-  * OpenCorePkg, as well as many of the core kexts and tools
-* [Dortania](https://github.com/dortania) and OpenCore Legacy Patcher contributors
-* Apple
-  * for macOS and many of the kexts, frameworks and other binaries we reimplemented into newer OSes
+## This branch does not accept issue, only PR
