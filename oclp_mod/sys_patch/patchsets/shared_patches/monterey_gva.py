@@ -34,8 +34,8 @@ class MontereyGVA(BaseSharedPatchSet):
             "Monterey GVA": {
                 PatchType.MERGE_SYSTEM_VOLUME: {
                     "/System/Library/PrivateFrameworks": {
-                        "AppleGVA.framework":     "12.5",
-                        "AppleGVACore.framework": "12.5",
+                        "AppleGVA.framework":     "12.5" if self._xnu_major < os_data.tahoe else "12.5-25",
+                        "AppleGVACore.framework": "12.5" if self._xnu_major < os_data.tahoe else "12.5-25",
                     },
                 },
             },
