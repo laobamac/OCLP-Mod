@@ -1073,6 +1073,7 @@ class intel_ids:
         0x1622,  # Iris Pro Graphics 6200
         0x1612,  # HD Graphics 5600
         0x162B,  # Iris Graphics 6100
+
     ]
 
     skylake_ids = [
