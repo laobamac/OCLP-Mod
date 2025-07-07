@@ -28,7 +28,7 @@ jobs:
           rm -rf Univ*
           rm -rf *pay*.dmg
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip install -r requirements.txt
-          aria2c -x 16 "https://github.com/laobamac/PatcherSupportPkg/releases/download/pre-release-179e1e8124570a73fafe175616c0a0d0a96b8470/Universal-Binaries.dmg"
+          aria2c -x 16 "https://github.com/laobamac/PatcherSupportPkg/releases/download/pre-release-123cfe0b3ab2b1b3a22ba5564712c82d4e5e83d5/Universal-Binaries.dmg"
 
       - name: Force Universal2 charset for Python
         run: |
@@ -77,9 +77,8 @@ jobs:
         if: github.event_name == 'push'
         uses: dev-drprasad/delete-older-releases@v0.3.4
         with:
-          keep_latest: 1
+          keep_latest: 0
           delete_prerelease_only: true
-          repo_token: ${{ github.token }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
