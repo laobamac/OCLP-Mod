@@ -48,3 +48,5 @@ To run the project from source, see here: [Build and run from source](./SOURCE.m
 * [Dortania](https://github.com/dortania) and OpenCore Legacy Patcher contributors
 * Apple
   * for macOS and many of the kexts, frameworks and other binaries we reimplemented into newer OSes
+* [Satria Ramadan](https://github.com/strhmdn14102004)
+  * for multi-language support,see branch multilingual

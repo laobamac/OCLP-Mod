@@ -47,3 +47,5 @@
 * [Dortania](https://github.com/dortania) 和 OpenCore Legacy Patcher 贡献者
 * Apple
   * 提供 macOS 及部分驱动、框架和二进制文件，我们将其适配至新版系统
+* [Satria Ramadan](https://github.com/strhmdn14102004)
+  * 提供英文等非中文版本维护，见多语言分支
