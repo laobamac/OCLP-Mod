@@ -58,7 +58,7 @@ class LegacyUSBHOST(BaseHardware):
         """
         if self.native_os() is True:
             return {}
-
+        
         return {
             "旧版USB扩展": {
                 PatchType.OVERWRITE_SYSTEM_VOLUME: {
