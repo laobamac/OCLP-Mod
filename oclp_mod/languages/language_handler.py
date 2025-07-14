@@ -8,9 +8,9 @@ class LanguageHandler:
     def __init__(self, constants: constants.Constants):
         self.constants = constants
         self.language_files = {
-            "Indonesia": "id_ID.json",
             "English": "en_US.json",
-            "Chinese": "zh_CN.json"
+            "中文": "zh_CN.json",
+            "Indonesia": "id_ID.json"
         }
         self.current_language = constants.current_language
         self.translations = self._load_language_file()

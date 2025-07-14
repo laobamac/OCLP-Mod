@@ -15,6 +15,9 @@ import hashlib
 
 from pathlib import Path
 
+from .. import constants
+from ..languages.language_handler import LanguageHandler
+
 from .. import (
     constants,
     sucatalog
@@ -51,7 +54,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self.constants: constants.Constants = global_constants
         self.title: str = title
         self.parent: wx.Frame = parent
-
+        self.language_handler = LanguageHandler(self.constants)
         self.available_installers = None
         self.available_installers_latest = None
         self.available_simplehac_dmgs = None
@@ -95,30 +98,30 @@ class macOSInstallerDownloadFrame(wx.Frame):
 
         frame = self if not frame else frame
 
-        title_label = wx.StaticText(frame, label="创建macOS安装器", pos=(-1,5))
+        title_label = wx.StaticText(frame, label=self.language_handler.get_translation("CreateamacOSinstaller"), pos=(-1,5))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title_label.Centre(wx.HORIZONTAL)
 
         # Button: Download macOS Installer
-        download_button = wx.Button(frame, label="下载macOS安装器（.app）", pos=(-1, title_label.GetPosition()[1] + title_label.GetSize()[1] + 5), size=(200, 30))
+        download_button = wx.Button(frame, label=self.language_handler.get_translation("DownloadthemacOSinstaller(.app)"), pos=(-1, title_label.GetPosition()[1] + title_label.GetSize()[1] + 5), size=(200, 30))
         download_button.Bind(wx.EVT_BUTTON, self.on_download)
         download_button.Centre(wx.HORIZONTAL)
 
         # Button: Use existing macOS Installer
-        existing_button = wx.Button(frame, label="选择本地的安装器（.app）", pos=(-1, download_button.GetPosition()[1] + download_button.GetSize()[1] - 5), size=(200, 30))
+        existing_button = wx.Button(frame, label=self.language_handler.get_translation("Selectthelocalinstaller(.app)"), pos=(-1, download_button.GetPosition()[1] + download_button.GetSize()[1] - 5), size=(200, 30))
         existing_button.Bind(wx.EVT_BUTTON, self.on_existing)
         existing_button.Centre(wx.HORIZONTAL)
 
-        shdmg_button = wx.Button(frame, label="下载三分区镜像（.dmg）", pos=(-1, existing_button.GetPosition()[1] + existing_button.GetSize()[1] - 5), size=(200, 30))
+        shdmg_button = wx.Button(frame, label=self.language_handler.get_translation("Downloadthethree-partitionimage(.dmg)"), pos=(-1, existing_button.GetPosition()[1] + existing_button.GetSize()[1] - 5), size=(200, 30))
         shdmg_button.Bind(wx.EVT_BUTTON, self.on_downdmg)
         shdmg_button.Centre(wx.HORIZONTAL)
 
-        fldmg_button = wx.Button(frame, label="烧录DMG镜像（.dmg）", pos=(-1, shdmg_button.GetPosition()[1] + shdmg_button.GetSize()[1] - 5), size=(200, 30))
+        fldmg_button = wx.Button(frame, label=self.language_handler.get_translation("BurnDMGimage(.dmg)"), pos=(-1, shdmg_button.GetPosition()[1] + shdmg_button.GetSize()[1] - 5), size=(200, 30))
         fldmg_button.Bind(wx.EVT_BUTTON, self.on_flashdmg)
         fldmg_button.Centre(wx.HORIZONTAL)
 
         # Button: Return to Main Menu
-        return_button = wx.Button(frame, label="返回", pos=(-1, fldmg_button.GetPosition()[1] + fldmg_button.GetSize()[1] + 5), size=(150, 30))
+        return_button = wx.Button(frame, label=self.language_handler.get_translation("back"), pos=(-1, fldmg_button.GetPosition()[1] + fldmg_button.GetSize()[1] + 5), size=(150, 30))
         return_button.Bind(wx.EVT_BUTTON, self.on_return)
         return_button.Centre(wx.HORIZONTAL)
 
@@ -135,7 +138,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self.Centre()
 
         # Title: Pulling installer catalog
-        title_label = wx.StaticText(self, label="正在查找可下载的版本", pos=(-1,5))
+        title_label = wx.StaticText(self, label=self.language_handler.get_translation("Searchingforavailabledownloadableversions."), pos=(-1,5))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title_label.Centre(wx.HORIZONTAL)
 
@@ -181,7 +184,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self.Centre()
 
         # 标题: 正在查找可下载的版本
-        title_label = wx.StaticText(self, label="正在查找可下载的DMG镜像", pos=(-1, 5))
+        title_label = wx.StaticText(self, label=self.language_handler.get_translation("LookingfordownloadableDMGimages"), pos=(-1, 5))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title_label.Centre(wx.HORIZONTAL)
 
@@ -263,9 +266,9 @@ class macOSInstallerDownloadFrame(wx.Frame):
         bundles = [wx.BitmapBundle.FromBitmaps(icon) for icon in self.icons]
 
         self.frame_modal.Destroy()
-        self.frame_modal = wx.Dialog(self, title="选择SimpleHac DMG镜像", size=(505, 500))
+        self.frame_modal = wx.Dialog(self, title=self.language_handler.get_translation("SelectSimpleHacDMGimage"), size=(505, 500))
 
-        title_label = wx.StaticText(self.frame_modal, label="选择此镜像 由SimpleHac提供支持", pos=(-1, -1))
+        title_label = wx.StaticText(self.frame_modal, label=self.language_handler.get_translation("ChoosethisimagesupportedbySimpleHac"), pos=(-1, -1))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
 
         id = wx.NewIdRef()
@@ -305,11 +308,11 @@ class macOSInstallerDownloadFrame(wx.Frame):
                     print(f"数据格式错误: {item}")
             if self.fetched_aes_key_status != 200:
                 logging.info(f"无法获取到密钥 {self.fetched_aes_key_status}")
-                wx.MessageDialog(self.frame_modal, "未能获取到密钥，请联系laobamac", "错误", wx.OK | wx.ICON_ERROR).ShowModal()
+                wx.MessageDialog(self.frame_modal, self.language_handler.get_translation("Failed_to_obtain_DMG_information,please_contact_laobamac."), self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR).ShowModal()
                 self.on_return_to_main_menu()
         else:
             logging.error("No dmgs found")
-            wx.MessageDialog(self.frame_modal, "未能获取到DMG信息，请联系laobamac", "错误", wx.OK | wx.ICON_ERROR).ShowModal()
+            wx.MessageDialog(self.frame_modal, self.language_handler.get_translation("Failed_to_obtain_DMG_information,please_contact_laobamac."), self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR).ShowModal()
             self.on_return_to_main_menu()
 
         if not show_full:
@@ -318,23 +321,23 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self.list.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.on_select_list)
         self.list.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_select_list)
 
-        self.select_button = wx.Button(self.frame_modal, label="下载", pos=(-1, -1), size=(150, -1))
+        self.select_button = wx.Button(self.frame_modal, label=self.language_handler.get_translation("Download"), pos=(-1, -1), size=(150, -1))
         self.select_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         self.select_button.Bind(wx.EVT_BUTTON, lambda event, installers=dmgs: self.on_download_dmg(installers))
         self.dmgs = dmgs
-        self.select_button.SetToolTip("下载选定的DMG")
+        self.select_button.SetToolTip(self.language_handler.get_translation("DownloadtheselectedDMG"))
         self.select_button.SetDefault()
         if show_full:
             self.select_button.Disable()
 
-        self.copy_button = wx.Button(self.frame_modal, label="复制链接", pos=(-1, -1), size=(80, -1))
+        self.copy_button = wx.Button(self.frame_modal, label=self.language_handler.get_translation("Copy_link"), pos=(-1, -1), size=(80, -1))
         self.copy_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         if show_full:
             self.copy_button.Disable()
-        self.copy_button.SetToolTip("复制选定DMG的下载链接")
+        self.copy_button.SetToolTip(self.language_handler.get_translation("Copy_the_download_link_of_the_selected_DMG."))
         self.copy_button.Bind(wx.EVT_BUTTON, lambda event, installers=dmgs: self.on_copy_dmg_link(installers))
 
-        return_button = wx.Button(self.frame_modal, label="返回", pos=(-1, -1), size=(150, -1))
+        return_button = wx.Button(self.frame_modal, label=self.language_handler.get_translation("back"), pos=(-1, -1), size=(150, -1))
         return_button.Bind(wx.EVT_BUTTON, self.on_return_to_main_menu)
         return_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
 
@@ -363,10 +366,10 @@ class macOSInstallerDownloadFrame(wx.Frame):
         bundles = [wx.BitmapBundle.FromBitmaps(icon) for icon in self.icons]
 
         self.frame_modal.Destroy()
-        self.frame_modal = wx.Dialog(self, title="选择macOS安装器", size=(505, 500))
+        self.frame_modal = wx.Dialog(self, title=self.language_handler.get_translation("Choose_the_macOS_installer"), size=(505, 500))
 
         # Title: Select macOS Installer
-        title_label = wx.StaticText(self.frame_modal, label="选择此macOS", pos=(-1,-1))
+        title_label = wx.StaticText(self.frame_modal, label=self.language_handler.get_translation("Choose_this_macOS"), pos=(-1,-1))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
 
         # macOS Installers list
@@ -406,26 +409,26 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self.list.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.on_select_list)
         self.list.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_select_list)
 
-        self.select_button = wx.Button(self.frame_modal, label="下载", pos=(-1, -1), size=(150, -1))
+        self.select_button = wx.Button(self.frame_modal, label=self.language_handler.get_translation("Download"), pos=(-1, -1), size=(150, -1))
         self.select_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         self.select_button.Bind(wx.EVT_BUTTON, lambda event, installers=installers: self.on_download_installer(installers))
-        self.select_button.SetToolTip("下载选定的macOS")
+        self.select_button.SetToolTip(self.language_handler.get_translation("Download_the_selected_macOS"))
         self.select_button.SetDefault()
         if show_full is True:
             self.select_button.Disable()
 
-        self.copy_button = wx.Button(self.frame_modal, label="复制链接", pos=(-1, -1), size=(80, -1))
+        self.copy_button = wx.Button(self.frame_modal, label=self.language_handler.get_translation("Copy_link"), pos=(-1, -1), size=(80, -1))
         self.copy_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         if show_full is True:
             self.copy_button.Disable()
         self.copy_button.SetToolTip("Copy the download link of the selected macOS Installer.")
         self.copy_button.Bind(wx.EVT_BUTTON, lambda event, installers=installers: self.on_copy_link(installers))
 
-        return_button = wx.Button(self.frame_modal, label="返回", pos=(-1, -1), size=(150, -1))
+        return_button = wx.Button(self.frame_modal, label=self.language_handler.get_translation("back"), pos=(-1, -1), size=(150, -1))
         return_button.Bind(wx.EVT_BUTTON, self.on_return_to_main_menu)
         return_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
 
-        self.showolderversions_checkbox = wx.CheckBox(self.frame_modal, label="显示老版本/测试版本", pos=(-1, -1))
+        self.showolderversions_checkbox = wx.CheckBox(self.frame_modal, label=self.language_handler.get_translation("Show_old_version/test_version"), pos=(-1, -1))
         if show_full is True:
             self.showolderversions_checkbox.SetValue(True)
         self.showolderversions_checkbox.Bind(wx.EVT_CHECKBOX, lambda event: self._display_available_installers(event, self.showolderversions_checkbox.GetValue()))
@@ -462,7 +465,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
 
             clipboard.Close()
 
-            wx.MessageDialog(self.frame_modal, "已复制到剪贴板", "", wx.OK | wx.ICON_INFORMATION).ShowModal()
+            wx.MessageDialog(self.frame_modal, self.language_handler.get_translation("Copied_to_clipboard"), "", wx.OK | wx.ICON_INFORMATION).ShowModal()
 
     def on_copy_dmg_link(self, installers: dict) -> None:
 
@@ -479,14 +482,14 @@ class macOSInstallerDownloadFrame(wx.Frame):
             if not origin:
                 logging.error(f"Download URL not found for selected item: {item}")
                 clipboard.Close()
-                wx.MessageDialog(self.frame_modal, "未能找到下载链接", "错误", wx.OK | wx.ICON_ERROR).ShowModal()
+                wx.MessageDialog(self.frame_modal, self.language_handler.get_translation("Unable_to_find_the_download_link."), self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR).ShowModal()
                 return
             
             clipboard.SetData(wx.TextDataObject(self.generate_signed_url(origin, self.fetched_aes_key)))
 
             clipboard.Close()
 
-            wx.MessageDialog(self.frame_modal, "已复制到剪贴板", "", wx.OK | wx.ICON_INFORMATION).ShowModal()
+            wx.MessageDialog(self.frame_modal, self.language_handler.get_translation("Copied_to_clipboard"), "", wx.OK | wx.ICON_INFORMATION).ShowModal()
 
     def on_select_list(self, event):
         if self.list.GetSelectedItemCount() > 0:
@@ -516,7 +519,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
 
             self.frame_modal.Close()
 
-            dir_dialog = wx.DirDialog(self, "选择保存目录", "", wx.DD_DIR_MUST_EXIST)
+            dir_dialog = wx.DirDialog(self, self.language_handler.get_translation("Select_save_directory"), "", wx.DD_DIR_MUST_EXIST)
         
             if dir_dialog.ShowModal() == wx.ID_OK:
             # 获取用户选择的目录路径
@@ -529,7 +532,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
 
             gui_download.DownloadFrame(
                 self,
-                title="从SimpleHac OSS下载镜像",
+                title=self.language_handler.get_translation("Download_the_image_from_SimpleHac_OSS"),
                 global_constants=self.constants,
                 download_obj=download_obj,
                 item_name=f"SimpleHac's macOS {selected_installer['version']}",
@@ -766,7 +769,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
             if frame:
                 frame.Destroy()
         '''
-        wx.MessageDialog(self.frame_modal, "学业繁忙，此处未完工（gui_simplehac_dmg_flash.py为残品），请下载etcher自行刻录！\n现在为你打开SimpleHac加速镜像下载etcher", "", wx.OK | wx.ICON_INFORMATION).ShowModal()
+        wx.MessageDialog(self.frame_modal, self.language_handler.get_translation("due_to"), "", wx.OK | wx.ICON_INFORMATION).ShowModal()
         webbrowser.open("https://download.simplehac.cn/https://github.com/balena-io/etcher/releases/download/v1.19.25/balenaEtcher-1.19.25-x64.dmg")
 
     def on_return(self, event: wx.Event) -> None:

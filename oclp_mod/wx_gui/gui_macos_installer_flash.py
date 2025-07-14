@@ -13,6 +13,7 @@ import subprocess
 from pathlib import Path
 
 from .. import constants
+from ..languages.language_handler import LanguageHandler
 
 from ..datasets import os_data
 from ..volume   import generate_copy_arguments
@@ -41,7 +42,7 @@ class macOSInstallerFlashFrame(wx.Frame):
 
         self.constants: constants.Constants = global_constants
         self.title: str = title
-
+        self.language_handler = LanguageHandler(self.constants)
         self.available_installers_local: dict = {}
         self.available_disks: dict = {}
         self.prepare_result: bool = False
@@ -64,7 +65,7 @@ class macOSInstallerFlashFrame(wx.Frame):
         """
 
         # Title: Fetching local macOS Installers
-        title_label = wx.StaticText(self, label="寻找本地的macOS安装器", pos=(-1,1))
+        title_label = wx.StaticText(self, label=self.language_handler.get_translation("FindalocalmacOSinstaller"), pos=(-1,1))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title_label.Centre(wx.HORIZONTAL)
 
@@ -93,7 +94,7 @@ class macOSInstallerFlashFrame(wx.Frame):
         frame_modal = wx.Dialog(self, title=self.title, size=(350, 200))
 
         # Title: Select macOS Installer
-        title_label = wx.StaticText(frame_modal, label="选择本地的macOS安装器", pos=(-1,5))
+        title_label = wx.StaticText(frame_modal, label=self.language_handler.get_translation("Select_the_local_macOS_installer"), pos=(-1,5))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title_label.Centre(wx.HORIZONTAL)
 
@@ -124,12 +125,12 @@ class macOSInstallerFlashFrame(wx.Frame):
                     installer_button.SetDefault()
 
         else:
-            installer_button = wx.StaticText(frame_modal, label="应用程序文件夹内似乎没有安装器", pos=(-1, title_label.GetPosition()[1] + title_label.GetSize()[1] + 5))
+            installer_button = wx.StaticText(frame_modal, label=self.language_handler.get_translation("it_seems"), pos=(-1, title_label.GetPosition()[1] + title_label.GetSize()[1] + 5))
             installer_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
             installer_button.Centre(wx.HORIZONTAL)
 
         # Button: Return to Main Menu
-        cancel_button = wx.Button(frame_modal, label="返回", pos=(-1, installer_button.GetPosition()[1] + installer_button.GetSize()[1]), size=(150, 30))
+        cancel_button = wx.Button(frame_modal, label=self.language_handler.get_translation("back"), pos=(-1, installer_button.GetPosition()[1] + installer_button.GetSize()[1]), size=(150, 30))
         cancel_button.Bind(wx.EVT_BUTTON, self.on_return_to_main_menu)
         cancel_button.Centre(wx.HORIZONTAL)
 
@@ -150,7 +151,7 @@ class macOSInstallerFlashFrame(wx.Frame):
             child.Destroy()
 
         # Fetching information on local disks
-        title_label = wx.StaticText(self, label="取回本地硬盘信息", pos=(-1,1))
+        title_label = wx.StaticText(self, label=self.language_handler.get_translation("Retrieve_local_hard_drive_information"), pos=(-1,1))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title_label.Centre(wx.HORIZONTAL)
 
@@ -184,12 +185,12 @@ class macOSInstallerFlashFrame(wx.Frame):
         self.frame_modal = wx.Dialog(self, title=self.title, size=(350, 200))
 
         # Title: Select local disk
-        title_label = wx.StaticText(self.frame_modal, label="选择本地硬盘", pos=(-1,5))
+        title_label = wx.StaticText(self.frame_modal, label=self.language_handler.get_translation("Select_local_hard_drive"), pos=(-1,5))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title_label.Centre(wx.HORIZONTAL)
 
         # Label: Selected USB will be erased, please backup any data
-        warning_label = wx.StaticText(self.frame_modal, label="选择的U盘会格式化！", pos=(-1, title_label.GetPosition()[1] + title_label.GetSize()[1] + 5))
+        warning_label = wx.StaticText(self.frame_modal, label=self.language_handler.get_translation("The_selected_USB_drive_will_be_formatted!"), pos=(-1, title_label.GetPosition()[1] + title_label.GetSize()[1] + 5))
         warning_label.SetFont(gui_support.font_factory(11, wx.FONTWEIGHT_NORMAL))
         warning_label.Centre(wx.HORIZONTAL)
 
@@ -207,17 +208,17 @@ class macOSInstallerFlashFrame(wx.Frame):
                     disk_button.SetDefault()
                 spacer += 25
         else:
-            disk_button = wx.StaticText(self.frame_modal, label="未找到可用硬盘", pos=(-1, warning_label.GetPosition()[1] + warning_label.GetSize()[1] + 5))
+            disk_button = wx.StaticText(self.frame_modal, label=self.language_handler.get_translation("No_available_hard_disk_found."), pos=(-1, warning_label.GetPosition()[1] + warning_label.GetSize()[1] + 5))
             disk_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
             disk_button.Centre(wx.HORIZONTAL)
 
         # Search for disks again
-        search_button = wx.Button(self.frame_modal, label="再次扫描", pos=(-1, disk_button.GetPosition()[1] + disk_button.GetSize()[1]), size=(150, 30))
+        search_button = wx.Button(self.frame_modal, label=self.language_handler.get_translation("Scan_again"), pos=(-1, disk_button.GetPosition()[1] + disk_button.GetSize()[1]), size=(150, 30))
         search_button.Bind(wx.EVT_BUTTON, lambda event, temp=installer: self.on_select(temp))
         search_button.Centre(wx.HORIZONTAL)
 
         # Button: Return to Main Menu
-        cancel_button = wx.Button(self.frame_modal, label="返回", pos=(-1, search_button.GetPosition()[1] + search_button.GetSize()[1] - 10), size=(150, 30))
+        cancel_button = wx.Button(self.frame_modal, label=self.language_handler.get_translation("back"), pos=(-1, search_button.GetPosition()[1] + search_button.GetSize()[1] - 10), size=(150, 30))
         cancel_button.Bind(wx.EVT_BUTTON, self.on_return_to_main_menu)
         cancel_button.Centre(wx.HORIZONTAL)
 
@@ -249,17 +250,17 @@ class macOSInstallerFlashFrame(wx.Frame):
         title_label.Centre(wx.HORIZONTAL)
 
         # Label: Creating macOS installers can take 30min+ on slower USB drives.
-        warning_label = wx.StaticText(self, label="根据设备速度，可能需要30min甚至更久.", pos=(-1, title_label.GetPosition()[1] + title_label.GetSize()[1] + 5))
+        warning_label = wx.StaticText(self, label=self.language_handler.get_translation("devending"), pos=(-1, title_label.GetPosition()[1] + title_label.GetSize()[1] + 5))
         warning_label.SetFont(gui_support.font_factory(11, wx.FONTWEIGHT_NORMAL))
         warning_label.Centre(wx.HORIZONTAL)
 
         # Label: We will notify you when the installer is ready.
-        warning_label = wx.StaticText(self, label="可以去做其他事情，比如看看SimpleHac资源社，完成会提示你.", pos=(-1, warning_label.GetPosition()[1] + warning_label.GetSize()[1] + 5))
+        warning_label = wx.StaticText(self, label=self.language_handler.get_translation("you_can_go_to_other_things"), pos=(-1, warning_label.GetPosition()[1] + warning_label.GetSize()[1] + 5))
         warning_label.SetFont(gui_support.font_factory(11, wx.FONTWEIGHT_NORMAL))
         warning_label.Centre(wx.HORIZONTAL)
 
         # Label: Bytes Written: 0 MB
-        bytes_written_label = wx.StaticText(self, label="已写入: 0.00 MB", pos=(-1, warning_label.GetPosition()[1] + warning_label.GetSize()[1] + 5))
+        bytes_written_label = wx.StaticText(self, label=self.language_handler.get_translation("written"), pos=(-1, warning_label.GetPosition()[1] + warning_label.GetSize()[1] + 5))
         bytes_written_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         bytes_written_label.Centre(wx.HORIZONTAL)
 
@@ -326,7 +327,7 @@ class macOSInstallerFlashFrame(wx.Frame):
         progress_bar_animation = gui_support.GaugePulseCallback(self.constants, progress_bar)
         progress_bar_animation.start_pulse()
 
-        bytes_written_label.SetLabel("验证安装器...")
+        bytes_written_label.SetLabel(self.language_handler.get_translation("verifying_the_installer"))
         error_message = self._validate_installer_pkg(disk['identifier'])
 
         progress_bar_animation.stop_pulse()
@@ -340,11 +341,11 @@ class macOSInstallerFlashFrame(wx.Frame):
         progress_bar.SetValue(estimated_size)
 
         if gui_support.CheckProperties(self.constants).host_can_build() is False:
-            wx.MessageBox("安装程序创建成功！如果要将 OpenCore 安装到此 USB，则需要在设置中更改目标机型", "已成功创建 macOS 安装器！", wx.OK | wx.ICON_INFORMATION)
+            wx.MessageBox(self.language_handler.get_translation("this_installer_has_been_created"), self.language_handler.get_translation("the_macos_installer-has_been_succesfully"), wx.OK | wx.ICON_INFORMATION)
             self.on_return_to_main_menu()
             return
 
-        answer = wx.MessageBox("安装程序创建成功，是否要继续并将 OpenCore 安装到此磁盘？", "已成功创建 macOS 安装器！", wx.YES_NO | wx.ICON_QUESTION)
+        answer = wx.MessageBox(self.language_handler.get_translation("Theinstallerwascreatedsuccessfully.DoyouwanttocontinueandinstallOpenCoreon_this_disk?"), self.language_handler.get_translation("The_macOS_installer_has_been_successfully_created!"), wx.YES_NO | wx.ICON_QUESTION)
         if answer != wx.YES:
             self.on_return_to_main_menu()
             return
@@ -392,7 +393,7 @@ class macOSInstallerFlashFrame(wx.Frame):
 
         if "Install media now available at" not in output:
             logging.info("Failed to create macOS installer")
-            popup = wx.MessageDialog(self, f"创建安装器失败\n\n输出: {output}\n\n错误: {error}", "错误", wx.OK | wx.ICON_ERROR)
+            popup = wx.MessageDialog(self, f"创建安装器失败\n\n输出: {output}\n\n错误: {error}", self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR)
             popup.ShowModal()
             return False
 

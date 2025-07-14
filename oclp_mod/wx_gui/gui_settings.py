@@ -413,52 +413,52 @@ class SettingsFrame(wx.Frame):
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "允许使用AppleALC音频": {
+                self.language_handler.get_translation("Allow_the_use_of_AppleALC_audio"): {
                     "type": "checkbox",
                     "value": self.constants.set_alc_usage,
                     "variable": "set_alc_usage",
                     "description": [
-                        "如果适用，允许AppleALC管理音频",
-                        "仅在主机缺少GOP ROM时禁用。",
+                        self.language_handler.get_translation("AllowAppleALCtomanageaudioifapplicable."),
+                        self.language_handler.get_translation("DisabledonlywhenthehostlackstheGOPROM."),
                     ],
                 },
-                "写入NVRAM": {
+                self.language_handler.get_translation("WritetoNVRAM"): {
                     "type": "checkbox",
                     "value": self.constants.nvram_write,
                     "variable": "nvram_write",
                     "description": [
-                        "允许OpenCore写入NVRAM。",
-                        "在有故障或",
-                        "降级的NVRAM系统上禁用。",
+                        self.language_handler.get_translation("AllowOpenCoretowritetoNVRAM."),
+                        self.language_handler.get_translation("Incaseoramalfunctionor"),
+                        self.language_handler.get_translation("DisabledondowngradedNVRAMsystem."),
                     ],
                 },
 
-                "第三方NVMe电源管理": {
+                self.language_handler.get_translation("Third-partyNVMepowermanagement"): {
                     "type": "checkbox",
                     "value": self.constants.allow_nvme_fixing,
                     "variable": "allow_nvme_fixing",
                     "description": [
-                        "在 macOS 中启用未被提供的",
-                        "NVMe 电源管理",
+                        self.language_handler.get_translation("EnableunprovidedfeaturesinmacOS"),
+                        self.language_handler.get_translation("NVMepowermanagement"),
                     ],
                 },
-                "第三方SATA电源管理": {
+                self.language_handler.get_translation("Third-partySATApowermanagement"): {
                     "type": "checkbox",
                     "value": self.constants.allow_3rd_party_drives,
                     "variable": "allow_3rd_party_drives",
                     "description": [
-                        "在 macOS 中启用未被提供的",
-                        "SATA 电源管理",
+                        self.language_handler.get_translation("EnableunprovidedfeaturesinmacOS"),
+                        self.language_handler.get_translation("SATA_power_management"),
                     ],
                     "condition": not bool(self.constants.computer.third_party_sata_ssd is False and not self.constants.custom_model)
                 },
-                "Trim相关": {
+                self.language_handler.get_translation("Trim_related"): {
                     "type": "checkbox",
                     "value": self.constants.apfs_trim_timeout,
                     "variable": "apfs_trim_timeout",
                     "description": [
-                        "建议所有用户使用，即使有故障",
-                        "SSDs 可能也会从禁用此功能中受益。",
+                        self.language_handler.get_translation("Itisrecommendedthatallusersuseit,evenifthereareissues."),
+                        self.language_handler.get_translation("SSDsmayalsobenefitfromdisablingthisfeature."),
                     ],
                 },
             },

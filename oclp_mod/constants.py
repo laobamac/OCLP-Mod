@@ -20,8 +20,8 @@ class Constants:
         self.current_language = "English"  # Default bahasa Indonesia
         self.language_options = {
         "English": "English",
-        "Indonesia": "Bahasa Indonesia",
-        "Chinese": "中文"
+        "中文": "中文",
+        "Indonesia": "Bahasa Indonesia"
         }
 
         # URLs
