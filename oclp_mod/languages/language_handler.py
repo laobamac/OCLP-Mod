@@ -10,7 +10,8 @@ class LanguageHandler:
         self.language_files = {
             "English": "en_US.json",
             "中文": "zh_CN.json",
-            "Indonesia": "id_ID.json"
+            "Indonesia": "id_ID.json",
+            "Spain": "es_ES.json"
         }
         self.current_language = constants.current_language
         self.translations = self._load_language_file()
