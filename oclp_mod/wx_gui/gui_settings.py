@@ -1030,7 +1030,7 @@ class SettingsFrame(wx.Frame):
         self.custom_board_serial_number_textbox = custom_board_serial_number_textbox
 
         # Button: Generate Serial Number (below)
-        generate_serial_number_button = wx.Button(panel, label=f"Generate S/N: {self.constants.custom_model or self.constants.computer.real_model}", pos=(title.GetPosition()[0] - 30, custom_board_serial_number_label.GetPosition()[1] + 60), size=(200, 25))
+        generate_serial_number_button = wx.Button(panel, label=f"{self.language_handler.get_translation("generate_serial")} {self.constants.custom_model or self.constants.computer.real_model}", pos=(title.GetPosition()[0] - 30, custom_board_serial_number_label.GetPosition()[1] + 60), size=(200, 25))
         generate_serial_number_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         generate_serial_number_button.Bind(wx.EVT_BUTTON, self.on_generate_serial_number)
 

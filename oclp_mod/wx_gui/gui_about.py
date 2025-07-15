@@ -7,6 +7,7 @@ import wx.adv
 import logging
 
 from .. import constants
+from ..languages.language_handler import LanguageHandler
 
 from ..wx_gui import gui_support
 
@@ -14,11 +15,12 @@ from ..wx_gui import gui_support
 class AboutFrame(wx.Frame):
 
     def __init__(self, global_constants: constants.Constants) -> None:
-        if wx.FindWindowByName("关于"):
+        self.constants: constants.Constants = global_constants
+        self.language_handler = LanguageHandler(self.constants)
+        if wx.FindWindowByName(self.language_handler.get_translation("About")):
             return
-
         logging.info("Generating About frame")
-        super(AboutFrame, self).__init__(None, title="关于", size=(350, 350), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
+        super(AboutFrame, self).__init__(None, title=self.language_handler.get_translation("About"), size=(350, 350), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
         self.constants: constants.Constants = global_constants
         self.Centre()
         self.hyperlink_colour = (25, 179, 231)
@@ -31,21 +33,23 @@ class AboutFrame(wx.Frame):
     def _generate_elements(self, frame: wx.Frame) -> None:
 
         # Set title
-        title = wx.StaticText(frame, label="OCLP-Mod By laobamac", pos=(-1, 5))
-        title.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
+        title = wx.StaticText(frame, label=self.language_handler.get_translation("OCLP-Mod_By_laobamac_translated_by_satria_ramadan"), pos=(-1, 5))
+        title.SetFont(gui_support.font_factory(11, wx.FONTWEIGHT_BOLD))
         title.Centre(wx.HORIZONTAL)
 
         # Set version
-        version = wx.StaticText(frame, label=f"版本: {self.constants.patcher_version}", pos=(-1, title.GetPosition()[1] + title.GetSize()[1] + 5))
+        version = wx.StaticText(frame, label=f"{self.language_handler.get_translation("Versions")} {self.constants.patcher_version}", pos=(-1, title.GetPosition()[1] + title.GetSize()[1] + 5))
         version.SetFont(gui_support.font_factory(11, wx.FONTWEIGHT_NORMAL))
         version.Centre(wx.HORIZONTAL)
 
         # Description
         description = [
-            "这是一个喜欢咕咕的高中生Mod的OCLP",
-            "SimpleHac[laobamac]修改并汉化",
-            "SimpleHac资源社：www.simplehac.cn",
-            "Q群：965625664",
+            self.language_handler.get_translation("This_is_an_OCLP_mod_for_a_high_school_student_who_likes_to_coo."),
+            "",
+            self.language_handler.get_translation("simplehac_laobamac"),
+            "",
+            self.language_handler.get_translation("SimpleHac_Resource_Community:www.simplehac.cn"),
+            self.language_handler.get_translation("Qgroup:965625664"),
         ]
         spacer = 5
         for line in description:

@@ -7,6 +7,7 @@ import logging
 import webbrowser
 
 from .. import constants
+from ..languages.language_handler import LanguageHandler
 
 from ..wx_gui import gui_support
 
@@ -18,8 +19,9 @@ class HelpFrame(wx.Frame):
     def __init__(self, parent: wx.Frame, title: str, global_constants: constants.Constants, screen_location: tuple = None) -> None:
         logging.info("Initializing Help Frame")
         self.dialog = wx.Dialog(parent, title=title, size=(300, 200))
-
+        
         self.constants: constants.Constants = global_constants
+        self.language_handler = LanguageHandler(self.constants)
         self.title: str = title
 
         self._generate_elements(self.dialog)
@@ -39,19 +41,20 @@ class HelpFrame(wx.Frame):
 
         frame = self if not frame else frame
 
-        title_label = wx.StaticText(frame, label="OCLP资源", pos=(-1,5))
+        title_label = wx.StaticText(frame, label=self.language_handler.get_translation("OCLP_resources"), pos=(-1,5))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title_label.Centre(wx.HORIZONTAL)
 
-        text_label = wx.StaticText(frame, label="可用资源:", pos=(-1,30))
+        text_label = wx.StaticText(frame, label=self.language_handler.get_translation("Available_resources:"), pos=(-1,30))
         text_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         text_label.Centre(wx.HORIZONTAL)
 
         buttons = {
-            "官方指南":           self.constants.guide_link,
-            "官方支持":   "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-            "官方Discord社区": self.constants.discord_link,
-            "SimpleHac资源社": "https://www.simplehac.cn"
+            self.language_handler.get_translation("Official_Guide"):           self.constants.guide_link,
+            self.language_handler.get_translation("Official_support"):   "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            self.language_handler.get_translation("Official_Discord_community"): self.constants.discord_link,
+            self.language_handler.get_translation("SimpleHac_Resource_Community"): "https://www.simplehac.cn",
+            self.language_handler.get_translation("language_support"): "https://github.com/strhmdn14102004"
         }
 
         for button in buttons:
@@ -60,7 +63,7 @@ class HelpFrame(wx.Frame):
             help_button.Centre(wx.HORIZONTAL)
 
         # Button: Return to Main Menu
-        return_button = wx.Button(frame, label="返回", pos=(-1, help_button.GetPosition()[1] + help_button.GetSize()[1]), size=(150, 30))
+        return_button = wx.Button(frame, label=self.language_handler.get_translation("back"), pos=(-1, help_button.GetPosition()[1] + help_button.GetSize()[1]), size=(150, 30))
         return_button.Bind(wx.EVT_BUTTON, lambda event: frame.Close())
         return_button.Centre(wx.HORIZONTAL)
 

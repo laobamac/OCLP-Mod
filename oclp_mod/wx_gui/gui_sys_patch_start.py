@@ -14,6 +14,7 @@ import subprocess
 from pathlib import Path
 
 from .. import constants
+from ..languages.language_handler import LanguageHandler
 
 from ..datasets import os_data
 
@@ -44,6 +45,7 @@ class SysPatchStartFrame(wx.Frame):
 
         self.title = title
         self.constants: constants.Constants = global_constants
+        self.language_handler = LanguageHandler(self.constants)
         self.frame_modal: wx.Dialog = None
         self.return_button: wx.Button = None
         self.available_patches: bool = False
@@ -62,11 +64,11 @@ class SysPatchStartFrame(wx.Frame):
 
         logging.info("KDK missing, generating KDK download frame")
 
-        header = wx.StaticText(frame, label="正在下载KDK", pos=(-1,5))
+        header = wx.StaticText(frame, label=self.language_handler.get_translation("Downloading_KDK"), pos=(-1,5))
         header.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         header.Centre(wx.HORIZONTAL)
 
-        subheader = wx.StaticText(frame, label="取回KDK数据库...", pos=(-1, header.GetPosition()[1] + header.GetSize()[1] + 5))
+        subheader = wx.StaticText(frame, label=self.language_handler.get_translation("Retrieve_the_KDK_database"), pos=(-1, header.GetPosition()[1] + header.GetSize()[1] + 5))
         subheader.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         subheader.Centre(wx.HORIZONTAL)
 
@@ -93,7 +95,7 @@ class SysPatchStartFrame(wx.Frame):
         if self.kdk_obj.success is False:
             progress_bar_animation.stop_pulse()
             progress_bar.SetValue(0)
-            wx.MessageBox(f"KDK 下载失败: {self.kdk_obj.error_msg}", "Error", wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(f"{self.language_handler.get_translation("KDK_download_failed:")} {self.kdk_obj.error_msg}", self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR)
             return False
 
         kdk_download_obj = self.kdk_obj.retrieve_download()
@@ -125,7 +127,7 @@ class SysPatchStartFrame(wx.Frame):
             progress_bar.SetValue(0)
             logging.error("KDK checksum validation failed")
             logging.error(self.kdk_obj.error_msg)
-            msg = wx.MessageDialog(frame, f"KDK MD5不匹配: {self.kdk_obj.error_msg}", "Error", wx.OK | wx.ICON_ERROR)
+            msg = wx.MessageDialog(frame, f"{self.language_handler.get_translation("KDK_MD5_mismatch")} {self.kdk_obj.error_msg}", self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR)
             msg.ShowModal()
             return False
 
@@ -144,11 +146,11 @@ class SysPatchStartFrame(wx.Frame):
 
         logging.info("MetallibSupportPkg missing, generating Metallib download frame")
 
-        header = wx.StaticText(frame, label="正在下载 Metal Libraries", pos=(-1,5))
+        header = wx.StaticText(frame, label=self.language_handler.get_translation("Downloading_Metal_Libraries"), pos=(-1,5))
         header.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         header.Centre(wx.HORIZONTAL)
 
-        subheader = wx.StaticText(frame, label="取回 MetallibSupportPkg 数据库...", pos=(-1, header.GetPosition()[1] + header.GetSize()[1] + 5))
+        subheader = wx.StaticText(frame, label=self.language_handler.get_translation("Retrieve_MetallibSupportPkg_database..."), pos=(-1, header.GetPosition()[1] + header.GetSize()[1] + 5))
         subheader.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         subheader.Centre(wx.HORIZONTAL)
 
@@ -174,7 +176,7 @@ class SysPatchStartFrame(wx.Frame):
         if self.metallib_obj.success is False:
             progress_bar_animation.stop_pulse()
             progress_bar.SetValue(0)
-            wx.MessageBox(f"Metallib 下载失败: {self.metallib_obj.error_msg}", "Error", wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(f"{self.language_handler.get_translation("Metallib_download_failed")}: {self.metallib_obj.error_msg}", self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR)
             return False
 
         self.metallib_download_obj = self.metallib_obj.retrieve_download()
@@ -194,10 +196,10 @@ class SysPatchStartFrame(wx.Frame):
 
         logging.info("Metallib download complete, installing Metallib PKG")
 
-        header.SetLabel(f"正在安装Metallib: {self.metallib_obj.metallib_url_build}")
+        header.SetLabel(f"{self.language_handler.get_translation("Installing_Metallib:")} {self.metallib_obj.metallib_url_build}")
         header.Centre(wx.HORIZONTAL)
 
-        subheader.SetLabel("正在安装Metallib...")
+        subheader.SetLabel(self.language_handler.get_translation("Installing_Metallib:"))
         subheader.Centre(wx.HORIZONTAL)
 
         self.result = False
@@ -212,7 +214,7 @@ class SysPatchStartFrame(wx.Frame):
         if self.result is False:
             progress_bar_animation.stop_pulse()
             progress_bar.SetValue(0)
-            wx.MessageBox(f"Metallib 安装失败: {self.metallib_obj.error_msg}", "Error", wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(f"{self.language_handler.get_translation("Metallib_installation_failed:")} {self.metallib_obj.error_msg}", self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR)
             return False
 
         progress_bar_animation.stop_pulse()
@@ -230,7 +232,7 @@ class SysPatchStartFrame(wx.Frame):
         """
         Create UI for 正在安装驱动补丁/unpatching
         """
-        supported_variants = ["正在安装驱动补丁", "正在卸载驱动补丁"]
+        supported_variants = [self.language_handler.get_translation("Installing_driver_patch"), self.language_handler.get_translation("Uninstalling_driver_patch")]
         if variant not in supported_variants:
             logging.error(f"Unsupported variant: {variant}")
             return
@@ -244,9 +246,9 @@ class SysPatchStartFrame(wx.Frame):
         title.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title.Centre(wx.HORIZONTAL)
 
-        if variant == "正在安装驱动补丁":
+        if variant == self.language_handler.get_translation("Installing_driver_patch"):
             # Label
-            label = wx.StaticText(dialog, label="将会安装以下补丁:", pos=(-1, title.GetPosition()[1] + 30))
+            label = wx.StaticText(dialog, label=self.language_handler.get_translation("The_following_patches_will_be_installed:"), pos=(-1, title.GetPosition()[1] + 30))
             label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
             label.Centre(wx.HORIZONTAL)
 
@@ -254,7 +256,7 @@ class SysPatchStartFrame(wx.Frame):
             # Get longest patch label, then create anchor for patch labels
             longest_patch = ""
             for patch in patches:
-                if (not patch.startswith("设置") and not patch.startswith("验证") and patches[patch] is True):
+                if (not patch.startswith(self.language_handler.get_translation("settings")) and not patch.startswith(self.language_handler.get_translation("Verification")) and patches[patch] is True):
                     if len(patch) > len(longest_patch):
                         longest_patch = patch
 
@@ -267,7 +269,7 @@ class SysPatchStartFrame(wx.Frame):
             i = 0
             logging.info("Available patches:")
             for patch in patches:
-                if (not patch.startswith("设置") and not patch.startswith("验证") and patches[patch] is True):
+                if (not patch.startswith(self.language_handler.get_translation("settings")) and not patch.startswith(self.language_handler.get_translation("Verification")) and patches[patch] is True):
                     logging.info(f"- {patch}")
                     patch_label = wx.StaticText(dialog, label=f"- {patch}", pos=(anchor.GetPosition()[0], label.GetPosition()[1] + 20 + i))
                     patch_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
@@ -278,11 +280,11 @@ class SysPatchStartFrame(wx.Frame):
                 patch_label.Centre(wx.HORIZONTAL)
 
             elif i == 0:
-                patch_label = wx.StaticText(dialog, label="未能应用任何补丁", pos=(label.GetPosition()[0], label.GetPosition()[1] + 20))
+                patch_label = wx.StaticText(dialog, label=self.language_handler.get_translation("Failed_to_apply_any_patches."), pos=(label.GetPosition()[0], label.GetPosition()[1] + 20))
                 patch_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
                 patch_label.Centre(wx.HORIZONTAL)
         else:
-            patch_label = wx.StaticText(dialog, label="恢复到最近快照", pos=(-1, title.GetPosition()[1] + 30))
+            patch_label = wx.StaticText(dialog, label=self.language_handler.get_translation("Restore_to_the_most_recent_snapshot"), pos=(-1, title.GetPosition()[1] + 30))
             patch_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
             patch_label.Centre(wx.HORIZONTAL)
 
@@ -294,7 +296,7 @@ class SysPatchStartFrame(wx.Frame):
         self.text_box = text_box
 
         # Button: Return to Main Menu
-        return_button = wx.Button(dialog, label="返回", pos=(10, text_box.GetPosition()[1] + text_box.GetSize()[1] + 5), size=(150, 30))
+        return_button = wx.Button(dialog, label=self.language_handler.get_translation("back"), pos=(10, text_box.GetPosition()[1] + text_box.GetSize()[1] + 5), size=(150, 30))
         return_button.Bind(wx.EVT_BUTTON, self.on_return_to_main_menu)
         return_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         return_button.Centre(wx.HORIZONTAL)
@@ -321,7 +323,7 @@ class SysPatchStartFrame(wx.Frame):
             if self._metallib_download(self) is False:
                 sys.exit(1)
 
-        self._generate_modal(self.patches, "正在安装驱动补丁")
+        self._generate_modal(self.patches, self.language_handler.get_translation("Installing_driver_patch"))
         self.return_button.Disable()
 
         thread = threading.Thread(target=self._start_root_patching, args=(self.patches,))
@@ -347,7 +349,7 @@ class SysPatchStartFrame(wx.Frame):
     def revert_root_patching(self):
         logging.info("Reverting root patches")
 
-        self._generate_modal(self.patches, "正在卸载驱动补丁")
+        self._generate_modal(self.patches, self.language_handler.get_translation("Uninstalling_driver_patch"))
         self.return_button.Disable()
 
         thread = threading.Thread(target=self._revert_root_patching, args=(self.patches,))
@@ -397,21 +399,21 @@ class SysPatchStartFrame(wx.Frame):
             return
 
         if self.constants.needs_to_open_preferences is False:
-            gui_support.RestartHost(self.frame_modal).restart(message="驱动补丁操作成功!\n\n现在重启吗?")
+            gui_support.RestartHost(self.frame_modal).restart(message=self.language_handler.get_translation("The_driver_patch_operation_was_successful!Restart_now?"))
             return
 
         if self.constants.detected_os >= os_data.os_data.ventura:
-            gui_support.RestartHost(self.frame_modal).restart(message="驱动补丁操作成功!\n如果系统提示您打开“系统设置”以授权新的 Kext，可以忽略此项。重新启动后，您的系统已准备就绪.\n\n现在重启吗?")
+            gui_support.RestartHost(self.frame_modal).restart(message=self.language_handler.get_translation("the_driver_patch_was_succesfully"))
             return
 
         # Create dialog box to open System Preferences -> Security and Privacy
         self.popup = wx.MessageDialog(
             self.frame_modal,
-            "我们刚刚完成了到根卷的补丁安装！\n\n但是，Apple 要求用户手动批准已安装的内核扩展，然后才能在下次重新启动之前使用它们。\n\n您要打开系统偏好设置吗？",
-            "Open System Preferences?",
+            self.language_handler.get_translation("we_have_just_completed"),
+            self.language_handler.get_translation("Open_System_Preferences?"),
             wx.YES_NO | wx.ICON_INFORMATION
         )
-        self.popup.SetYesNoLabels("打开系统设置", "忽略")
+        self.popup.SetYesNoLabels(self.language_handler.get_translation("Open_system_settings"), self.language_handler.get_translation("Ignore"))
         answer = self.popup.ShowModal()
         if answer == wx.ID_YES:
             output =subprocess.run(
@@ -454,7 +456,7 @@ class SysPatchStartFrame(wx.Frame):
 
         oclp_plist_data = plistlib.load(open(oclp_plist, "rb"))
         for patch in patches:
-            if (not patch.startswith("设置") and not patch.startswith("验证") and patches[patch] is True):
+            if (not patch.startswith(self.language_handler.get_translation("settings")) and not patch.startswith(self.language_handler.get_translation("Verification")) and patches[patch] is True):
                 # Patches should share the same name as the plist key
                 # See sys_patch/patchsets/base.py for more info
                 if patch.split(": ")[1] not in oclp_plist_data:
