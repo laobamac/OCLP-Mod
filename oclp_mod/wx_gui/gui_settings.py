@@ -462,29 +462,29 @@ class SettingsFrame(wx.Frame):
                     ],
                 },
             },
-            "canggih": {
-                "Aneka ragam": {
+            self.language_handler.get_translation("advanced"): {
+                self.language_handler.get_translation("Various_kinds"): {
                     "type": "title",
                 },
-                "Disable Firmware Throttling": {
+                self.language_handler.get_translation("Disable_Firmware_Throttling"): {
                     "type": "checkbox",
                     "value": self.constants.disable_fw_throttle,
                     "variable": "disable_fw_throttle",
                     "description": [
-                        "禁用基于固件的限制",
-                        "由缺少硬件引起",
-                        "例如缺少显示器、电池等",
+                        self.language_handler.get_translation("Disable_firmware-based_restrictions"),
+                        self.language_handler.get_translation("Caused_by_lack_of_hardware"),
+                        self.language_handler.get_translation("Forexample,missingmonitors,batteries,etc."),
                     ],
                 },
-                "Software DeMUX": {
+                self.language_handler.get_translation("Software_DeMUX"): {
                     "type": "checkbox",
                     "value": self.constants.software_demux,
                     "variable": "software_demux",
                     "description": [
-                        "启用基于软件的 DeMUX",
-                        "适用于 MacBookPro8,2 和 MacBookPro8,3.",
-                        "防止有故障的 dGPU 启用",
-                        "注意：需要相关的 NVRAM 参数：",
+                        self.language_handler.get_translation("Enable_software-based_DeMUX"),
+                        self.language_handler.get_translation("Applicable_to_MacBookPro8,2_and_MacBookPro8,3."),
+                        self.language_handler.get_translation("Prevent_the_faulty_dGPU_from_being_enabled."),
+                        self.language_handler.get_translation("Note:Relevant_NVRAM_parameters_are_required:"),
                         "'gpu-power-prefs'.",
                     ],
                     "warning": "This settings requires 'gpu-power-prefs' NVRAM argument to be set to '1'.\n\nIf missing and this option is toggled, the system will not boot\n\nFull command:\nnvram FA4CE28D-B62F-4C99-9CC3-6815686E30F9:gpu-power-prefs=%01%00%00%00",
@@ -493,7 +493,7 @@ class SettingsFrame(wx.Frame):
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "启用不支持的功能": {
+                self.language_handler.get_translation("Enable_unsupported_features"): {
                     "type": "choice",
                     "choices": [
                         "Enabled",
@@ -503,9 +503,9 @@ class SettingsFrame(wx.Frame):
                     "value": "Enabled",
                     "variable": "",
                     "description": [
-                        "配置 FeatureUnlock 等级.",
-                        "如果您的系统提示建议降低",
-                        "由于遇到内存不稳定",
+                        self.language_handler.get_translation("Configure_FeatureUnlock_level."),
+                        self.language_handler.get_translation("If_your_system_prompts_to_suggest_lowering"),
+                        self.language_handler.get_translation("Due_to_encountering_unstable_memory."),
                     ],
                 },
                 "Populate FeatureUnlock Override": {
@@ -513,44 +513,44 @@ class SettingsFrame(wx.Frame):
                     "function": self._populate_fu_override,
                     "args": wx.Frame,
                 },
-                "休眠方案": {
+                self.language_handler.get_translation("Sleep_Plan"): {
                     "type": "checkbox",
                     "value": self.constants.disable_connectdrivers,
                     "variable": "disable_connectdrivers",
                     "description": [
-                        "仅加载最低 EFI 驱动程序",
-                        "防止休眠问题",
-                        "注意：这可能会中断从",
-                        "外置硬盘的启动",
+                        self.language_handler.get_translation("Load_only_the_minimum_EFI_drivers"),
+                        self.language_handler.get_translation("Prevent_sleep_issues"),
+                        self.language_handler.get_translation("Note:This_may_interrupt_from"),
+                        self.language_handler.get_translation("Booting_from_an_external_hard_drive"),
                     ],
                 },
-                "显卡": {
+                self.language_handler.get_translation("Graphics_card"): {
                     "type": "title",
                 },
-                "AMD GOP 注入": {
+                self.language_handler.get_translation("AMD_GOP_injection"): {
                     "type": "checkbox",
                     "value": self.constants.amd_gop_injection,
                     "variable": "amd_gop_injection",
                     "description": [
-                        "注入AMD GOP来显示",
-                        "启动界面",
+                        self.language_handler.get_translation("Inject_AMD_GOP_to_display"),
+                        self.language_handler.get_translation("Start_screen"),
                     ],
                     "condition": not bool((not self.constants.custom_model and self.constants.computer.real_model not in socketed_gpu_models) or (self.constants.custom_model and self.constants.custom_model not in socketed_gpu_models))
                 },
-                "Nvidia GOP 注入": {
+                self.language_handler.get_translation("Nvidia_GOP_injection"): {
                     "type": "checkbox",
                     "value": self.constants.nvidia_kepler_gop_injection,
                     "variable": "nvidia_kepler_gop_injection",
                     "description": [
-                        "注入Nvidia Kepler GOP来显示",
-                        "启动界面",
+                        self.language_handler.get_translation("Inject_Nvidia_Kepler_GOP_for_sisplay"),
+                        self.language_handler.get_translation("Start_screen"),
                     ],
                     "condition": not bool((not self.constants.custom_model and self.constants.computer.real_model not in socketed_gpu_models) or (self.constants.custom_model and self.constants.custom_model not in socketed_gpu_models))
                 },
                 "wrap_around 2": {
                     "type": "wrap_around",
                 },
-                "显卡覆写": {
+                self.language_handler.get_translation("Graphics_card_overwrite"): {
                     "type": "choice",
                     "choices": [
                         "None",
@@ -563,8 +563,8 @@ class SettingsFrame(wx.Frame):
                     "value": "None",
                     "variable": "",
                     "description": [
-                        "覆盖检测到的/假设的 MXM显卡",
-                        "适用于MXM-based iMacs.",
+                        self.language_handler.get_translation("Cover_detected/hypothetical_MXM_graphics_card"),
+                        self.language_handler.get_translation("Applicable_to_MXM-based_iMacs."),
                     ],
                     "condition": bool((not self.constants.custom_model and self.constants.computer.real_model in socketed_imac_models) or (self.constants.custom_model and self.constants.custom_model in socketed_imac_models))
                 },
@@ -575,42 +575,42 @@ class SettingsFrame(wx.Frame):
                 },
 
             },
-            "Keamanan": {
-                "Keamanan Kernel": {
+            self.language_handler.get_translation("Security"): {
+                self.language_handler.get_translation("Kernel_Security"): {
                     "type": "title",
                 },
-                "禁用资源库验证": {
+                self.language_handler.get_translation("Disable_resource_library_validation"): {
                     "type": "checkbox",
                     "value": self.constants.disable_cs_lv,
                     "variable": "disable_cs_lv",
                     "description": [
-                        "在打补丁时注入修改后",
-                        "的系统文件时需要",
+                        self.language_handler.get_translation("After_injecting_modifications_while_patching"),
+                        self.language_handler.get_translation("When_the_system_files_are_needed"),
                     ],
                 },
-                "禁用 AMFI": {
+                self.language_handler.get_translation("Disable_AMFI"): {
                     "type": "checkbox",
                     "value": self.constants.disable_amfi,
                     "variable": "disable_amfi",
                     "description": [
-                        "在打补丁时注入修改后",
-                        "的系统文件时需要",
+                        self.language_handler.get_translation("After_injecting_modifications_while_patching"),
+                        self.language_handler.get_translation("When_the_system_files_are_needed"),
                     ],
                 },
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "安全启动机型": {
+                self.language_handler.get_translation("Safe_boot_model"): {
                     "type": "checkbox",
                     "value": self.constants.secure_status,
                     "variable": "secure_status",
                     "description": [
-                        "设置 Apple 安全启动模型标识符",
-                        "如果已经仿冒，则匹配 T2 模型",
-                        "注意：与驱动补丁不兼容",
+                        self.language_handler.get_translation("Set_Apple_Secure_Boot_Model_Identifier"),
+                        self.language_handler.get_translation("If_it_has_been_counterfeited,then_match_the_T2_model."),
+                        self.language_handler.get_translation("Note:Incompatible_with_driver_patches"),
                     ],
                 },
-                "系统完整性保护（SIP）": {
+                self.language_handler.get_translation("System_Integrity_Protection_(SIP)"): {
                     "type": "title",
                 },
                 "Populate SIP": {
@@ -620,53 +620,54 @@ class SettingsFrame(wx.Frame):
                 },
             },
             "SMBIOS": {
-                "Penggantian Model": {
+                self.language_handler.get_translation("Model_Replacement"): {
                     "type": "title",
                 },
-                "Tingkat Penggantian SMBIOS": {
+                self.language_handler.get_translation("SMBIOS_Replacement_Level"): {
                     "type": "choice",
                     "choices": [
-                        "Tidak ada",
-                        "Minimal",
-                        "Moderate",
-                        "Canggih",
+                        self.language_handler.get_translation("None"),
+                        self.language_handler.get_translation("Minimal"),
+                        self.language_handler.get_translation("Moderate"),
+                        self.language_handler.get_translation("advanced"),
                     ],
                     "value": self.constants.serial_settings,
                     "variable": "serial_settings",
                     "description": [
-                        "Level yang didukung:",
-                        "   - Tidak ada : Tidak ada",
-                        "   - Kecil : Board ID.",
-                        "   - Di dalam: Ganti Model.",
-                        "   - Tinggi: Ganti Model dan serial.",
+                        self.language_handler.get_translation("Supported_levels:"),
+                        self.language_handler.get_translation("- None:_None"),
+                        self.language_handler.get_translation("- Small:_Board_ID."),
+                        self.language_handler.get_translation("- Inside:_Change_Model."),
+                        self.language_handler.get_translation("- Height:_Change_model_and_serial.")
                     ],
                 },
 
-                "Penggantian Model SMBIOS": {
+                self.language_handler.get_translation("SMBIOS_Model_Replacement"): {
                     "type": "choice",
-                    "choices": models + ["Default"],
+                    "choices": models + [self.language_handler.get_translation("Default")],
                     "value": self.constants.override_smbios,
                     "variable": "override_smbios",
                     "description": [
-                        "Siapkan model palsu",
+                        self.language_handler.get_translation("Prepare_a_fake_model"),
                     ],
 
                 },
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "Memungkinkan penggantian Mac yang didukung secara asli": {
+                self.language_handler.get_translation("Enables_replacement_of_natively_supported_Macs"): {
                     "type": "checkbox",
                     "value": self.constants.allow_native_spoofs,
                     "variable": "allow_native_spoofs",
                     "description": [
-                        "Izinkan OpenCore meniru native",
-                        "Mac yang didukung.",
-                        "Terutama digunakan untuk mengaktifkan",
-                        "Kontrol Universal pada Mac yang tidak didukung",
+                        "",
+                        self.language_handler.get_translation("Allow_OpenCore_to_mimic_native"),
+                        self.language_handler.get_translation("Supported_Mac."),
+                        self.language_handler.get_translation("Mainly_used_to_activate"),
+                        self.language_handler.get_translation("Universal_Control_on_unsupported_Mac"),
                     ],
                 },
-                "序列号覆写": {
+                self.language_handler.get_translation("Serial_number_overwrite"): {
                     "type": "title",
                 },
                 "Populate 序列号覆写": {
@@ -675,85 +676,84 @@ class SettingsFrame(wx.Frame):
                     "args": wx.Frame,
                 },
             },
-            "tambalan": {
-                "Patch direktori root": {
+            self.language_handler.get_translation("Patching"): {
+                self.language_handler.get_translation("Patch_root_directory"): {
                     "type": "title",
                 },
-                "TeraScale 2 Acceleration": {
+                self.language_handler.get_translation("TeraScale_2_Acceleration"): {
                     "type": "checkbox",
                     "value": global_settings.GlobalEnviromentSettings().read_property("MacBookPro_TeraScale_2_Accel") or self.constants.allow_ts2_accel,
                     "variable": "MacBookPro_TeraScale_2_Accel",
                     "constants_variable": "allow_ts2_accel",
                     "description": [
-                        "Mengaktifkan GPU AMD TeraScale 2",
-                        "Di MacBookPro8,2 dan",
-                        "Percepatan pada MacBookPro8,3.",
-                        "Ini dinonaktifkan secara default karena",
-                        "Model GPU ini memiliki kegagalan umum."
+                        self.language_handler.get_translation("Activating_AMD_TeraScale_2_GPU"),
+                        self.language_handler.get_translation("On_the_MacBookPro8,2_and"),
+                        self.language_handler.get_translation("Acceleration_on_MacBookPro8,3."),
+                        self.language_handler.get_translation("This_is_disabled_by_default_because"),
+                        self.language_handler.get_translation("This_GPU_model_has_common_failures.")
                     ],
                     "override_function": self._update_global_settings,
                     "condition": not bool(self.constants.computer.real_model not in ["MacBookPro8,2", "MacBookPro8,3"])
                 },
-                "Izinkan pemasangan patch ekstensi lingkungan HDA lama": {
+                self.language_handler.get_translation("Allow_the_installation_of_the_old_HDA_environment_extension_patch"): {
                     "type": "checkbox",
                     "value": self.constants.allow_hda_patch,
                     "variable": "allow_hda_patch",
                     "description": [
-                        "Diizinkan pada sistem Tahoe dan di atasnya",
-                        "Aktifkan driver AppleHDA untuk kartu suara",
-                        "Dengan AppleALC.kext"
+                        self.language_handler.get_translation("Allowed_on_Tahoe_system_and_above"),
+                        self.language_handler.get_translation("Activate_the_AppleHDA_driver_for_the_sound_card"),
+                        self.language_handler.get_translation("With_AppleALC.kext")
                     ],
                 },
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "Izinkan pemasangan patch ekstensi lingkungan USB lama": {
+                self.language_handler.get_translation("Allow_the_installation_of_the_old_USB_environment_extension_patch"): {
                     "type": "checkbox",
                     "value": self.constants.allow_usb_patch,
                     "variable": "allow_usb_patch",
                     "description": [
-                        "Diizinkan pada sistem Tahoe dan di atasnya",
-                        "Memasang Ekstensi Lingkungan USB Legacy"
+                        self.language_handler.get_translation("Allowed_on_Tahoe_system_and_above"),
+                        self.language_handler.get_translation("Installing_USB_Legacy_Environment_Extension")
                     ],
                 },
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "Konfigurasi Non-Metal": {
+                self.language_handler.get_translation("Non-Metal_Configuration"): {
                     "type": "title",
                 },
-                "Logout diperlukan untuk menerapkan perubahan pada SkyLight": {
+                self.language_handler.get_translation("Logout_is_required_to_apply_changes_to_SkyLight"): {
                     "type": "sub_title",
                 },
-                "Menu Mode Gelap": {
+                self.language_handler.get_translation("Dark_Mode_Menu"): {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea_DarkMenuBar"),
                     "variable": "Moraea_DarkMenuBar",
                     "description": [
-                        "Jika bilah menu Beta diaktifkan，"
-                        "\nWarna bilah menu akan dinamis sesuai\n kebutuhan"
-                        "mengubah."
+                        self.language_handler.get_translation("If_the_Beta_menu_bar_is_activated,the_menu_bar_color_will_be_dynamic_as_needed"),
+                        # self.language_handler.get_translation("change")
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
                 },
-                "Beta Blur": {
+                self.language_handler.get_translation("beta_blur"): {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea_BlurBeta"),
                     "variable": "Moraea_BlurBeta",
                     "description": [
-                        "Control window blur behaviour.",
+                        self.language_handler.get_translation("Control_window_blur_behaviour."),
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
 
                 },
-                "Solusi memuat kursor (lingkaran pelangi)": {
+                self.language_handler.get_translation("Solution_to_load_the_cursor_(rainbow_circle)"): {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea.EnableSpinHack"),
                     "variable": "Moraea.EnableSpinHack",
                     "description": [
-                        "Catatan: Mungkin menggunakan lebih banyak\nsumber daya CPU.",
+                        self.language_handler.get_translation("Note:May_use_more_CPU_resources."),
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
@@ -761,57 +761,51 @@ class SettingsFrame(wx.Frame):
                 "wrap_around 2": {
                     "type": "wrap_around",
                 },
-                "Beta Menu Bar": {
+                self.language_handler.get_translation("Beta_Menu_Bar"): {
                     "type": "checkbox",
                     "value": self._get_system_settings("Amy.MenuBar2Beta"),
                     "variable": "Amy.MenuBar2Beta",
                     "description": [
-                        "Mendukung perubahan warna dinamis."
-                        "Catatan: Pengaturan ini masih eksperimental."
-                        "Jika Anda mengalami masalah, silakan"
-                        "Nonaktifkan pengaturan ini."
+                        self.language_handler.get_translation("support_for_dynamic_color")
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
                 },
-                "Nonaktifkan Beta Rim": {
+                self.language_handler.get_translation("Disable_Beta_Rim"): {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea_RimBetaDisabled"),
                     "variable": "Moraea_RimBetaDisabled",
                     "description": [
-                        "Kontrol efek rendering tepi jendela",
+                        self.language_handler.get_translation("Control_the_window_edge_rendering_effect"),
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
                 },
-                "Kontrol penerapan warna widget desktop": {
+                self.language_handler.get_translation("Control_the_application_of_widget_colors_on_the_desktop"): {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea_ColorWidgetDisabled"),
                     "variable": "Moraea_ColorWidgetDisabled",
                     "description": [
-                        "Kontrol penerapan warna widget desktop",
+                        self.language_handler.get_translation("Control_the_application_of_widget_colors_on_the_desktop"),
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
                 },
             },
-            "App": {
-                "Umum": {
+            self.language_handler.get_translation("App"): {
+                self.language_handler.get_translation("General"): {
                     "type": "title",
                 },
-                "Allow native models": {
+                self.language_handler.get_translation("Allow_native_models"): {
                     "type": "checkbox",
                     "value": self.constants.allow_oc_everywhere,
                     "variable": "allow_oc_everywhere",
                     "description": [
-                        "允许在原生支持的Mac上安装OpenCore。",
-                        "注意这不会允许不支持的",
-                        "macOS版本安装在",
-                        "你的系统上。"
+                        self.language_handler.get_translation("Allows_the_installation_of_OpenCore")
                     ],
-                    "注意": "这个选项仅应在您的Mac原生支持您想要运行的操作系统时使用。\n\n如果您当前正在运行一个不支持的操作系统，这个选项将会导致启动失败。\n\n仅在原生Mac上切换以启用操作系统特性。\n\n您确定要继续吗？",
+                    "注意": self.language_handler.get_translation("attention_this_option_should"),
                 },
-                "忽略App更新": {
+                self.language_handler.get_translation("Ignore_app_updates"): {
                     "type": "checkbox",
                     "value": global_settings.GlobalEnviromentSettings().read_property("IgnoreAppUpdates") or self.constants.ignore_updates,
                     "variable": "IgnoreAppUpdates",
@@ -824,29 +818,26 @@ class SettingsFrame(wx.Frame):
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "禁用报告": {
+                self.language_handler.get_translation("Disabled_Report"): {
                     "type": "checkbox",
                     "value": global_settings.GlobalEnviromentSettings().read_property("DisableCrashAndAnalyticsReporting"),
                     "variable": "DisableCrashAndAnalyticsReporting",
                     "description": [
-                        "当启用时，修补程序将不会",
-                        "向laobamac报告任何信息。",
+                        self.language_handler.get_translation("When_enabled,_the_patch_will_not_report_any_information_to_laobamac.")
                     ],
                     "override_function": self._update_global_settings,
                 },
-                "移除未使用的KDK": {
+                self.language_handler.get_translation("Remove_unused_KDK"): {
                     "type": "checkbox",
                     "value": global_settings.GlobalEnviromentSettings().read_property("ShouldNukeKDKs") or self.constants.should_nuke_kdks,
                     "variable": "ShouldNukeKDKs",
                     "constants_variable": "should_nuke_kdks",
                     "description": [
-                        "当启用时，应用程序将从系统中移除",
-                        "未使用的KDK",
-                        "在根目录修补期间。",
+                        self.language_handler.get_translation("WhenenabledtheapplicationwillremoveunusedKDKsfromthesystemduringrootdirectorypatching"),
                     ],
                     "override_function": self._update_global_settings,
                 },
-                "统计": {
+                self.language_handler.get_translation("Statistics"): {
                     "type": "title",
                 },
                 "Populate Stats": {
@@ -951,14 +942,14 @@ class SettingsFrame(wx.Frame):
         # Look for title on frame
         sip_title: wx.StaticText = None
         for child in panel.GetChildren():
-            if child.GetLabel() == "系统完整性保护（SIP）":
+            if child.GetLabel() == self.language_handler.get_translation("System_Integrity_Protection_(SIP)"):
                 sip_title = child
                 break
 
 
         # Label: Flip individual bits corresponding to XNU's csr.h
         # If you're unfamiliar with how SIP works, do not touch this menu
-        sip_label = wx.StaticText(panel, label="反转对应于", pos=(sip_title.GetPosition()[0] - 20, sip_title.GetPosition()[1] + 30))
+        sip_label = wx.StaticText(panel, label=self.language_handler.get_translation("Reverse_corresponds_to"), pos=(sip_title.GetPosition()[0] - 20, sip_title.GetPosition()[1] + 30))
         sip_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
 
         # Hyperlink: csr.h
@@ -976,12 +967,12 @@ class SettingsFrame(wx.Frame):
             self.sip_value = 0x00
         else:
             self.sip_value = 0x803
-        sip_configured_label = wx.StaticText(panel, label=f"当前设置的SIP: {hex(self.sip_value)}", pos=(sip_label.GetPosition()[0] + 35, sip_label.GetPosition()[1] + 20))
+        sip_configured_label = wx.StaticText(panel, label=f"{self.language_handler.get_translation("Current_set_SIP:")} {hex(self.sip_value)}", pos=(sip_label.GetPosition()[0] + 35, sip_label.GetPosition()[1] + 20))
         sip_configured_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
         self.sip_configured_label = sip_configured_label
 
         # Label: SIP Status
-        sip_booted_label = wx.StaticText(panel, label=f"当前启动的SIP: {hex(py_sip_xnu.SipXnu().get_sip_status().value)}", pos=(sip_configured_label.GetPosition()[0], sip_configured_label.GetPosition()[1] + 20))
+        sip_booted_label = wx.StaticText(panel, label=f"{self.language_handler.get_translation("Currently_started_SIP:")} {hex(py_sip_xnu.SipXnu().get_sip_status().value)}", pos=(sip_configured_label.GetPosition()[0], sip_configured_label.GetPosition()[1] + 20))
         sip_booted_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
 
 
@@ -1010,12 +1001,12 @@ class SettingsFrame(wx.Frame):
     def _populate_serial_spoofing_settings(self, panel: wx.Frame) -> None:
         title: wx.StaticText = None
         for child in panel.GetChildren():
-            if child.GetLabel() == "序列号覆写":
+            if child.GetLabel() == self.language_handler.get_translation("Serial_number_overwrite"):
                 title = child
                 break
 
         # Label: Custom Serial Number
-        custom_serial_number_label = wx.StaticText(panel, label="自定义序列号", pos=(title.GetPosition()[0] - 150, title.GetPosition()[1] + 30))
+        custom_serial_number_label = wx.StaticText(panel, label=self.language_handler.get_translation("custom_serial"), pos=(title.GetPosition()[0] - 150, title.GetPosition()[1] + 30))
         custom_serial_number_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
 
         # Textbox: Custom Serial Number
@@ -1027,7 +1018,7 @@ class SettingsFrame(wx.Frame):
         self.custom_serial_number_textbox = custom_serial_number_textbox
 
         # Label: Custom Board Serial Number
-        custom_board_serial_number_label = wx.StaticText(panel, label="自定义主板序列号", pos=(title.GetPosition()[0] + 120, custom_serial_number_label.GetPosition()[1]))
+        custom_board_serial_number_label = wx.StaticText(panel, label=self.language_handler.get_translation("custom_board_serial"), pos=(title.GetPosition()[0] + 120, custom_serial_number_label.GetPosition()[1]))
         custom_board_serial_number_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
 
         # Textbox: Custom Board Serial Number
@@ -1039,7 +1030,7 @@ class SettingsFrame(wx.Frame):
         self.custom_board_serial_number_textbox = custom_board_serial_number_textbox
 
         # Button: Generate Serial Number (below)
-        generate_serial_number_button = wx.Button(panel, label=f"生成 S/N: {self.constants.custom_model or self.constants.computer.real_model}", pos=(title.GetPosition()[0] - 30, custom_board_serial_number_label.GetPosition()[1] + 60), size=(200, 25))
+        generate_serial_number_button = wx.Button(panel, label=f"Generate S/N: {self.constants.custom_model or self.constants.computer.real_model}", pos=(title.GetPosition()[0] - 30, custom_board_serial_number_label.GetPosition()[1] + 60), size=(200, 25))
         generate_serial_number_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         generate_serial_number_button.Bind(wx.EVT_BUTTON, self.on_generate_serial_number)
 
@@ -1047,28 +1038,28 @@ class SettingsFrame(wx.Frame):
     def _populate_app_stats(self, panel: wx.Frame) -> None:
         title: wx.StaticText = None
         for child in panel.GetChildren():
-            if child.GetLabel() == "统计":
+            if child.GetLabel() == self.language_handler.get_translation("Statistics"):
                 title = child
                 break
 
-        lines = f"""软件信息:
-    软件版本: {self.constants.patcher_version}
-    补丁支持包版本: {self.constants.patcher_support_pkg_version}
-    软件路径: {self.constants.launcher_binary}
-    软件加载: {self.constants.payload_path}
+        lines = f"""{self.language_handler.get_translation("Software_Information")}:
+    {self.language_handler.get_translation("Software_version")}: {self.constants.patcher_version}
+    {self.language_handler.get_translation("Patch_support_package_version")}: {self.constants.patcher_support_pkg_version}
+    {self.language_handler.get_translation("Software_Path")}: {self.constants.launcher_binary}
+    {self.language_handler.get_translation("Software_loading")}: {self.constants.payload_path}
 
 Commit Information:
     Branch: {self.constants.commit_info[0]}
     Date: {self.constants.commit_info[1]}
     URL: {self.constants.commit_info[2] if self.constants.commit_info[2] != "" else "N/A"}
 
-启动信息:
+{self.language_handler.get_translation("Startup_information")}:
     Booted OS: XNU {self.constants.detected_os} ({self.constants.detected_os_version})
     Booted Patcher Version: {self.constants.computer.oclp_version}
     Booted OpenCore Version: {self.constants.computer.opencore_version}
     Booted OpenCore Disk: {self.constants.booted_oc_disk}
 
-硬件信息:
+{self.language_handler.get_translation("Hardware_Information")}:
     {pprint.pformat(self.constants.computer, indent=4)}
 """
         # TextCtrl: properties
