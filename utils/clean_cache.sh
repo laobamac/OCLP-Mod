@@ -16,4 +16,8 @@ fi
 echo "正在删除 $1 及其子目录中的所有 __pycache__ 文件夹..."
 find "$1" -type d -name "__pycache__" -exec rm -rf {} +
 
+# 查找并删除所有 .DS_Store 文件
+echo "正在删除 $1 及其子目录中的所有 .DS_Store 文件..."
+find "$1" -type f -name ".DS_Store" -delete
+
 echo "清理完成"
