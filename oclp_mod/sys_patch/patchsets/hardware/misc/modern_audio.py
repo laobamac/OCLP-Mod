@@ -50,7 +50,7 @@ class ModernAudio(BaseHardware):
         """
         Type of hardware variant
         """
-        return HardwareVariant.AUDIO
+        return HardwareVariant.MISCELLANEOUS
 
 
     def requires_kernel_debug_kit(self) -> bool:
@@ -70,9 +70,9 @@ class ModernAudio(BaseHardware):
 
         return {
             "音频补丁": {
-                PatchType.OVERWRITE_SYSTEM_VOLUME: {
+                PatchType.MERGE_SYSTEM_VOLUME: {
                     "/System/Library/Extensions": {
-                        "AppleHDA.kext": "15.5-25",
+                        "AppleHDA.kext": "26.0 Beta 1",
                     },
                 },
             },
