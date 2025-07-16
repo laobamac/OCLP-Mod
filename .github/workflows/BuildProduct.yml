@@ -75,8 +75,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: manual-${{ github.sha }}
-          name: Pre-release (Manual Trigger) - NOT STABLE VERSION
-          body: "Manually triggered pre-release build"
+          name: Pre-release (Multilingual) - NOT STABLE VERSION
+          body: "Manually triggered pre-release multilingual build 多语言版本，对于中国大陆建议下载单中文版"
           prerelease: true
           files: |
             ./dist/AutoPkg-Assets.pkg
