@@ -700,6 +700,7 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.allow_hda_patch,
                     "variable": "allow_hda_patch",
                     "description": [
+                        "",
                         self.language_handler.get_translation("Allowed_on_Tahoe_system_and_above"),
                         self.language_handler.get_translation("Activate_the_AppleHDA_driver_for_the_sound_card"),
                         self.language_handler.get_translation("With_AppleALC.kext")
@@ -713,6 +714,7 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.allow_usb_patch,
                     "variable": "allow_usb_patch",
                     "description": [
+                        "",
                         self.language_handler.get_translation("Allowed_on_Tahoe_system_and_above"),
                         self.language_handler.get_translation("Installing_USB_Legacy_Environment_Extension")
                     ],
