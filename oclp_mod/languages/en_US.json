@@ -7,8 +7,8 @@
     ],
     "create_installer": "Create macOS Installer",
     "installer_description": [
-        "Download macOS installer",
-        "Install new macOS using ."
+        "Download and flash a macOS",
+        "Installer for your system."
     ],
     "settings": "⚙️ Settings",
     "post_install": "Install hardware patches",
