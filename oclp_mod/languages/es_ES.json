@@ -7,8 +7,8 @@
     ],
     "create_installer": "Crear instalador de macOS",
     "installer_description": [
-        "Descargar y grabar el instalador de",
-        "macOS para tu sistema."
+        "Descargar y grabar el instalador",
+        "de macOS para tu sistema."
     ],
     "settings": "⚙️ Ajustes",
     "post_install": "Instalar parches de hardware",
