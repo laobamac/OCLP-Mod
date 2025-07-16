@@ -52,7 +52,7 @@ class DownloadFrame(wx.Frame):
         icon.SetSize((100, 100))
         icon.Centre(wx.HORIZONTAL)
 
-        title_label = wx.StaticText(frame, label=f"{self.language_handler.get_translation("Downloading:")} {self.item_name}", pos=(-1,icon.GetPosition()[1] + icon.GetSize()[1] + 20))
+        title_label = wx.StaticText(frame, label=f"{self.language_handler.get_translation('Downloading:')} {self.item_name}", pos=(-1,icon.GetPosition()[1] + icon.GetSize()[1] + 20))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title_label.Centre(wx.HORIZONTAL)
 
