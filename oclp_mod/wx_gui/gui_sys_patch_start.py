@@ -95,7 +95,7 @@ class SysPatchStartFrame(wx.Frame):
         if self.kdk_obj.success is False:
             progress_bar_animation.stop_pulse()
             progress_bar.SetValue(0)
-            wx.MessageBox(f"{self.language_handler.get_translation("KDK_download_failed:")} {self.kdk_obj.error_msg}", self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(f"{self.language_handler.get_translation('KDK_download_failed:')} {self.kdk_obj.error_msg}", self.language_handler.get_translation('Error'), wx.OK | wx.ICON_ERROR)
             return False
 
         kdk_download_obj = self.kdk_obj.retrieve_download()
@@ -127,7 +127,7 @@ class SysPatchStartFrame(wx.Frame):
             progress_bar.SetValue(0)
             logging.error("KDK checksum validation failed")
             logging.error(self.kdk_obj.error_msg)
-            msg = wx.MessageDialog(frame, f"{self.language_handler.get_translation("KDK_MD5_mismatch")} {self.kdk_obj.error_msg}", self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR)
+            msg = wx.MessageDialog(frame, f"{self.language_handler.get_translation('KDK_MD5_mismatch')} {self.kdk_obj.error_msg}", self.language_handler.get_translation('Error'), wx.OK | wx.ICON_ERROR)
             msg.ShowModal()
             return False
 
@@ -176,7 +176,7 @@ class SysPatchStartFrame(wx.Frame):
         if self.metallib_obj.success is False:
             progress_bar_animation.stop_pulse()
             progress_bar.SetValue(0)
-            wx.MessageBox(f"{self.language_handler.get_translation("Metallib_download_failed")}: {self.metallib_obj.error_msg}", self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(f"{self.language_handler.get_translation('Metallib_download_failed')}: {self.metallib_obj.error_msg}", self.language_handler.get_translation('Error'), wx.OK | wx.ICON_ERROR)
             return False
 
         self.metallib_download_obj = self.metallib_obj.retrieve_download()
@@ -196,7 +196,7 @@ class SysPatchStartFrame(wx.Frame):
 
         logging.info("Metallib download complete, installing Metallib PKG")
 
-        header.SetLabel(f"{self.language_handler.get_translation("Installing_Metallib:")} {self.metallib_obj.metallib_url_build}")
+        header.SetLabel(f"{self.language_handler.get_translation('Installing_Metallib:')} {self.metallib_obj.metallib_url_build}")
         header.Centre(wx.HORIZONTAL)
 
         subheader.SetLabel(self.language_handler.get_translation("Installing_Metallib:"))
@@ -214,7 +214,7 @@ class SysPatchStartFrame(wx.Frame):
         if self.result is False:
             progress_bar_animation.stop_pulse()
             progress_bar.SetValue(0)
-            wx.MessageBox(f"{self.language_handler.get_translation("Metallib_installation_failed:")} {self.metallib_obj.error_msg}", self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(f"{self.language_handler.get_translation('Metallib_installation_failed:')} {self.metallib_obj.error_msg}", self.language_handler.get_translation('Error'), wx.OK | wx.ICON_ERROR)
             return False
 
         progress_bar_animation.stop_pulse()

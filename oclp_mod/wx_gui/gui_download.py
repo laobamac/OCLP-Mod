@@ -79,10 +79,10 @@ class DownloadFrame(wx.Frame):
                 percentage = 1
 
             if percentage == -1:
-                amount_str = f"{utilities.human_fmt(self.download_obj.downloaded_file_size)} {self.language_handler.get_translation("Downloaded")}， ({utilities.human_fmt(self.download_obj.get_speed())}/s)"
+                amount_str = f"{utilities.human_fmt(self.download_obj.downloaded_file_size)} {self.language_handler.get_translation('Downloaded')}， ({utilities.human_fmt(self.download_obj.get_speed())}/s)"
                 progress_bar.Pulse()
             else:
-                amount_str = f"{self.language_handler.get_translation("There_is_still")} {utilities.seconds_to_readable_time(self.download_obj.get_time_remaining())} - {utilities.human_fmt(self.download_obj.downloaded_file_size)} {self.language_handler.get_translation("at")} {utilities.human_fmt(self.download_obj.total_file_size)}{self.language_handler.get_translation("center")}， {self.language_handler.get_translation("speed")} ({utilities.human_fmt(self.download_obj.get_speed())}/s)"
+                amount_str = f"{self.language_handler.get_translation('There_is_still')} {utilities.seconds_to_readable_time(self.download_obj.get_time_remaining())} - {utilities.human_fmt(self.download_obj.downloaded_file_size)} {self.language_handler.get_translation('at')} {utilities.human_fmt(self.download_obj.total_file_size)}{self.language_handler.get_translation('center')}， {self.language_handler.get_translation('speed')} ({utilities.human_fmt(self.download_obj.get_speed())}/s)"
                 progress_bar.SetValue(int(percentage))
 
             label_amount.SetLabel(amount_str)
@@ -92,7 +92,7 @@ class DownloadFrame(wx.Frame):
             time.sleep(self.constants.thread_sleep_interval)
 
         if self.download_obj.download_complete is False and self.user_cancelled is False:
-            wx.MessageBox(f"{self.language_handler.get_translation("Download_failed")}: \n{self.download_obj.error_msg}", self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(f"{self.language_handler.get_translation('Download_failed')}: \n{self.download_obj.error_msg}", self.language_handler.get_translation('Error'), wx.OK | wx.ICON_ERROR)
 
         progress_bar.Destroy()
         frame.Destroy()

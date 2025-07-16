@@ -55,7 +55,7 @@ class DownloadProgressFrame(wx.Frame):
                     wx.CallAfter(self.progress_bar.SetValue, int((downloaded / total_size) * 100))
                     wx.CallAfter(self.speed_label.SetLabel, f"{downloaded/1024/1024:.2f} MB / {total_size/1024/1024:.2f} MB @ {speed/1024/1024:.2f} MB/s")
         except requests.RequestException as e:
-            wx.MessageBox(f"{self.language_handler.get_translation("Download_failed")} {e}", self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(f"{self.language_handler.get_translation('Download_failed')} {e}", self.language_handler.get_translation('Error'), wx.OK | wx.ICON_ERROR)
 
         wx.CallAfter(self.Close)
 
@@ -148,7 +148,7 @@ class DownloadKDKFrame(wx.Frame):
             wx.CallAfter(self.list_ctrl.SetData, kdk_data)
             wx.CallAfter(self.loading_frame.close)
         except requests.RequestException as e:
-            wx.MessageBox(f"{self.language_handler.get_translation("Failed_to_retrieve_KDK_information:")} {e}", self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(f"{self.language_handler.get_translation('Failed_to_retrieve_KDK_information:')} {e}", self.language_handler.get_translation('Error'), wx.OK | wx.ICON_ERROR)
             wx.CallAfter(self.loading_frame.close)
     
     def on_copy(self, event):

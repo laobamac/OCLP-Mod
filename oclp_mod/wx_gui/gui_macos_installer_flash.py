@@ -393,7 +393,7 @@ class macOSInstallerFlashFrame(wx.Frame):
 
         if "Install media now available at" not in output:
             logging.info("Failed to create macOS installer")
-            popup = wx.MessageDialog(self, f"创建安装器失败\n\n输出: {output}\n\n错误: {error}", self.language_handler.get_translation("Error"), wx.OK | wx.ICON_ERROR)
+            popup = wx.MessageDialog(self, f"创建安装器失败\n\n输出: {output}\n\n错误: {error}", self.language_handler.get_translation('Error'), wx.OK | wx.ICON_ERROR)
             popup.ShowModal()
             return False
 

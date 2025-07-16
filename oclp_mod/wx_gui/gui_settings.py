@@ -969,12 +969,12 @@ class SettingsFrame(wx.Frame):
             self.sip_value = 0x00
         else:
             self.sip_value = 0x803
-        sip_configured_label = wx.StaticText(panel, label=f"{self.language_handler.get_translation("Current_set_SIP:")} {hex(self.sip_value)}", pos=(sip_label.GetPosition()[0] + 35, sip_label.GetPosition()[1] + 20))
+        sip_configured_label = wx.StaticText(panel, label=f"{self.language_handler.get_translation('Current_set_SIP:')} {hex(self.sip_value)}", pos=(sip_label.GetPosition()[0] + 35, sip_label.GetPosition()[1] + 20))
         sip_configured_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
         self.sip_configured_label = sip_configured_label
 
         # Label: SIP Status
-        sip_booted_label = wx.StaticText(panel, label=f"{self.language_handler.get_translation("Currently_started_SIP:")} {hex(py_sip_xnu.SipXnu().get_sip_status().value)}", pos=(sip_configured_label.GetPosition()[0], sip_configured_label.GetPosition()[1] + 20))
+        sip_booted_label = wx.StaticText(panel, label=f"{self.language_handler.get_translation('Currently_started_SIP:')} {hex(py_sip_xnu.SipXnu().get_sip_status().value)}", pos=(sip_configured_label.GetPosition()[0], sip_configured_label.GetPosition()[1] + 20))
         sip_booted_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
 
 
@@ -1032,7 +1032,7 @@ class SettingsFrame(wx.Frame):
         self.custom_board_serial_number_textbox = custom_board_serial_number_textbox
 
         # Button: Generate Serial Number (below)
-        generate_serial_number_button = wx.Button(panel, label=f"{self.language_handler.get_translation("generate_serial")} {self.constants.custom_model or self.constants.computer.real_model}", pos=(title.GetPosition()[0] - 30, custom_board_serial_number_label.GetPosition()[1] + 60), size=(200, 25))
+        generate_serial_number_button = wx.Button(panel, label=f"{self.language_handler.get_translation('generate_serial')} {self.constants.custom_model or self.constants.computer.real_model}", pos=(title.GetPosition()[0] - 30, custom_board_serial_number_label.GetPosition()[1] + 60), size=(200, 25))
         generate_serial_number_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         generate_serial_number_button.Bind(wx.EVT_BUTTON, self.on_generate_serial_number)
 
@@ -1044,7 +1044,7 @@ class SettingsFrame(wx.Frame):
                 title = child
                 break
 
-        lines = f"""{self.language_handler.get_translation("Software_Information")}:
+        lines = f"""{self.language_handler.get_translation('Software_Information')}:
     {self.language_handler.get_translation("Software_version")}: {self.constants.patcher_version}
     {self.language_handler.get_translation("Patch_support_package_version")}: {self.constants.patcher_support_pkg_version}
     {self.language_handler.get_translation("Software_Path")}: {self.constants.launcher_binary}
