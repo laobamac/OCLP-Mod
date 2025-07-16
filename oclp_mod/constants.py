@@ -21,7 +21,8 @@ class Constants:
         self.language_options = {
         "English": "English",
         "中文": "中文",
-        "Indonesia": "Bahasa Indonesia"
+        "Indonesia": "Bahasa Indonesia",
+        "Spanish": "Spanish"
         }
 
         # URLs
