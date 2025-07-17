@@ -93,7 +93,9 @@ class LegacyUSBHOST(BaseHardware):
                         "IOUSBDeviceFamily.kext": "14.7.6",  
                         "IOUSBFamily.kext": "14.7.6",  
                         "IOUSBHostFamily.kext": "14.7.6",  
-                        "IOUSBMassStorageDriver.kext": "14.7.6"  
+                        "IOUSBMassStorageDriver.kext": "14.7.6",
+                        "AppleUSBAudio.kext.dSYM": "14.7.6",
+                        "IOUSBFamily.kext.dSYM": "14.7.6",
                     },
                 },
             },
