@@ -35,13 +35,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Import Application Signing Certificate
-        uses: dhinakg/import-codesign-certs@master
+        uses: laobamac/import-codesign-certs@master
         with:
           p12-file-base64: ${{ secrets.ORG_MAC_DEVELOPER_ID_APPLICATION_CERT_P12_BASE64 }}
           p12-password: ${{ secrets.ORG_MAC_DEVELOPER_ID_APPLICATION_CERT_P12_PASSWORD }}
 
       - name: Import Installer Signing Certificate
-        uses: dhinakg/import-codesign-certs@master
+        uses: laobamac/import-codesign-certs@master
         with:
           p12-file-base64: ${{ secrets.ORG_MAC_DEVELOPER_ID_INSTALLER_CERT_P12_BASE64 }}
           p12-password: ${{ secrets.ORG_MAC_DEVELOPER_ID_INSTALLER_CERT_P12_PASSWORD }}
