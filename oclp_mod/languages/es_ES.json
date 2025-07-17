@@ -135,7 +135,7 @@
     "Install_driver_patch" :"Instalar parche de controlador",
     "Scan_again":"Comprobar de nuevo",
     "No_available_hard_disk_found.":"No se encuentra disco duro disponible.",
-    "The_selected_USB_drive_will_be_formatted!":"¿Se formateará la unidad USB seleccionada!",
+    "The_selected_USB_drive_will_be_formatted!":"¡Se formateará la unidad USB seleccionada!",
     "Select_local_hard_drive":"Seleccionar disco duro local",
     "Retrieve_local_hard_drive_information":"Obtener información del disco duro local",
     "it_seems":"Parece que no hay ningún instalador en la carpeta de aplicaciones.",
