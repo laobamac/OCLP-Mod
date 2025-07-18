@@ -4,7 +4,13 @@ import threading
 from wx.lib.agw.customtreectrl import CustomTreeCtrl
 import time
 
+from .. import constants
+from ..constants import Constants
+
 mlurl = ""
+
+METALLIB_API_LINK_PROXY:     str  = "https://oclpapi.simplehac.cn/MetallibSupportPkg/manifest.json"
+METALLIB_API_LINK_ORIGIN:     str  = "https://dortania.github.io/MetallibSupportPkg/manifest.json"
 
 class DownloadProgressFrame(wx.Frame):
     def __init__(self, parent, title, url, file_path):
@@ -106,7 +112,8 @@ class DownloadListCtrl(wx.ListCtrl):
         return None
 
 class DownloadMLFrame(wx.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, global_constants: Constants):
+        self.constants: constants.Constants = global_constants
         super(DownloadMLFrame, self).__init__(parent, title="MetalLib下载", size=(600, 400))
         panel = wx.Panel(self)
 
@@ -130,8 +137,12 @@ class DownloadMLFrame(wx.Frame):
 
     def fetch_MetalLib_data(self):
         time.sleep(1)
+        if self.constants.use_github_proxy == True:
+            METALLIB_API_LINK: str = METALLIB_API_LINK_PROXY
+        else:
+            METALLIB_API_LINK: str = METALLIB_API_LINK_ORIGIN
         try:
-            response = requests.get("https://oclpapi.simplehac.cn/MetallibSupportPkg/manifest.json")
+            response = requests.get(METALLIB_API_LINK)
             response.raise_for_status()
             MetalLib_data = response.json()
             wx.CallAfter(self.list_ctrl.SetData, MetalLib_data)

@@ -8,7 +8,6 @@ from ...base import PatchType
 
 from .....constants import Constants
 from ..... import constants
-from .....detections import device_probe
 from .....datasets.os_data import os_data
 
 

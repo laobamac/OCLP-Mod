@@ -827,7 +827,7 @@ class SettingsFrame(wx.Frame):
                 "使用加速代理下载Github资源": {
                     "type": "checkbox",
                     "value": self.constants.use_github_proxy,
-                    "variable": "allow_hda_patch",
+                    "variable": "use_github_proxy",
                     "description": [
                         "通过代理地址下载Github资源",
                         "关闭后将直接请求Github",
