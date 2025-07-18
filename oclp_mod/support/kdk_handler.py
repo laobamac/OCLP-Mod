@@ -13,6 +13,7 @@ from typing import cast
 from pathlib import Path
 
 from .. import constants
+from ..constants import Constants
 
 from ..datasets import os_data
 from ..volume   import generate_copy_arguments
@@ -21,13 +22,22 @@ from . import (
     network_handler,
     subprocess_wrapper
 )
+settings = Constants()
 
 KDK_INSTALL_PATH: str  = "/Library/Developer/KDKs"
 KDK_INFO_PLIST:   str  = "KDKInfo.plist"
-KDK_API_LINK:     str  = "https://oclpapi.simplehac.cn/KdkSupportPkg/manifest.json"
+KDK_API_LINK_PROXY:     str  = "https://oclpapi.simplehac.cn/KdkSupportPkg/manifest.json"
+KDK_API_LINK_ORIGIN:     str  = "https://dortania.github.io/KdkSupportPkg/manifest.json"
 
 KDK_ASSET_LIST:   list = None
 
+'''
+Determine whether the proxy address needs to be used, the default is True.
+'''
+if settings.use_github_proxy == True:
+    KDK_API_LINK:  str = KDK_API_LINK_PROXY
+else:
+    KDK_API_LINK:  str = KDK_API_LINK_ORIGIN
 
 class KernelDebugKitObject:
     """

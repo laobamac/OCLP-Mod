@@ -12,15 +12,22 @@ from pathlib import Path
 
 from .  import network_handler, subprocess_wrapper
 from .. import constants
+from ..constants import Constants
 
 from ..datasets import os_data
 
+settings = Constants()
 
 METALLIB_INSTALL_PATH: str  = "/Library/Application Support/Dortania/MetallibSupportPkg"
-METALLIB_API_LINK:     str  = "https://oclpapi.simplehac.cn/MetallibSupportPkg/manifest.json"
+METALLIB_API_LINK_PROXY:     str  = "https://oclpapi.simplehac.cn/MetallibSupportPkg/manifest.json"
+METALLIB_API_LINK_ORIGIN:     str  = "https://dortania.github.io/MetallibSupportPkg/manifest.json"
 
 METALLIB_ASSET_LIST:   list = None
 
+if settings.use_github_proxy == True:
+    METALLIB_API_LINK:  str = METALLIB_API_LINK_PROXY
+else:
+    METALLIB_API_LINK:  str = METALLIB_API_LINK_ORIGIN
 
 class MetalLibraryObject:
 

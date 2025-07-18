@@ -802,7 +802,7 @@ class SettingsFrame(wx.Frame):
                 "通用": {
                     "type": "title",
                 },
-                "Allow native models": {
+                "允许原生机型": {
                     "type": "checkbox",
                     "value": self.constants.allow_oc_everywhere,
                     "variable": "allow_oc_everywhere",
@@ -823,6 +823,15 @@ class SettingsFrame(wx.Frame):
                         # "Ignore app updates",
                     ],
                     "override_function": self._update_global_settings,
+                },
+                "使用加速代理下载Github资源": {
+                    "type": "checkbox",
+                    "value": self.constants.use_github_proxy,
+                    "variable": "allow_hda_patch",
+                    "description": [
+                        "通过代理地址下载Github资源",
+                        "关闭后将直接请求Github",
+                    ],
                 },
                 "wrap_around 1": {
                     "type": "wrap_around",
@@ -1024,7 +1033,7 @@ class SettingsFrame(wx.Frame):
         # Textbox: Custom Serial Number
         custom_serial_number_textbox = wx.TextCtrl(panel, pos=(custom_serial_number_label.GetPosition()[0] - 27, custom_serial_number_label.GetPosition()[1] + 20), size=(200, 25))
         custom_serial_number_textbox.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-        custom_serial_number_textbox.SetToolTip("Enter a custom serial number here. This will be used for the SMBIOS and iMessage.\n\nNote: This will not be used if the \"Use Custom Serial Number\" checkbox is not checked.")
+        custom_serial_number_textbox.SetToolTip("在此处输入自定义序列号。这将用于 SMBIOS 和 iMessage。\n\n注意：如果未选中 \"使用自定义序列号\" 复选框，则不会使用该复选按钮。")
         custom_serial_number_textbox.Bind(wx.EVT_TEXT, self.on_custom_serial_number_textbox)
         custom_serial_number_textbox.SetValue(self.constants.custom_serial_number)
         self.custom_serial_number_textbox = custom_serial_number_textbox

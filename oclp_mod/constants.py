@@ -244,6 +244,7 @@ class Constants:
         self.custom_sip_value:        int = None  #  Set custom SIP value
         self.allow_usb_patch:        bool = False #  Allow USB Patch on Tahoe
         self.allow_hda_patch:        bool = False #  Allow HDA Patch on Tahoe
+        self.use_github_proxy:        bool = True #  Use proxy to get resources on Github
 
         ## Non-Metal OS support
         self.legacy_accel_support = [

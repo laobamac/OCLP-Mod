@@ -16,10 +16,13 @@ import atexit
 from typing import Union
 from pathlib import Path
 
+from ..constants import Constants
+
 from . import utilities
 
 SESSION = requests.Session()
 
+settings = Constants()
 
 class DownloadStatus(enum.Enum):
     """
@@ -41,7 +44,10 @@ class NetworkUtilities:
         self.url: str = url
 
         if self.url is None:
-            self.url = "https://oclpapi.simplehac.cn/"
+            if settings.use_github_proxy == True:
+                self.url = "https://oclpapi.simplehac.cn/"
+            else:
+                self.url = "https://dortania.github.io/"
 
 
     def verify_network_connection(self) -> bool:
