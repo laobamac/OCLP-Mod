@@ -936,9 +936,7 @@ class SettingsFrame(wx.Frame):
             screen_location=self.parent.GetPosition()
         )
 
-
     def _populate_sip_settings(self, panel: wx.Frame) -> None:
-
         horizontal_spacer = 250
 
         # Look for title on frame
@@ -948,19 +946,32 @@ class SettingsFrame(wx.Frame):
                 sip_title = child
                 break
 
+        # Calculate center position based on title
+        title_pos = sip_title.GetPosition()
+        title_width = sip_title.GetSize().width
+        center_x = title_pos.x + (title_width // 2)
 
         # Label: Flip individual bits corresponding to XNU's csr.h
         # If you're unfamiliar with how SIP works, do not touch this menu
-        sip_label = wx.StaticText(panel, label=self.language_handler.get_translation("Reverse_corresponds_to"), pos=(sip_title.GetPosition()[0] - 20, sip_title.GetPosition()[1] + 30))
+        sip_label = wx.StaticText(panel, label=self.language_handler.get_translation("Reverse_corresponds_to"))
         sip_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
+
+        # Calculate label position to be centered
+        label_width = sip_label.GetSize().width
+        sip_label.SetPosition((center_x - (label_width // 2), title_pos.y + 30))
 
         # Hyperlink: csr.h
         spacer = 1 if self.constants.detected_os >= os_data.os_data.big_sur else 3
-        sip_csr_h = wx.adv.HyperlinkCtrl(panel, id=wx.ID_ANY, label="XNU's csr.h", url="https://github.com/apple-oss-distributions/xnu/blob/xnu-8020.101.4/bsd/sys/csr.h", pos=(sip_label.GetPosition()[0] + sip_label.GetSize()[0] + 4, sip_label.GetPosition()[1] + spacer))
+        sip_csr_h = wx.adv.HyperlinkCtrl(panel, id=wx.ID_ANY, label="XNU's csr.h",
+                                         url="https://github.com/apple-oss-distributions/xnu/blob/xnu-8020.101.4/bsd/sys/csr.h")
         sip_csr_h.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         sip_csr_h.SetHoverColour(self.hyperlink_colour)
         sip_csr_h.SetNormalColour(self.hyperlink_colour)
         sip_csr_h.SetVisitedColour(self.hyperlink_colour)
+
+        # Position hyperlink next to label
+        hyperlink_x = sip_label.GetPosition().x + sip_label.GetSize().width + 4
+        sip_csr_h.SetPosition((hyperlink_x, sip_label.GetPosition().y + spacer))
 
         # Label: SIP Status
         if self.constants.custom_sip_value is not None:
@@ -969,14 +980,22 @@ class SettingsFrame(wx.Frame):
             self.sip_value = 0x00
         else:
             self.sip_value = 0x803
-        sip_configured_label = wx.StaticText(panel, label=f"{self.language_handler.get_translation('Current_set_SIP:')} {hex(self.sip_value)}", pos=(sip_label.GetPosition()[0] + 35, sip_label.GetPosition()[1] + 20))
+
+        sip_configured_label = wx.StaticText(panel,
+                                             label=f"{self.language_handler.get_translation('Current_set_SIP:')} {hex(self.sip_value)}")
         sip_configured_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
+        # Center this label
+        configured_width = sip_configured_label.GetSize().width
+        sip_configured_label.SetPosition((center_x - (configured_width // 2), sip_label.GetPosition().y + 20))
         self.sip_configured_label = sip_configured_label
 
         # Label: SIP Status
-        sip_booted_label = wx.StaticText(panel, label=f"{self.language_handler.get_translation('Currently_started_SIP:')} {hex(py_sip_xnu.SipXnu().get_sip_status().value)}", pos=(sip_configured_label.GetPosition()[0], sip_configured_label.GetPosition()[1] + 20))
+        sip_booted_label = wx.StaticText(panel,
+                                         label=f"{self.language_handler.get_translation('Currently_started_SIP:')} {hex(py_sip_xnu.SipXnu().get_sip_status().value)}")
         sip_booted_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-
+        # Center this label
+        booted_width = sip_booted_label.GetSize().width
+        sip_booted_label.SetPosition((center_x - (booted_width // 2), sip_configured_label.GetPosition().y + 20))
 
         # SIP toggles
         entries_per_row = len(sip_data.system_integrity_protection.csr_values) // 2
@@ -984,12 +1003,18 @@ class SettingsFrame(wx.Frame):
         vertical_spacer = 25
         index = 1
         for sip_bit in sip_data.system_integrity_protection.csr_values_extended:
-            self.sip_checkbox = wx.CheckBox(panel, label=sip_data.system_integrity_protection.csr_values_extended[sip_bit]["name"].split("CSR_")[1], pos = (vertical_spacer, sip_booted_label.GetPosition()[1] + 20 + horizontal_spacer))
+            self.sip_checkbox = wx.CheckBox(panel, label=
+            sip_data.system_integrity_protection.csr_values_extended[sip_bit]["name"].split("CSR_")[1])
             self.sip_checkbox.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-            self.sip_checkbox.SetToolTip(f'Description: {sip_data.system_integrity_protection.csr_values_extended[sip_bit]["description"]}\nValue: {hex(sip_data.system_integrity_protection.csr_values_extended[sip_bit]["value"])}\nIntroduced in: macOS {sip_data.system_integrity_protection.csr_values_extended[sip_bit]["introduced_friendly"]}')
+            self.sip_checkbox.SetToolTip(
+                f'Description: {sip_data.system_integrity_protection.csr_values_extended[sip_bit]["description"]}\nValue: {hex(sip_data.system_integrity_protection.csr_values_extended[sip_bit]["value"])}\nIntroduced in: macOS {sip_data.system_integrity_protection.csr_values_extended[sip_bit]["introduced_friendly"]}')
 
-            if self.sip_value & sip_data.system_integrity_protection.csr_values_extended[sip_bit]["value"] == sip_data.system_integrity_protection.csr_values_extended[sip_bit]["value"]:
+            if self.sip_value & sip_data.system_integrity_protection.csr_values_extended[sip_bit]["value"] == \
+                    sip_data.system_integrity_protection.csr_values_extended[sip_bit]["value"]:
                 self.sip_checkbox.SetValue(True)
+
+            # Position checkbox
+            self.sip_checkbox.SetPosition((vertical_spacer, sip_booted_label.GetPosition().y + 20 + horizontal_spacer))
 
             horizontal_spacer += 20
             if index == entries_per_row:
@@ -999,7 +1024,6 @@ class SettingsFrame(wx.Frame):
             index += 1
             self.sip_checkbox.Bind(wx.EVT_CHECKBOX, self.on_sip_value)
 
-
     def _populate_serial_spoofing_settings(self, panel: wx.Frame) -> None:
         title: wx.StaticText = None
         for child in panel.GetChildren():
@@ -1007,32 +1031,75 @@ class SettingsFrame(wx.Frame):
                 title = child
                 break
 
+        # Calculate positions based on title position
+        title_pos = title.GetPosition()
+
+        # Field dimensions
+        field_width = 200
+        spacing = 20
+
+        # Calculate center position relative to title
+        # We'll use the title's x position as our reference point
+        center_x = title_pos.x + (title.GetSize().width // 2)
+
+        # Position for left field (Custom Serial Number)
+        left_x = center_x - field_width - spacing // 2
+
+        # Position for right field (Custom Board Serial Number)
+        right_x = center_x + spacing // 2
+
+        # Vertical positions
+        label_y = title_pos.y + 30
+        textbox_y = label_y + 20
+        button_y = textbox_y + 40
+
         # Label: Custom Serial Number
-        custom_serial_number_label = wx.StaticText(panel, label=self.language_handler.get_translation("custom_serial"), pos=(title.GetPosition()[0] - 150, title.GetPosition()[1] + 30))
+        custom_serial_number_label = wx.StaticText(
+            panel,
+            label=self.language_handler.get_translation("custom_serial"),
+            pos=(left_x, label_y)
+        )
         custom_serial_number_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
 
         # Textbox: Custom Serial Number
-        custom_serial_number_textbox = wx.TextCtrl(panel, pos=(custom_serial_number_label.GetPosition()[0] - 27, custom_serial_number_label.GetPosition()[1] + 20), size=(200, 25))
+        custom_serial_number_textbox = wx.TextCtrl(
+            panel,
+            pos=(left_x, textbox_y),
+            size=(field_width, 25)
+        )
         custom_serial_number_textbox.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-        custom_serial_number_textbox.SetToolTip("Enter a custom serial number here. This will be used for the SMBIOS and iMessage.\n\nNote: This will not be used if the \"Use Custom Serial Number\" checkbox is not checked.")
+        custom_serial_number_textbox.SetToolTip("Enter a custom serial number here...")
         custom_serial_number_textbox.Bind(wx.EVT_TEXT, self.on_custom_serial_number_textbox)
         custom_serial_number_textbox.SetValue(self.constants.custom_serial_number)
         self.custom_serial_number_textbox = custom_serial_number_textbox
 
         # Label: Custom Board Serial Number
-        custom_board_serial_number_label = wx.StaticText(panel, label=self.language_handler.get_translation("custom_board_serial"), pos=(title.GetPosition()[0] + 120, custom_serial_number_label.GetPosition()[1]))
+        custom_board_serial_number_label = wx.StaticText(
+            panel,
+            label=self.language_handler.get_translation("custom_board_serial"),
+            pos=(right_x, label_y)
+        )
         custom_board_serial_number_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
 
         # Textbox: Custom Board Serial Number
-        custom_board_serial_number_textbox = wx.TextCtrl(panel, pos=(custom_board_serial_number_label.GetPosition()[0] - 5, custom_serial_number_textbox.GetPosition()[1]), size=(200, 25))
+        custom_board_serial_number_textbox = wx.TextCtrl(
+            panel,
+            pos=(right_x, textbox_y),
+            size=(field_width, 25)
+        )
         custom_board_serial_number_textbox.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-        custom_board_serial_number_textbox.SetToolTip("Enter a custom board serial number here. This will be used for the SMBIOS and iMessage.\n\nNote: This will not be used if the \"Use Custom Board Serial Number\" checkbox is not checked.")
+        custom_board_serial_number_textbox.SetToolTip("Enter a custom board serial number here...")
         custom_board_serial_number_textbox.Bind(wx.EVT_TEXT, self.on_custom_board_serial_number_textbox)
         custom_board_serial_number_textbox.SetValue(self.constants.custom_board_serial_number)
         self.custom_board_serial_number_textbox = custom_board_serial_number_textbox
 
-        # Button: Generate Serial Number (below)
-        generate_serial_number_button = wx.Button(panel, label=f"{self.language_handler.get_translation('generate_serial')} {self.constants.custom_model or self.constants.computer.real_model}", pos=(title.GetPosition()[0] - 30, custom_board_serial_number_label.GetPosition()[1] + 60), size=(200, 25))
+        # Button: Generate Serial Number (centered below both fields)
+        generate_serial_number_button = wx.Button(
+            panel,
+            label=f"{self.language_handler.get_translation('generate_serial')} {self.constants.custom_model or self.constants.computer.real_model}",
+            pos=(center_x - 100, button_y),
+            size=(200, 25)
+        )
         generate_serial_number_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         generate_serial_number_button.Bind(wx.EVT_BUTTON, self.on_generate_serial_number)
 
