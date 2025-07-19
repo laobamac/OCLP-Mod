@@ -70,7 +70,7 @@
     "Limitthemaximumnumberofthreadsonthisunitto4.":"Limitar el número máximo de hilos a 4.",
     "RequiredformacOSSequoiaandnewerversions.":"Requerido por Sequoia y siguientes.",
     "Debugging":"Depurando",
-    "verbose_mode":"Modo detallado",
+    "verbose_debug":"Modo detallado",
     "debug_version_driver":"Depurar versión del controlador",
     "Additional":"Adicional",
     "Universal(effectivesustainability)":"Universal (continuación)",
