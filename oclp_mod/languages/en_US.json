@@ -70,7 +70,7 @@
     "Limitthemaximumnumberofthreadsonthisunitto4.":"Limit the maximum number of threads on this\nunit to 4.",
     "RequiredformacOSSequoiaandnewerversions.":"Required for macOS Sequoia and newer versions.",
     "Debugging":"Debugging",
-    "verbose_mode":"Verbose mode",
+    "verbose_debug":"Verbose mode",
     "debug_version_driver":"Debug version driver",
     "Additional":"Additional",
     "Universal(effectivesustainability)":"Universal (effective sustainability)",
