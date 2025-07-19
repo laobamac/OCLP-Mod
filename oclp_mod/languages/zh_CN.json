@@ -70,7 +70,7 @@
     "Limitthemaximumnumberofthreadsonthisunitto4.": "将此单元的最大线程数限制为4。",
     "RequiredformacOSSequoiaandnewerversions.": "需要 macOS Sequoia 及更新版本。",
     "Debugging": "调试",
-    "verbose_mode": "详细模式",
+    "verbose_debug": "详细模式",
     "debug_version_driver": "调试版本驱动程序",
     "debugging_OpenCore_version": "调试 OpenCore 版本",
     "use_debug": "使用 DEBUG 版本的 kext，并启用额外的内核记录。",
