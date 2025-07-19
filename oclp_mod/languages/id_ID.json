@@ -71,7 +71,7 @@
     "Limitthemaximumnumberofthreadsonthisunitto4.":"Batasi jumlah thread maksimum pada unit ini\nhingga 4.",
     "RequiredformacOSSequoiaandnewerversions.":"Diperlukan untuk macOS Sequoia dan versi lebih baru.",
     "Debugging":"Debugging",
-    "verbose_mode":"Mode verbose",
+    "verbose_debug":"Mode verbose",
     "debug_version_driver":"Versi debug driver",
     "Additional":"Tambahan",
     "Universal(effectivesustainability)":"Universal (keberlanjutan yang efektif)",
