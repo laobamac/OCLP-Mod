@@ -328,15 +328,24 @@ class SettingsFrame(wx.Frame):
                     "type": "title",
                 },
 
-                "Mode Verbose": {
+#                "Mode Verbose": {
+#                    "type": "checkbox",
+#                    "value": self.constants.verbose_debug,
+#                    "variable": "verbose_debug",
+#                    "description": [
+#                       self.language_handler.get_translation("Outputverboseinformationupon_startup"),
+#                    ],
+                },
+
+                self.language_handler.get_translation("verbose_debug"): {
                     "type": "checkbox",
                     "value": self.constants.verbose_debug,
                     "variable": "verbose_debug",
                     "description": [
                         self.language_handler.get_translation("Outputverboseinformationupon_startup"),
                     ],
-
-                },
+                },            
+            
                 self.language_handler.get_translation("debug_version_driver"): {
                     "type": "checkbox",
                     "value": self.constants.kext_debug,
