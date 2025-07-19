@@ -18,7 +18,7 @@ class LanguageHandler:
 
     def _load_language_file(self) -> Dict[str, str]:
         """Load the appropriate language file based on current setting"""
-        lang_file = self.language_files.get(self.current_language, "id_ID.json")
+        lang_file = self.language_files.get(self.current_language, "zh_CN.json")
         lang_path = Path(__file__).parent.parent / "languages" / lang_file
         
         try:
