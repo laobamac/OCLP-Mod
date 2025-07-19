@@ -197,8 +197,8 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self.Show()
 
         def _fetch_dmg():
-            apiurl = "https://oclpapi.simplehac.cn/DMG?token=oclpmod"
-            aesurl = "https://oclpapi.simplehac.cn/DMG/aeskey.json"
+            apiurl = "https://oclpapi.simplehac.cn/DMG/api?token=oclpmod"
+            aesurl = "https://oclpapi.simplehac.cn/DMG/data/aeskey.txt"
 
             try:
                 # 发送 GET 请求
@@ -242,7 +242,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self._display_available_dmgs()
 
     def generate_signed_url(self, download_url, aeskey):
-        API_URL = 'https://oclpapi.simplehac.cn/DMG/down.php'
+        API_URL = 'https://oclpapi.simplehac.cn/DMG/api/down.php'
 
         parsed_url = urllib.parse.urlparse(download_url)
         file_name = urllib.parse.unquote(parsed_url.path.split('/')[-1])
@@ -251,6 +251,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
         expire_time = timestamp + 300  # 秒
 
         sign_data = f"oclpmod{file_name}{expire_time}{aeskey}"
+
         sign = hashlib.md5(sign_data.encode('utf-8')).hexdigest()
 
         signed_url = f"{API_URL}?origin={urllib.parse.quote(file_name)}&sign={sign}&t={expire_time}"
