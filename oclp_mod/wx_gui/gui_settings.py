@@ -335,7 +335,7 @@ class SettingsFrame(wx.Frame):
 #                    "description": [
 #                       self.language_handler.get_translation("Outputverboseinformationupon_startup"),
 #                    ],
-                },
+#                },
 
                 self.language_handler.get_translation("verbose_debug"): {
                     "type": "checkbox",
