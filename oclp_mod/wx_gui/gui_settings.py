@@ -725,7 +725,7 @@ class SettingsFrame(wx.Frame):
                 "Non-Metal配置": {
                     "type": "title",
                 },
-                "Log out required to apply changes to SkyLight": {
+                "需要重新登录来应用SkyLight插件": {
                     "type": "sub_title",
                 },
                 "暗黑模式菜单": {
@@ -740,7 +740,7 @@ class SettingsFrame(wx.Frame):
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
                 },
-                "Beta Blur": {
+                "测试版毛玻璃": {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea_BlurBeta"),
                     "variable": "Moraea_BlurBeta",
@@ -764,7 +764,7 @@ class SettingsFrame(wx.Frame):
                 "wrap_around 2": {
                     "type": "wrap_around",
                 },
-                "Beta Menu Bar": {
+                "测试版菜单栏": {
                     "type": "checkbox",
                     "value": self._get_system_settings("Amy.MenuBar2Beta"),
                     "variable": "Amy.MenuBar2Beta",
@@ -824,12 +824,12 @@ class SettingsFrame(wx.Frame):
                     ],
                     "override_function": self._update_global_settings,
                 },
-                "使用加速代理下载Github资源": {
+                "使用SimpleHac API下载所需资源": {
                     "type": "checkbox",
                     "value": self.constants.use_github_proxy,
                     "variable": "use_github_proxy",
                     "description": [
-                        "通过代理地址下载Github资源",
+                        "通过SimpleHac API下载Github资源",
                         "关闭后将直接请求Github",
                     ],
                 },
