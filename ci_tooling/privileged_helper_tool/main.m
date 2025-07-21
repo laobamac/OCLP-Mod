@@ -1,6 +1,6 @@
 /*
     ------------------------------------------------
-    OCLP-Mod Privileged Helper Tool
+    OpenCore Legacy Patcher Privileged Helper Tool
     ------------------------------------------------
     Designed as an alternative to an XPC service,
     this tool is used to run commands as root.
@@ -16,7 +16,7 @@
 
 #define UTILITY_VERSION "1.0.0"
 
-#define VALID_CLIENT_TEAM_ID @"74U2CH74U6"
+#define VALID_CLIENT_TEAM_ID @"4379L389U9"
 
 #define OCLP_PHT_ERROR_MISSING_ARGUMENTS           160
 #define OCLP_PHT_ERROR_SET_UID_MISSING             161
@@ -115,12 +115,12 @@ int main(int argc, const char * argv[]) {
         // DO NOT USE IN PRODUCTION
         #else
         // Check Team ID
-        if (![processSigningInformation[@"74U2CH74U6"] isEqualToString:VALID_CLIENT_TEAM_ID] || ![parentProcessSigningInformation[@"74U2CH74U6"] isEqualToString:VALID_CLIENT_TEAM_ID]) {
+        if (![processSigningInformation[@"teamid"] isEqualToString:VALID_CLIENT_TEAM_ID] || ![parentProcessSigningInformation[@"teamid"] isEqualToString:VALID_CLIENT_TEAM_ID]) {
             return OCLP_PHT_ERROR_INVALID_TEAM_ID;
         }
 
         // Check Certificates
-        if (![processSigningInformation[@"636H9J6N4H"] isEqualToArray:parentProcessSigningInformation[@"636H9J6N4H"]]) {
+        if (![processSigningInformation[@"certificates"] isEqualToArray:parentProcessSigningInformation[@"certificates"]]) {
             return OCLP_PHT_ERROR_INVALID_CERTIFICATES;
         }
         #endif
