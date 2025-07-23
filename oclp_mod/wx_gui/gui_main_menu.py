@@ -32,6 +32,8 @@ from ..wx_gui import (
     gui_update,
     gui_kdk_dl,
     gui_ml_dl,
+    new_kdk_dl,
+    new_ml_dl
 )
 
 
@@ -106,7 +108,7 @@ class MainFrame(wx.Frame):
                     "icon": str(self.constants.icns_resource_path / "OC-Installer.icns"),
                 },
                 "KDK下载": {
-                    "function": self.on_download_kdk_package,
+                    "function": self.new_download_kdk_package,
                     "description": [
                         "提供kdk下载",
                         "这是OCLP打补丁所必须的(macOS 13+)",
@@ -128,7 +130,7 @@ class MainFrame(wx.Frame):
                     "icon": str(self.constants.icns_resource_path / "OC-Patch.icns"),
                 },
                 "MetalLib下载": {
-                    "function": self.on_download_ml_package,
+                    "function": self.new_download_ml_package,
                     "description": [
                         "提供MetalLib下载",
                         "这是Metal3802 GPU所必须的",
@@ -422,7 +424,22 @@ class MainFrame(wx.Frame):
             global_constants=self.constants,
         )
         kdk_window.Show()
-
+    def new_download_kdk_package(self, event: wx.Event = None):
+        kdk_window = new_kdk_dl.NewKDKDownloadFrame(
+            parent=self,
+            title=self.title,
+            global_constants=self.constants,
+            screen_location=self.GetPosition()
+        )
+        kdk_window.Show()
+    def new_download_ml_package(self, event: wx.Event = None):
+        ml_window = new_ml_dl.NewMetallibDownloadFrame(
+            parent=self,
+            title=self.title,
+            global_constants=self.constants,
+            screen_location=self.GetPosition()
+        )
+        ml_window.Show()
     def on_download_ml_package(self, event: wx.Event = None):
         ml_window = gui_ml_dl.DownloadMLFrame(
             parent=self,
