@@ -282,12 +282,12 @@ class macOSInstallerDownloadFrame(wx.Frame):
             except requests.exceptions.RequestException as e:
                 logging.info(f"请求发生异常: {e}")
             finally:
-                if dmgdata is not None:
+                if dmgdatak is not None:
                     logging.info("Got it!")
                     self.available_simplehac_dmgs=self.latest_dmgs
                     self.dmgs_all = dmgdatak
-                    self.dmgs = dmgdata
-                    logging.info(type(dmgdata))
+                   
+                    logging.info(type(self.dmgs_all))
                 else:
                     logging.error("Lost it!")
 
