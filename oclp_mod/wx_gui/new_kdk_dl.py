@@ -189,8 +189,7 @@ class NewKDKDownloadFrame(wx.Frame):
         :param show_full: 是否显示所有版本（True 显示所有，False 只显示最新）
         用法：供用户选择需要下载的 macOS 版本
         """
-        #super(NewKDKDownloadFrame, self).__init__(None, title=self.title, size=(300, 200), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
-        # bundles 用于 wx.ListCtrl 的图标绑定 
+        
         
         bundles = [wx.BitmapBundle.FromBitmaps(self.icons)]
 
