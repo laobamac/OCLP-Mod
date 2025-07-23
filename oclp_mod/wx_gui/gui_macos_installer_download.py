@@ -224,7 +224,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
                     logging.info(f"请求失败，状态码: {response.status_code}")
                 dmg_number=[]
                 dmg_build=[]
-                maxnx=[]
+                max_version=[]
                 dmgdatak=dmgdata
                 dmgdata=dmgdata['dmgFiles'][::-1]
                 for i in range(len(dmgdata)):
@@ -235,40 +235,36 @@ class macOSInstallerDownloadFrame(wx.Frame):
                     data2=dmgdata[i]["build"]
                     dmg_number.append(data)
                     dmg_build.append(data2)
-                #print(kdk_data_number)
-                #dmg_number=dmg_number[::-1]
-                #dmg_build=dmg_build[::-1]
                 for i in range(4):
                     maxn=dmg_number[0]
                     while True:
                         dmg_number.pop(0)
                         if len(dmg_number)==0 or dmg_number[0]<maxn :
                             break
-                    maxnx.append(maxn)
-                #print(kdk_data[0]['build'])
+                    max_version.append(maxn)
                 i=0
-                fl=[0,0,0,0]
+                flag=[0,0,0,0]
                 model={
                     "dmgFiles":[]
                 }
                 latest=[]
                 while True:
-                    if maxnx[0] == dmgdata[i]["build"][:2] and fl[0]==0:
+                    if max_version[0] == dmgdata[i]["build"][:2] and flag[0]==0:
                         latest.append(dmgdata[i])
-                        fl[0]=1
+                        flag[0]=1
                         #print(kdk_data_latest)
                         i+=1
-                    if  maxnx[1] == dmgdata[i]["build"][:2]and fl[1]==0:
+                    if  max_version[1] == dmgdata[i]["build"][:2]and flag[1]==0:
                         latest.append(dmgdata[i])
-                        fl[1]=1
+                        flag[1]=1
                         i+=1
-                    if  maxnx[2] == dmgdata[i]["build"][:2]and fl[2]==0:
+                    if  max_version[2] == dmgdata[i]["build"][:2]and flag[2]==0:
                         latest.append(dmgdata[i])
-                        fl[2]=1
+                        flag[2]=1
                         i+=1
-                    if  maxnx[3] == dmgdata[i]["build"][:2]and fl[3]==0:
+                    if  max_version[3] == dmgdata[i]["build"][:2]and flag[3]==0:
                         latest.append(dmgdata[i])
-                        fl[3]=1
+                        flag[3]=1
                         i+=1
                     if i==len(dmgdata)-1:
                         break
@@ -276,8 +272,8 @@ class macOSInstallerDownloadFrame(wx.Frame):
                         i+=1
                         continue
                 #self.kdk_data_full=self.kdk_data
-                latest=latest[::-1]
-                model["dmgFiles"]=latest
+                dmg_latest_version=latest[::-1]
+                model["dmgFiles"]=dmg_latest_version
                 self.latest_dmgs=model
             except requests.exceptions.RequestException as e:
                 logging.info(f"请求发生异常: {e}")
