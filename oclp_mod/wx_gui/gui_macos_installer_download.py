@@ -51,6 +51,8 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self.constants: constants.Constants = global_constants
         self.title: str = title
         self.parent: wx.Frame = parent
+        self.latest_dmgs=[]
+        self.dmgs_all=[]
 
         self.available_installers = None
         self.available_installers_latest = None
@@ -221,12 +223,72 @@ class macOSInstallerDownloadFrame(wx.Frame):
                         logging.error(f"请求失败，状态码: {aes.status_code}")
                 else:
                     logging.info(f"请求失败，状态码: {response.status_code}")
+
+                dmg_number=[]
+                dmg_build=[]
+                dmgdata_all=dmgdata
+                maxnx=[]
+                dmgdata=dmgdata['dmgFiles'][::-1]
+                for i in range(len(dmgdata)):
+                    #self.kdk_data[i].pop("kernel_versions")
+                    dmgdata[i]['releaseDate']=((dmgdata[i]['releaseDate']).split("T"))[0]
+                for i in range(len(dmgdata)):
+                    data=dmgdata[i]["build"][:2]
+                    data2=dmgdata[i]["build"]
+                    dmg_number.append(data)
+                    dmg_build.append(data2)
+                #print(kdk_data_number)
+                #dmg_number=dmg_number[::-1]
+                #dmg_build=dmg_build[::-1]
+                for i in range(4):
+                    maxn=dmg_number[0]
+                    while True:
+                        dmg_number.pop(0)
+                        if len(dmg_number)==0 or dmg_number[0]<maxn :
+                            break
+                    maxnx.append(maxn)
+                #print(kdk_data[0]['build'])
+                i=0
+                fl=[0,0,0,0]
+                model={
+                    "dmgFiles":[]
+                }
+                latest=[]
+                while True:
+                    if maxnx[0] == dmgdata[i]["build"][:2] and fl[0]==0:
+                        latest.append(dmgdata[i])
+                        fl[0]=1
+                        #print(kdk_data_latest)
+                        i+=1
+                    if  maxnx[1] == dmgdata[i]["build"][:2]and fl[1]==0:
+                        latest.append(dmgdata[i])
+                        fl[1]=1
+                        i+=1
+                    if  maxnx[2] == dmgdata[i]["build"][:2]and fl[2]==0:
+                        latest.append(dmgdata[i])
+                        fl[2]=1
+                        i+=1
+                    if  maxnx[3] == dmgdata[i]["build"][:2]and fl[3]==0:
+                        latest.append(dmgdata[i])
+                        fl[3]=1
+                        i+=1
+                    if i==len(dmgdata)-1:
+                        break
+                    else:
+                        i+=1
+                        continue
+                #self.kdk_data_full=self.kdk_data
+                latest=latest[::-1]
+                model["dmgFiles"]=latest
+                self.latest_dmgs=model
+
             except requests.exceptions.RequestException as e:
                 logging.info(f"请求发生异常: {e}")
             finally:
                 if dmgdata is not None:
                     logging.info("Got it!")
-                    self.available_simplehac_dmgs = dmgdata
+                    self.available_simplehac_dmgs=self.latest_dmgs
+                    self.dmgs_all = dmgdata_all
                     self.dmgs = dmgdata
                     logging.info(type(dmgdata))
                 else:
@@ -280,7 +342,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self.list.InsertColumn(3, "Size", width=75)
         self.list.InsertColumn(4, "Release Date", width=100)
 
-        dmgs = self.available_simplehac_dmgs
+        dmgs = self.available_simplehac_dmgs if show_full is False else self.dmgs_all
 
         if dmgs:
             locale.setlocale(locale.LC_TIME, '')
@@ -315,6 +377,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
 
         if not show_full:
             self.list.Select(-1)
+            self.frame_modal.SetSize((490, 370))
 
         self.list.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.on_select_list)
         self.list.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_select_list)
@@ -335,14 +398,21 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self.copy_button.SetToolTip("复制选定DMG的下载链接")
         self.copy_button.Bind(wx.EVT_BUTTON, lambda event, installers=dmgs: self.on_copy_dmg_link(installers))
 
+        self.olderversions_checkbox = wx.CheckBox(self.frame_modal, label="显示老版本/测试版本", pos=(-1, -1))
+        if show_full is True:
+            self.olderversions_checkbox.SetValue(True)
+        self.olderversions_checkbox.Bind(wx.EVT_CHECKBOX, lambda event: self._display_available_dmgs(event, self.olderversions_checkbox.GetValue()))
+
         return_button = wx.Button(self.frame_modal, label="返回", pos=(-1, -1), size=(150, -1))
         return_button.Bind(wx.EVT_BUTTON, self.on_return_to_main_menu)
         return_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
+        checkboxsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         rectbox = wx.StaticBox(self.frame_modal, -1)
         rectsizer = wx.StaticBoxSizer(rectbox, wx.HORIZONTAL)
         rectsizer.Add(self.copy_button, 0, wx.EXPAND | wx.RIGHT, 5)
         rectsizer.Add(self.select_button, 0, wx.EXPAND | wx.LEFT, 5)
+        checkboxsizer.Add(self.olderversions_checkbox, 0, wx.ALIGN_CENTRE | wx.RIGHT, 5)
 
 
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -351,6 +421,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
         sizer.Add(self.list, 1, wx.EXPAND | wx.ALL, 10)
         sizer.Add(rectsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
         sizer.AddSpacer(10)
+        sizer.Add(checkboxsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 15)
         sizer.Add(return_button, 0, wx.ALIGN_CENTRE | wx.BOTTOM, 15)
 
         self.frame_modal.SetSizer(sizer)
