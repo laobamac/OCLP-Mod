@@ -88,47 +88,62 @@ class MainFrame(wx.Frame):
 
         # Buttons:
         menu_buttons = {
-            "创建OpenCore引导": {
-                "function": self.on_build_and_install,
-                "description": [
-                    "提供额外的引导",
-                    "来启动高版本的系统",
-                    "需要使用.app或者其他安装器"
-                ],
-                "icon": str(self.constants.icns_resource_path / "OC-Build.icns"),
-            },
-            "创建macOS安装器": {
-                "function": self.on_create_macos_installer,
-                "description": [
-                    "下载/烧录macOS安装器",
-                    "安装新macOS使用.",
-                ],
-                "icon": str(self.constants.icns_resource_path / "OC-Installer.icns"),
-            },
-            "⚙️ 设置": {
-                "function": self.on_settings,
-                "description": [
-                ],
-            },
-            "安装驱动补丁": {
-                "function": self.on_post_install_root_patch,
-                "description": [
-                    "安装硬件驱动补丁",
-                    "（在安装新版本macOS后",
-                    "进入系统再打）",
-                ],
-                "icon": str(self.constants.icns_resource_path / "OC-Patch.icns"),
-            },
-
-            "获取支持": {
-                "function": self.on_help,
-                "description": [
-                    "OCLP相关资源",
-                    "由laobamac汉化",
-                ],
-                "icon": str(self.constants.icns_resource_path / "OC-Support.icns"),
-            },
-        }
+                "创建OpenCore引导": {
+                    "function": self.on_build_and_install,
+                    "description": [
+                        "提供额外的引导",
+                        "来启动高版本的系统",
+                        "需要使用.app或者其他安装器"
+                    ],
+                    "icon": str(self.constants.icns_resource_path / "OC-Build.icns"),
+                },
+                "创建macOS安装器": {
+                    "function": self.on_create_macos_installer,
+                    "description": [
+                        "下载/烧录macOS安装器",
+                        "安装新macOS使用.",
+                    ],
+                    "icon": str(self.constants.icns_resource_path / "OC-Installer.icns"),
+                },
+                "KDK下载": {
+                    "function": self.on_download_kdk_package,
+                    "description": [
+                        "提供kdk下载",
+                        "这是OCLP打补丁所必须的(macOS 13+)",
+                    ],
+                    "icon": str(self.constants.icns_resource_path / "Package.icns"),
+                },
+                "⚙️ 设置": {
+                    "function": self.on_settings,
+                    "description": [
+                    ],
+                },
+                "安装驱动补丁": {
+                    "function": self.on_post_install_root_patch,
+                    "description": [
+                        "安装硬件驱动补丁",
+                        "（在安装新版本macOS后",
+                        "进入系统再打）",
+                    ],
+                    "icon": str(self.constants.icns_resource_path / "OC-Patch.icns"),
+                },
+                "MetalLib下载": {
+                    "function": self.on_download_ml_package,
+                    "description": [
+                        "提供MetalLib下载",
+                        "这是Metal3802 GPU所必须的",
+                    ],
+                    "icon": str(self.constants.icns_resource_path / "Package.icns"),
+                },
+                "获取支持": {
+                    "function": self.on_help,
+                    "description": [
+                        "OCLP相关资源",
+                        "由laobamac汉化",
+                    ],
+                    "icon": str(self.constants.icns_resource_path / "OC-Support.icns"),
+                },
+            }
         button_x = 30
         button_y = model_label.GetPosition()[1] + 30
         rollover = len(menu_buttons) / 2
@@ -149,6 +164,12 @@ class MainFrame(wx.Frame):
                     icon.SetPosition((button_x - 7, button_y + 3))
                 if button_name == "创建OpenCore引导":
                     icon.SetSize((70, 70))
+                if button_name == "KDK下载":
+                    icon.SetSize((70, 70))
+                    icon.SetPosition((button_x - 11,button_y - 3))
+                if button_name == "MetalLib下载":
+                    icon.SetSize((70, 70))
+                    icon.SetPosition((button_x - 11,button_y - 5))
             if button_name == "⚙️ 设置":
                 button_y += 5
                 button_x += 150
@@ -183,13 +204,7 @@ class MainFrame(wx.Frame):
             elif button_name == "⚙️ 设置":
                   button.SetSize((100, -1))
                   #button.Centre(wx.HORIZONTAL)
-                  description_label.Centre(wx.HORIZONTAL)
-                  kdk_button = wx.Button(self, label="KDK下载", pos=(button_x - 50, button.GetPosition()[1]), size=(100, 30))
-                  kdk_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-                  kdk_button.Bind(wx.EVT_BUTTON, lambda event: self.on_download_kdk_package(event))
-                  ml_button = wx.Button(self, label="MetalLib下载", pos=(button_x + 190, button.GetPosition()[1]), size=(100, 30))
-                  ml_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-                  ml_button.Bind(wx.EVT_BUTTON, lambda event: self.on_download_ml_package(event))
+                  
                   #button_y += 60  # 调整按钮的垂直位置
 
             index += 1
