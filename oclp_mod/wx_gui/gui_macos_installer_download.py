@@ -227,7 +227,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
                 dmg_number=[]
                 dmg_build=[]
                 dmgdata_all=dmgdata
-                maxnx=[]
+                max_version=[]
                 dmgdata=dmgdata['dmgFiles'][::-1]
                 for i in range(len(dmgdata)):
                     #self.kdk_data[i].pop("kernel_versions")
