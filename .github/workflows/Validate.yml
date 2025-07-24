@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     name: Validate
-    runs-on: macos-13
+    runs-on: macos-14
     if: github.repository_owner == 'laobamac'
     steps:
       - uses: actions/checkout@v4
