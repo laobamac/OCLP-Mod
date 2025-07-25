@@ -494,23 +494,18 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self.list.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.on_select_list)
         self.list.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_select_list)
 
-        rectbox = wx.Panel(self.frame_modal)
-        rectbox.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
-        rectbox.SetMinSize((-1, 46))
-
-        self.copy_button = wx.Button(rectbox, label="复制链接", size=(70, 30))
-        self.select_button = wx.Button(rectbox, label="下载", size=(130, 30))
-
-        self.copy_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
+        self.select_button = wx.Button(self.frame_modal, label="下载", pos=(-1, -1), size=(150, -1))
         self.select_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-
-        if show_full is True:
-            self.select_button.Disable()
-            self.copy_button.Disable()
-
         self.select_button.Bind(wx.EVT_BUTTON, lambda event, installers=installers: self.on_download_installer(installers))
         self.select_button.SetToolTip("下载选定的macOS")
         self.select_button.SetDefault()
+        if show_full is True:
+            self.select_button.Disable()
+
+        self.copy_button = wx.Button(self.frame_modal, label="复制链接", pos=(-1, -1), size=(80, -1))
+        self.copy_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
+        if show_full is True:
+            self.copy_button.Disable()
         self.copy_button.SetToolTip("复制所选 macOS 安装程序的下载链接。")
         self.copy_button.Bind(wx.EVT_BUTTON, lambda event, installers=installers: self.on_copy_link(installers))
 
@@ -518,23 +513,15 @@ class macOSInstallerDownloadFrame(wx.Frame):
         return_button.Bind(wx.EVT_BUTTON, self.on_return_to_main_menu)
         return_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
 
-        rectsizer = wx.BoxSizer(wx.HORIZONTAL)
-        rectsizer.AddStretchSpacer(1)
-        rectsizer.Add(self.copy_button, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
-        rectsizer.Add(self.select_button, 0, wx.ALIGN_CENTER_VERTICAL)
-        rectsizer.AddStretchSpacer(1)
-        
-        outer_sizer = wx.BoxSizer(wx.VERTICAL)
-        outer_sizer.AddStretchSpacer(1)
-        outer_sizer.Add(rectsizer, 1, wx.EXPAND | wx.ALL, 5)
-        outer_sizer.AddStretchSpacer(1)
-        
-        rectbox.SetSizer(outer_sizer)
-
         self.showolderversions_checkbox = wx.CheckBox(self.frame_modal, label="显示老版本/测试版本", pos=(-1, -1))
         if show_full is True:
             self.showolderversions_checkbox.SetValue(True)
         self.showolderversions_checkbox.Bind(wx.EVT_CHECKBOX, lambda event: self._display_available_installers(event, self.showolderversions_checkbox.GetValue()))
+
+        rectbox = wx.StaticBox(self.frame_modal, -1)
+        rectsizer = wx.StaticBoxSizer(rectbox, wx.HORIZONTAL)
+        rectsizer.Add(self.copy_button, 0, wx.EXPAND | wx.RIGHT, 5)
+        rectsizer.Add(self.select_button, 0, wx.EXPAND | wx.LEFT, 5)
 
         checkboxsizer = wx.BoxSizer(wx.HORIZONTAL)
         checkboxsizer.Add(self.showolderversions_checkbox, 0, wx.ALIGN_CENTRE | wx.RIGHT, 5)
@@ -543,8 +530,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
         sizer.AddSpacer(10)
         sizer.Add(title_label, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
         sizer.Add(self.list, 1, wx.EXPAND | wx.ALL, 10)
-        sizer.Add(rectbox, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 80)
-        sizer.AddSpacer(10)
+        sizer.Add(rectsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
         sizer.Add(checkboxsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 15)
         sizer.Add(return_button, 0, wx.ALIGN_CENTRE | wx.BOTTOM, 15)
 
