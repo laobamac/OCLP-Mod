@@ -458,6 +458,19 @@ class macOSInstallerDownloadFrame(wx.Frame):
 
         self.frame_modal.SetSizer(sizer)
         self.frame_modal.ShowWindowModal()
+    def _is_dark_mode(self):
+        """
+        检测系统是否处于深色模式
+        """
+        # 简单实现：根据构建版本或其他系统信息判断
+        # 可以根据实际需要进行更复杂的判断
+        try:
+            import subprocess
+            result = subprocess.run(['defaults', 'read', '-g', 'AppleInterfaceStyle'], 
+                                capture_output=True, text=True)
+            return result.stdout.strip() == 'Dark'
+        except:
+            return False
     def _display_available_installers(self, event: wx.Event = None, show_full: bool = False) -> None:
         """
         Display available installers in frame
@@ -533,12 +546,15 @@ class macOSInstallerDownloadFrame(wx.Frame):
         if show_full is True:
             self.showolderversions_checkbox.SetValue(True)
         self.showolderversions_checkbox.Bind(wx.EVT_CHECKBOX, lambda event: self._display_available_installers(event, self.showolderversions_checkbox.GetValue()))
-
-        if self.os_build_tahoe!='25A5316i':
-            rectbox = wx.StaticBox(self.frame_modal, -1)
-            rectsizer = wx.StaticBoxSizer(rectbox, wx.HORIZONTAL)
-            rectsizer.Add(self.copy_button, 0, wx.EXPAND | wx.RIGHT, 5)
-            rectsizer.Add(self.select_button, 0, wx.EXPAND | wx.LEFT, 5)
+        
+        
+        rectbox = wx.StaticBox(self.frame_modal,label="Download Options")
+        #rectbox.SetFont(wx.Font(1, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
+        rectbox.SetOwnForegroundColour(wx.Colour(0,0,255))
+        
+        rectsizer = wx.StaticBoxSizer(rectbox, wx.HORIZONTAL)
+        rectsizer.Add(self.copy_button, 0, wx.EXPAND | wx.RIGHT, 5)
+        rectsizer.Add(self.select_button, 0, wx.EXPAND | wx.LEFT, 5)
 
         checkboxsizer = wx.BoxSizer(wx.HORIZONTAL)
         checkboxsizer.Add(self.showolderversions_checkbox, 0, wx.ALIGN_CENTRE | wx.RIGHT, 5)
@@ -547,13 +563,9 @@ class macOSInstallerDownloadFrame(wx.Frame):
         sizer.AddSpacer(10)
         sizer.Add(title_label, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
         sizer.Add(self.list, 1, wx.EXPAND | wx.ALL, 10)
-        if self.os_build_tahoe!='25A5316i':
-             sizer.Add(rectsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
-        elif self.os_build_tahoe=='25A5316i':
-            mosizer=wx.BoxSizer(wx.HORIZONTAL)
-            mosizer.Add(self.copy_button, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
-            mosizer.Add(self.select_button, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
-            sizer.Add(mosizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
+        
+        sizer.Add(rectsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
+        
         sizer.Add(checkboxsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 15)
         sizer.Add(return_button, 0, wx.ALIGN_CENTRE | wx.BOTTOM, 15)
 

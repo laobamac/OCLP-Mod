@@ -4,7 +4,7 @@ wxPython @ https://pypi.tuna.tsinghua.edu.cn/packages/48/20/390530466538829eb8aa
 pyobjc
 pyinstaller
 packaging
-py_sip_xnu
+py_sip_xnu       
 py-applescript
 markdown2
 macos-pkg-builder
