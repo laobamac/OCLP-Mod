@@ -227,7 +227,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
                 dmg_number=[]
                 dmg_build=[]
                 dmgdata_all=dmgdata
-                maxnx=[]
+                max_version=[]
                 dmgdata=dmgdata['dmgFiles'][::-1]
                 for i in range(len(dmgdata)):
                     #self.kdk_data[i].pop("kernel_versions")
@@ -237,40 +237,36 @@ class macOSInstallerDownloadFrame(wx.Frame):
                     data2=dmgdata[i]["build"]
                     dmg_number.append(data)
                     dmg_build.append(data2)
-                #print(kdk_data_number)
-                #dmg_number=dmg_number[::-1]
-                #dmg_build=dmg_build[::-1]
                 for i in range(4):
                     maxn=dmg_number[0]
                     while True:
                         dmg_number.pop(0)
                         if len(dmg_number)==0 or dmg_number[0]<maxn :
                             break
-                    maxnx.append(maxn)
-                #print(kdk_data[0]['build'])
+                    max_version.append(maxn)
                 i=0
-                fl=[0,0,0,0]
+                flag=[0,0,0,0]
                 model={
                     "dmgFiles":[]
                 }
                 latest=[]
                 while True:
-                    if maxnx[0] == dmgdata[i]["build"][:2] and fl[0]==0:
+                    if max_version[0] == dmgdata[i]["build"][:2] and flag[0]==0:
                         latest.append(dmgdata[i])
-                        fl[0]=1
+                        flag[0]=1
                         #print(kdk_data_latest)
                         i+=1
-                    if  maxnx[1] == dmgdata[i]["build"][:2]and fl[1]==0:
+                    if  max_version[1] == dmgdata[i]["build"][:2]and flag[1]==0:
                         latest.append(dmgdata[i])
-                        fl[1]=1
+                        flag[1]=1
                         i+=1
-                    if  maxnx[2] == dmgdata[i]["build"][:2]and fl[2]==0:
+                    if  max_version[2] == dmgdata[i]["build"][:2]and flag[2]==0:
                         latest.append(dmgdata[i])
-                        fl[2]=1
+                        flag[2]=1
                         i+=1
-                    if  maxnx[3] == dmgdata[i]["build"][:2]and fl[3]==0:
+                    if  max_version[3] == dmgdata[i]["build"][:2]and flag[3]==0:
                         latest.append(dmgdata[i])
-                        fl[3]=1
+                        flag[3]=1
                         i+=1
                     if i==len(dmgdata)-1:
                         break
@@ -278,8 +274,8 @@ class macOSInstallerDownloadFrame(wx.Frame):
                         i+=1
                         continue
                 #self.kdk_data_full=self.kdk_data
-                latest=latest[::-1]
-                model["dmgFiles"]=latest
+                dmg_latest_version=latest[::-1]
+                model["dmgFiles"]=dmg_latest_version
                 self.latest_dmgs=model
 
             except requests.exceptions.RequestException as e:
@@ -318,13 +314,41 @@ class macOSInstallerDownloadFrame(wx.Frame):
 
         signed_url = f"{API_URL}?origin={urllib.parse.quote(file_name)}&sign={sign}&t={expire_time}"
         return signed_url
+    def detect_os_build(self, rsr: bool = False) -> str:
+        import plistlib
+        """
+        Detect the booted OS build
 
+        Implementation note:
+            With macOS 13.2, Apple implemented the Rapid Security Response system which
+            will change the reported build to the RSR version and not the original host
+
+            To get the proper versions:
+            - Host: /System/Library/CoreServices/SystemVersion.plist
+            - RSR:  /System/Volumes/Preboot/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist
+
+
+        Parameters:
+            rsr (bool): Whether to use the RSR version of the build
+
+        Returns:
+            str: OS build (ex. 21A5522h)
+        """
+
+        file_path = "/System/Library/CoreServices/SystemVersion.plist"
+        if rsr is True:
+            file_path = f"/System/Volumes/Preboot/Cryptexes/OS{file_path}"
+
+        try:
+            return plistlib.load(open(file_path, "rb"))["ProductBuildVersion"]
+        except Exception as e:
+            raise RuntimeError(f"Failed to detect OS build: {e}")
     def _display_available_dmgs(self, event: wx.Event = None, show_full: bool = False) -> None:
         """
         在框架中显示可用的DMG
         """
         bundles = [wx.BitmapBundle.FromBitmaps(icon) for icon in self.icons]
-
+        self.os_build_tahoe=self.detect_os_build(False)
         self.frame_modal.Destroy()
         self.frame_modal = wx.Dialog(self, title="选择SimpleHac DMG镜像", size=(505, 500))
 
@@ -408,10 +432,11 @@ class macOSInstallerDownloadFrame(wx.Frame):
         return_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         checkboxsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        rectbox = wx.StaticBox(self.frame_modal, -1)
-        rectsizer = wx.StaticBoxSizer(rectbox, wx.HORIZONTAL)
-        rectsizer.Add(self.copy_button, 0, wx.EXPAND | wx.RIGHT, 5)
-        rectsizer.Add(self.select_button, 0, wx.EXPAND | wx.LEFT, 5)
+        if self.os_build_tahoe!='25A5316i':
+            rectbox = wx.StaticBox(self.frame_modal, -1)
+            rectsizer = wx.StaticBoxSizer(rectbox, wx.HORIZONTAL)
+            rectsizer.Add(self.copy_button, 0, wx.EXPAND | wx.RIGHT, 5)
+            rectsizer.Add(self.select_button, 0, wx.EXPAND | wx.LEFT, 5)
         checkboxsizer.Add(self.olderversions_checkbox, 0, wx.ALIGN_CENTRE | wx.RIGHT, 5)
 
 
@@ -419,8 +444,15 @@ class macOSInstallerDownloadFrame(wx.Frame):
         sizer.AddSpacer(10)
         sizer.Add(title_label, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
         sizer.Add(self.list, 1, wx.EXPAND | wx.ALL, 10)
-        sizer.Add(rectsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
-        sizer.AddSpacer(10)
+        if self.os_build_tahoe!='25A5316i':
+             sizer.Add(rectsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
+             sizer.AddSpacer(10)
+        elif self.os_build_tahoe=='25A5316i':
+            mosizer=wx.BoxSizer(wx.HORIZONTAL)
+            mosizer.Add(self.copy_button, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+            mosizer.Add(self.select_button, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+            sizer.Add(mosizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
+            sizer.AddSpacer(8)
         sizer.Add(checkboxsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 15)
         sizer.Add(return_button, 0, wx.ALIGN_CENTRE | wx.BOTTOM, 15)
 
@@ -431,7 +463,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
         Display available installers in frame
         """
 
-
+        self.os_build_tahoe=self.detect_os_build(False)
         bundles = [wx.BitmapBundle.FromBitmaps(icon) for icon in self.icons]
 
         self.frame_modal.Destroy()
@@ -502,10 +534,11 @@ class macOSInstallerDownloadFrame(wx.Frame):
             self.showolderversions_checkbox.SetValue(True)
         self.showolderversions_checkbox.Bind(wx.EVT_CHECKBOX, lambda event: self._display_available_installers(event, self.showolderversions_checkbox.GetValue()))
 
-        rectbox = wx.StaticBox(self.frame_modal, -1)
-        rectsizer = wx.StaticBoxSizer(rectbox, wx.HORIZONTAL)
-        rectsizer.Add(self.copy_button, 0, wx.EXPAND | wx.RIGHT, 5)
-        rectsizer.Add(self.select_button, 0, wx.EXPAND | wx.LEFT, 5)
+        if self.os_build_tahoe!='25A5316i':
+            rectbox = wx.StaticBox(self.frame_modal, -1)
+            rectsizer = wx.StaticBoxSizer(rectbox, wx.HORIZONTAL)
+            rectsizer.Add(self.copy_button, 0, wx.EXPAND | wx.RIGHT, 5)
+            rectsizer.Add(self.select_button, 0, wx.EXPAND | wx.LEFT, 5)
 
         checkboxsizer = wx.BoxSizer(wx.HORIZONTAL)
         checkboxsizer.Add(self.showolderversions_checkbox, 0, wx.ALIGN_CENTRE | wx.RIGHT, 5)
@@ -514,7 +547,13 @@ class macOSInstallerDownloadFrame(wx.Frame):
         sizer.AddSpacer(10)
         sizer.Add(title_label, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
         sizer.Add(self.list, 1, wx.EXPAND | wx.ALL, 10)
-        sizer.Add(rectsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
+        if self.os_build_tahoe!='25A5316i':
+             sizer.Add(rectsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
+        elif self.os_build_tahoe=='25A5316i':
+            mosizer=wx.BoxSizer(wx.HORIZONTAL)
+            mosizer.Add(self.copy_button, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+            mosizer.Add(self.select_button, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+            sizer.Add(mosizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
         sizer.Add(checkboxsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 15)
         sizer.Add(return_button, 0, wx.ALIGN_CENTRE | wx.BOTTOM, 15)
 
