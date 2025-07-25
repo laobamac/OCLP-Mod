@@ -186,6 +186,35 @@ class NewMetallibDownloadFrame(wx.Frame):
                 return f"{size_bytes:.2f} {unit}"
             size_bytes /= 1024.0
         return f"{size_bytes:.2f} TB"
+    def detect_os_build(self, rsr: bool = False) -> str:
+        import plistlib
+        """
+        Detect the booted OS build
+
+        Implementation note:
+            With macOS 13.2, Apple implemented the Rapid Security Response system which
+            will change the reported build to the RSR version and not the original host
+
+            To get the proper versions:
+            - Host: /System/Library/CoreServices/SystemVersion.plist
+            - RSR:  /System/Volumes/Preboot/Cryptexes/OS/System/Library/CoreServices/SystemVersion.plist
+
+
+        Parameters:
+            rsr (bool): Whether to use the RSR version of the build
+
+        Returns:
+            str: OS build (ex. 21A5522h)
+        """
+
+        file_path = "/System/Library/CoreServices/SystemVersion.plist"
+        if rsr is True:
+            file_path = f"/System/Volumes/Preboot/Cryptexes/OS{file_path}"
+
+        try:
+            return plistlib.load(open(file_path, "rb"))["ProductBuildVersion"]
+        except Exception as e:
+            raise RuntimeError(f"Failed to detect OS build: {e}")
     def _display_available_installers(self, event: wx.Event = None, show_full: bool = False) -> None:
         """
         在窗口中显示可用的 macOS 安装器列表
@@ -195,7 +224,7 @@ class NewMetallibDownloadFrame(wx.Frame):
         """
         #super(NewMetallibDownloadFrame, self).__init__(None, title=self.title, size=(300, 200), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
         # bundles 用于 wx.ListCtrl 的图标绑定 
-        
+        self.os_build_tahoe=self.detect_os_build(False)
         bundles = [wx.BitmapBundle.FromBitmaps(self.icons)]
 
         self.frame_modal.Destroy()
@@ -285,10 +314,11 @@ class NewMetallibDownloadFrame(wx.Frame):
         self.showolderversions_checkbox.Bind(wx.EVT_CHECKBOX, lambda event: self._display_available_installers(event, self.showolderversions_checkbox.GetValue()))
 
         # 按钮布局
-        rectbox = wx.StaticBox(self.frame_modal, -1)
-        rectsizer = wx.StaticBoxSizer(rectbox, wx.HORIZONTAL)
-        rectsizer.Add(self.copy_button, 0, wx.EXPAND | wx.RIGHT, 5)
-        rectsizer.Add(self.select_button, 0, wx.EXPAND | wx.LEFT, 5)
+        if self.os_build_tahoe!='25A5316i':
+            rectbox = wx.StaticBox(self.frame_modal, -1)
+            rectsizer = wx.StaticBoxSizer(rectbox, wx.HORIZONTAL)
+            rectsizer.Add(self.copy_button, 0, wx.EXPAND | wx.RIGHT, 5)
+            rectsizer.Add(self.select_button, 0, wx.EXPAND | wx.LEFT, 5)
 
         checkboxsizer = wx.BoxSizer(wx.HORIZONTAL)
         checkboxsizer.Add(self.showolderversions_checkbox, 0, wx.ALIGN_CENTRE | wx.RIGHT, 5)
@@ -297,7 +327,13 @@ class NewMetallibDownloadFrame(wx.Frame):
         sizer.AddSpacer(10)
         sizer.Add(title_label, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
         sizer.Add(self.list, 1, wx.EXPAND | wx.ALL, 10)
-        sizer.Add(rectsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
+        if self.os_build_tahoe!='25A5316i':
+             sizer.Add(rectsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
+        elif self.os_build_tahoe=='25A5316i':
+            mosizer=wx.BoxSizer(wx.HORIZONTAL)
+            mosizer.Add(self.copy_button, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+            mosizer.Add(self.select_button, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+            sizer.Add(mosizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
         sizer.Add(checkboxsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 15)
         sizer.Add(return_button, 0, wx.ALIGN_CENTRE | wx.BOTTOM, 15)
         sizer.Add(bo_label, 0, wx.ALIGN_CENTRE | wx.BOTTOM, 15)
