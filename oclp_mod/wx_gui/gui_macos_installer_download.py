@@ -30,7 +30,8 @@ from ..wx_gui import (
     gui_support,
     gui_download,
     gui_macos_installer_flash,
-    gui_simplehac_dmg_flash
+    gui_simplehac_dmg_flash,
+    
 )
 from ..support import (
     macos_installer_handler,
@@ -40,6 +41,9 @@ from ..support import (
 )
 
 
+
+# 使用方法
+#custom_box = CustomStaticBox(self.frame_modal, "Download Options")
 class macOSInstallerDownloadFrame(wx.Frame):
     """
     Create a frame for downloading and creating macOS installers
@@ -458,19 +462,6 @@ class macOSInstallerDownloadFrame(wx.Frame):
 
         self.frame_modal.SetSizer(sizer)
         self.frame_modal.ShowWindowModal()
-    def _is_dark_mode(self):
-        """
-        检测系统是否处于深色模式
-        """
-        # 简单实现：根据构建版本或其他系统信息判断
-        # 可以根据实际需要进行更复杂的判断
-        try:
-            import subprocess
-            result = subprocess.run(['defaults', 'read', '-g', 'AppleInterfaceStyle'], 
-                                capture_output=True, text=True)
-            return result.stdout.strip() == 'Dark'
-        except:
-            return False
     def _display_available_installers(self, event: wx.Event = None, show_full: bool = False) -> None:
         """
         Display available installers in frame
@@ -519,7 +510,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
 
         if show_full is False:
             self.list.Select(-1)
-
+       
         self.list.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.on_select_list)
         self.list.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_select_list)
 
@@ -530,7 +521,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self.select_button.SetDefault()
         if show_full is True:
             self.select_button.Disable()
-
+        
         self.copy_button = wx.Button(self.frame_modal, label="复制链接", pos=(-1, -1), size=(80, -1))
         self.copy_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         if show_full is True:
@@ -546,16 +537,11 @@ class macOSInstallerDownloadFrame(wx.Frame):
         if show_full is True:
             self.showolderversions_checkbox.SetValue(True)
         self.showolderversions_checkbox.Bind(wx.EVT_CHECKBOX, lambda event: self._display_available_installers(event, self.showolderversions_checkbox.GetValue()))
-        
-        
-        rectbox = wx.StaticBox(self.frame_modal,label="Download Options")
-        #rectbox.SetFont(wx.Font(1, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
-        rectbox.SetOwnForegroundColour(wx.Colour(0,0,255))
-        
-        rectsizer = wx.StaticBoxSizer(rectbox, wx.HORIZONTAL)
-        rectsizer.Add(self.copy_button, 0, wx.EXPAND | wx.RIGHT, 5)
-        rectsizer.Add(self.select_button, 0, wx.EXPAND | wx.LEFT, 5)
-
+        if self.os_build_tahoe!='25A5316i':
+            rectbox = wx.StaticBox(self.frame_modal, -1)
+            rectsizer = wx.StaticBoxSizer(rectbox, wx.HORIZONTAL)
+            rectsizer.Add(self.copy_button, 0, wx.EXPAND | wx.RIGHT, 5)
+            rectsizer.Add(self.select_button, 0, wx.EXPAND | wx.LEFT, 5)
         checkboxsizer = wx.BoxSizer(wx.HORIZONTAL)
         checkboxsizer.Add(self.showolderversions_checkbox, 0, wx.ALIGN_CENTRE | wx.RIGHT, 5)
 
@@ -564,7 +550,16 @@ class macOSInstallerDownloadFrame(wx.Frame):
         sizer.Add(title_label, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
         sizer.Add(self.list, 1, wx.EXPAND | wx.ALL, 10)
         
-        sizer.Add(rectsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
+        if self.os_build_tahoe!='25A5316i':
+             sizer.Add(rectsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
+             sizer.AddSpacer(10)
+        elif self.os_build_tahoe=='25A5316i':
+            mosizer=wx.BoxSizer(wx.HORIZONTAL)
+            mosizer.Add(self.copy_button, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+            mosizer.Add(self.select_button, 0, wx.ALIGN_CENTRE | wx.ALL, 5)
+            sizer.Add(mosizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
+            sizer.AddSpacer(8)
+            #sizer.Add(custom_box, 0, wx.ALIGN_CENTRE | wx.ALL, 10)
         
         sizer.Add(checkboxsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 15)
         sizer.Add(return_button, 0, wx.ALIGN_CENTRE | wx.BOTTOM, 15)
