@@ -11,7 +11,9 @@
 
 ----------
 
-![GitHub 所有版本](https://img.shields.io/github/release/laobamac/OCLP-Mod) ![GitHub 主要语言](https://img.shields.io/github/languages/top/laobamac/OCLP-Mod?color=4B8BBE&style=plastic) ![GitHub 许可证](https://img.shields.io/github/license/laobamac/OCLP-Mod) [Telegram 群组](https://t.me/simplehac1)
+![GitHub 所有版本](https://img.shields.io/github/release/laobamac/OCLP-Mod) ![GitHub 主要语言](https://img.shields.io/github/languages/top/laobamac/OCLP-Mod?color=4B8BBE&style=plastic)
+![GitHub all releases](https://img.shields.io/github/downloads/laobamac/OCLP-Mod/total?color=white&style=plastic)
+[Telegram 群组](https://t.me/simplehac1)
 
 ----------
 
