@@ -2,8 +2,10 @@
              <img src="docs/images/OC-Mod.png" alt="OCLP-Mod 徽标" width="256" />
              <h1>OCLP-Mod</h1>
              <a href="README.md">English README</a>
+<br><br>
+<h3>服务器维护成本极其高昂，有点承担不起....有能力的小伙伴请支持本项目，感谢！</h3>
+<img width="287"alt="84f6564a9497f5b4c3e1f952f7c57ca8" src="https://github.com/user-attachments/assets/6f4e7b2a-f7d4-4a98-8469-fc8fa6f9c18d" /><img width="256"alt="84f6564a9497f5b4c3e1f952f7c57ca8" src="https://github.com/user-attachments/assets/68dc88a5-c852-423c-b80f-42e275429f32" />
 </div>
-<br>
 
 [OCLP-Mod](https://github.com/laobamac/OCLP-Mod) 是基于 Python 的修改版项目，核心基于 [Acidanthera 的 OpenCorePkg](https://github.com/acidanthera/OpenCorePkg) 和 [Lilu](https://github.com/acidanthera/Lilu)，用于在支持或不支持的 Mac 设备上运行并解锁 macOS 功能。
 
