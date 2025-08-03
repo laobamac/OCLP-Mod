@@ -97,7 +97,7 @@ class ModernWireless(BaseHardware):
         """
         Apple no longer provides standalone kexts in the base OS
         """
-        return self._xnu_major >= os_data.tahoe.value
+        return False
 
 
     def patches(self) -> dict:

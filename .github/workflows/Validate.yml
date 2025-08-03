@@ -20,6 +20,6 @@ jobs:
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip install -r requirements.txt
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 -m pip install packaging
           rm -rf Univ*
-          aria2c -x 16 "https://github.com/laobamac/PatcherSupportPkg/releases/download/pre-release-d95a1cb0890d8e2d2c3841a7a94f8381fe4ceaa6/Universal-Binaries.dmg"
+          aria2c -x 16 "https://github.com/laobamac/PatcherSupportPkg/releases/download/pre-release-bfa5bb9a021e534bc0d2ac7401e5e21d31d36e3b/Universal-Binaries.dmg"
           /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 OCLP-Mod-GUI.command --validate
     

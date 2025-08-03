@@ -745,7 +745,7 @@ class SettingsFrame(wx.Frame):
                     "value": self._get_system_settings("Moraea_BlurBeta"),
                     "variable": "Moraea_BlurBeta",
                     "description": [
-                        "Control window blur behaviour.",
+                        "控制毛玻璃行为。.",
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
