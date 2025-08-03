@@ -2,8 +2,11 @@
              <img src="docs/images/OC-Mod.png" alt="OCLP-Mod Logo" width="256" />
              <h1>OCLP-Mod</h1>
              <a href="README_CN.md">中文版README</a>
+<br><br>
+<h3>服务器维护成本极其高昂，有点承担不起....有能力的小伙伴请支持本项目，感谢！</h3>
+<img width="287"alt="84f6564a9497f5b4c3e1f952f7c57ca8" src="https://github.com/user-attachments/assets/6f4e7b2a-f7d4-4a98-8469-fc8fa6f9c18d" /><img width="256"alt="84f6564a9497f5b4c3e1f952f7c57ca8" src="https://github.com/user-attachments/assets/68dc88a5-c852-423c-b80f-42e275429f32" />
 </div>
-<br>
+
 
 A Mod version [OCLP-Mod](https://github.com/laobamac/OCLP-Mod) which based on  Python-based project revolving around [Acidanthera's OpenCorePkg](https://github.com/acidanthera/OpenCorePkg) and [Lilu](https://github.com/acidanthera/Lilu) for both running and unlocking features in macOS on supported and unsupported Macs.
 
