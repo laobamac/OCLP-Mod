@@ -70,7 +70,7 @@ class LegacyLaunchpad(BaseHardware):
                     },
                     "/System/Applications": {
                         "Apps.app": f"{self.constants.launchpad_verison}",
-                        "Launchpad.app": f"{self.constants.launchpad_verison}" if f"{self.constants.launchpad_verison}" != f"26.0 Beta 4" else {},
+                        **({"Launchpad.app": f"{self.constants.launchpad_verison}"} if f"{self.constants.launchpad_verison}" != f"26.0 Beta 4" else {}),
                     }
                 },
             },
