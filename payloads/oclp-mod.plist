@@ -7,46 +7,59 @@
 	<key>PatcherSupportPkg</key>
 	<string>v1.9.8</string>
 	<key>Time Patched</key>
-	<string>August 03, 2025 @ 23:17:12</string>
+	<string>August 08, 2025 @ 22:14:47</string>
 	<key>Commit URL</key>
 	<string></string>
 	<key>Kernel Debug Kit Used</key>
-	<string>/Library/Developer/KDKs/KDK_26.0_25A5279m.kdk</string>
+	<string>Not applicable</string>
 	<key>Metal Library Used</key>
 	<string>Not applicable</string>
 	<key>OS Version</key>
-	<string>25.0 (25A5316i)</string>
+	<string>25.0 (25A5327h)</string>
 	<key>Custom Signature</key>
 	<false/>
-	<key>旧版USB扩展</key>
+	<key>音频补丁</key>
 	<dict>
-		<key>Overwrite System Volume</key>
+		<key>Merge System Volume</key>
 		<dict>
 			<key>/System/Library/Extensions</key>
+			<dict/>
+			<key>/Library/Extensions</key>
 			<dict>
-				<key>AppleUSBACM.kext</key>
-				<string>14.7.6</string>
-				<key>AppleUSBAudio.kext</key>
-				<string>14.7.6</string>
-				<key>AppleUSBCDC.kext</key>
-				<string>14.7.6</string>
-				<key>AppleUSBCommon.kext</key>
-				<string>14.7.6</string>
-				<key>IOUSBDeviceFamily.kext</key>
-				<string>14.7.6</string>
-				<key>IOUSBFamily.kext</key>
-				<string>14.7.6</string>
-				<key>IOUSBHostFamily.kext</key>
-				<string>14.7.6</string>
-				<key>IOAccessoryManager.kext</key>
-				<string>14.7.6</string>
-				<key>IOAccessoryPortUSB.kext</key>
-				<string>14.7.6</string>
-			</dict>
-			<key>/System/Library/Frameworks</key>
-			<dict>
-				<key>IOUSBHost.framework</key>
-				<string>14.6.1</string>
+				<key>AppleHDA.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOACPIFamily.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOAudio2Family.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOAudioFamily.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOPAudioAssetManagerDevice.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOPAudioClientManagerDevice.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOPAudioDriverFamily.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOPAudioHapticsLEAPControlDevice.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOPAudioIOBufferDevice.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOPAudioIsolatedIOBufferDevice.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOPAudioLEAPControlDevice.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOPAudioLPMicDevice.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOPAudioPCMAssetManagerDevice.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOPAudioRemoteIICController.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOPAudioVoiceTriggerDevice.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOPCIFamily.kext</key>
+				<string>26.0 Beta 1</string>
+				<key>IOPlatformPluginFamily.kext</key>
+				<string>26.0 Beta 1</string>
 			</dict>
 		</dict>
 	</dict>

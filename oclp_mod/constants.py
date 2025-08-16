@@ -245,6 +245,8 @@ class Constants:
         self.allow_usb_patch:        bool = False #  Allow USB Patch on Tahoe
         self.allow_hda_patch:        bool = True #  Allow HDA Patch on Tahoe
         self.use_github_proxy:       bool = True #  Use proxy to get resources on Github
+        self.allow_launchpad_patch:  bool = False # Allow LaunchPad Patch on Tahoe
+        self.launchpad_verison:      str  = "26.0 Beta 4"  # Set launchpad used
 
         ## Non-Metal OS support
         self.legacy_accel_support = [

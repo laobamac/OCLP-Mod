@@ -49,7 +49,7 @@ class SettingsFrame(wx.Frame):
 
         self.settings = self._settings()
 
-        self.frame_modal = wx.Dialog(parent, title=title, size=(600, 685))
+        self.frame_modal = wx.Dialog(parent, title=title, size=(600, 700))
 
         self._generate_elements(self.frame_modal)
         self.frame_modal.ShowWindowModal()
@@ -719,6 +719,23 @@ class SettingsFrame(wx.Frame):
                         "安装旧版USB环境扩展"
                     ],
                 },
+                "允许安装旧版启动台": {
+                    "type": "checkbox",
+                    "value": self.constants.allow_launchpad_patch,
+                    "variable": "allow_launchpad_patch",
+                    "description": [
+                        "在macOS Tahoe Beta 4及更高版本恢复启动台",
+                    ],
+                },
+                "使用的启动台版本": {
+                    "type": "choice",
+                    "choices": ["26.0 Beta 4","26.0 Beta 2"],
+                    "value": self.constants.launchpad_verison,
+                    "variable": "launchpad_verison",
+                    "description": [
+                        "设置要移植的启动台版本",
+                    ],
+                },
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
@@ -733,9 +750,8 @@ class SettingsFrame(wx.Frame):
                     "value": self._get_system_settings("Moraea_DarkMenuBar"),
                     "variable": "Moraea_DarkMenuBar",
                     "description": [
-                        "如果启用了 Beta 菜单栏，"
-                        "菜单栏颜色将根据需要动态"
-                        "变化。"
+                        "如果启用了 Beta 菜单栏，",
+                        "菜单栏颜色将根据需要动态变化。"
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
@@ -745,7 +761,7 @@ class SettingsFrame(wx.Frame):
                     "value": self._get_system_settings("Moraea_BlurBeta"),
                     "variable": "Moraea_BlurBeta",
                     "description": [
-                        "控制毛玻璃行为。.",
+                        "控制毛玻璃行为。",
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
@@ -769,10 +785,8 @@ class SettingsFrame(wx.Frame):
                     "value": self._get_system_settings("Amy.MenuBar2Beta"),
                     "variable": "Amy.MenuBar2Beta",
                     "description": [
-                        "支持动态颜色变化。"
-                        "注意：此设置仍在试验阶段。"
-                        "如果遇到问题，请"
-                        "禁用此设置。"
+                        "支持动态颜色变化。注意：此设置仍在试验阶段。",
+                        "如果遇到问题，请禁用此设置。"
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)

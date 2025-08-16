@@ -46,7 +46,8 @@ from .hardware.misc import (
     t1_security,
     usb11,
     cpu_missing_avx,
-    legacy_usb_host_res
+    legacy_usb_host_res,
+    legacy_launchpad
 )
 
 from ... import constants
@@ -134,6 +135,7 @@ class HardwarePatchsetDetection:
             keyboard_backlight.KeyboardBacklight,
             legacy_audio.LegacyAudio,
             modern_audio.ModernAudio,
+            legacy_launchpad.LegacyLaunchpad,
             pcie_webcam.PCIeFaceTimeCamera,
             t1_security.T1SecurityChip,
             usb11.USB11Controller,
