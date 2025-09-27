@@ -207,6 +207,8 @@ class KernelDebugKitObject:
 
         # 如果没有精确匹配，检查最接近的匹配
         if self.kdk_url == "":
+            # 收集所有可能的候选版本
+            candidate_kdks = []
             for kdk in remote_kdk_version:
                 kdk_version = cast(packaging.version.Version, packaging.version.parse(kdk["version"]))
                 if kdk_version > parsed_version:
@@ -215,14 +217,30 @@ class KernelDebugKitObject:
                     continue
                 if kdk_version.minor not in range(parsed_version.minor - 1, parsed_version.minor + 1):
                     continue
+                
+                candidate_kdks.append(kdk)
 
-                # KDK 列表已经按版本和日期排序，因此第一个匹配的是最接近的匹配
-                self.kdk_closest_match_url = kdk["url"]
-                self.kdk_closest_match_url_build = kdk["build"]
-                self.kdk_closest_match_url_version = kdk["version"]
-                self.kdk_closest_match_url_expected_size = kdk["fileSize"]
+            # 按构建号排序，选择最接近的上一个版本
+            if candidate_kdks:
+                # 按构建号排序（降序，最新的在前）
+                candidate_kdks.sort(key=lambda x: x["build"], reverse=True)
+                
+                # 选择构建号小于等于当前构建的最新版本
+                closest_kdk = None
+                for kdk in candidate_kdks:
+                    if kdk["build"] <= host_build:
+                        closest_kdk = kdk
+                        break
+                
+                # 如果没有找到小于等于的版本，选择最小的版本（最老的）
+                if closest_kdk is None:
+                    closest_kdk = candidate_kdks[-1]  # 排序后最后一个是最小的
+                
+                self.kdk_closest_match_url = closest_kdk["url"]
+                self.kdk_closest_match_url_build = closest_kdk["build"]
+                self.kdk_closest_match_url_version = closest_kdk["version"]
+                self.kdk_closest_match_url_expected_size = closest_kdk["fileSize"]
                 self.kdk_url_is_exactly_match = False
-                break
 
         if self.kdk_url == "":
             if self.kdk_closest_match_url == "":

@@ -514,7 +514,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
                 self.list.SetItem(index, 4, item['PostDate'].strftime(date_format))
         else:
             logging.error("No installers found on SUCatalog")
-            wx.MessageDialog(self.frame_modal, "Failed to download Installer Catalog from Apple", "Error", wx.OK | wx.ICON_ERROR).ShowModal()
+            wx.MessageDialog(self.frame_modal, "未能从Apple服务器获取更新信息。", "Error", wx.OK | wx.ICON_ERROR).ShowModal()
     
         if show_full is False:
             self.list.Select(-1)
