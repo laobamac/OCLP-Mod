@@ -71,7 +71,7 @@ class ModernAudio(BaseHardware):
             "音频补丁": {
                 PatchType.MERGE_SYSTEM_VOLUME: {
                     "/System/Library/Extensions": {
-                        "AppleHDA.kext": "26.0 Beta 1",
+                        "AppleHDA.kext": "15.6",
                     },
                 },
             },
