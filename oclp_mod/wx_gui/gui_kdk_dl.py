@@ -91,7 +91,7 @@ class DownloadProgressFrame(wx.Frame):
                 wx.CallAfter(self.on_download_complete)
 
         except requests.RequestException as e:
-            if self.downloading:  # 只有在未取消的情况下才显示错误
+            if self.downloading:  # 只在未取消的情况下显示错误
                 wx.CallAfter(wx.MessageBox, f"下载失败: {e}", "错误", wx.OK | wx.ICON_ERROR)
         
         wx.CallAfter(self.timer.Stop)
