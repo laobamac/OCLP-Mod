@@ -107,6 +107,31 @@ class ModernWireless(BaseHardware):
         if self.native_os() is True:
             return {}
 
+        if self._xnu_major >= os_data.tahoe.value:
+            return {
+                f"{self.patchName}": {
+                    PatchType.OVERWRITE_SYSTEM_VOLUME: {
+                        "/usr/libexec": {
+                            "airportd": "14.7.7",
+                            "wifip2pd": "14.7.7",
+                        },
+                        "/System/Library/CoreServices": {
+                            "WiFiAgent.app": "14.7.7",
+                        },
+                    },
+                    PatchType.MERGE_SYSTEM_VOLUME: {
+                        "/System/Library/Frameworks": {
+                            "CoreWLAN.framework": "14.7.7",
+                        },
+                        "/System/Library/PrivateFrameworks": {
+                            "CoreWiFi.framework":       "14.7.7",
+                            "IO80211.framework":        "14.7.7",
+                            "WiFiPeerToPeer.framework": "14.7.7",
+                        },
+                    }
+                },
+            }
+
         return {
             f"{self.patchName}": {
                 PatchType.OVERWRITE_SYSTEM_VOLUME: {

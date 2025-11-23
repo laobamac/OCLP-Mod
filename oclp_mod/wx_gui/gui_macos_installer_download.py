@@ -51,6 +51,8 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self.constants: constants.Constants = global_constants
         self.title: str = title
         self.parent: wx.Frame = parent
+        self.latest_dmgs=[]
+        self.dmgs_all=[]
 
         self.available_installers = None
         self.available_installers_latest = None
@@ -197,12 +199,12 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self.Show()
 
         def _fetch_dmg():
-            apiurl = "https://oclpapi.simplehac.cn/DMG?token=oclpmod"
-            aesurl = "https://oclpapi.simplehac.cn/DMG/aeskey.json"
+            dmgdataurl = "https://next.oclpapi.simplehac.cn/DMG/data/dmgs.json"
+            aesurl = "https://next.oclpapi.simplehac.cn/DMG/data/aeskey.txt"
 
             try:
                 # 发送 GET 请求
-                response = requests.get(apiurl)
+                response = requests.get(dmgdataurl)
                 aes = requests.get(aesurl)
 
                 # 检查响应状态码是否为 200
@@ -221,12 +223,72 @@ class macOSInstallerDownloadFrame(wx.Frame):
                         logging.error(f"请求失败，状态码: {aes.status_code}")
                 else:
                     logging.info(f"请求失败，状态码: {response.status_code}")
+
+                dmg_number=[]
+                dmg_build=[]
+                dmgdata_all=dmgdata
+                maxnx=[]
+                dmgdata=dmgdata['dmgFiles'][::-1]
+                for i in range(len(dmgdata)):
+                    #self.kdk_data[i].pop("kernel_versions")
+                    dmgdata[i]['releaseDate']=((dmgdata[i]['releaseDate']).split("T"))[0]
+                for i in range(len(dmgdata)):
+                    data=dmgdata[i]["build"][:2]
+                    data2=dmgdata[i]["build"]
+                    dmg_number.append(data)
+                    dmg_build.append(data2)
+                #print(kdk_data_number)
+                #dmg_number=dmg_number[::-1]
+                #dmg_build=dmg_build[::-1]
+                for i in range(4):
+                    maxn=dmg_number[0]
+                    while True:
+                        dmg_number.pop(0)
+                        if len(dmg_number)==0 or dmg_number[0]<maxn :
+                            break
+                    maxnx.append(maxn)
+                #print(kdk_data[0]['build'])
+                i=0
+                fl=[0,0,0,0]
+                model={
+                    "dmgFiles":[]
+                }
+                latest=[]
+                while True:
+                    if maxnx[0] == dmgdata[i]["build"][:2] and fl[0]==0:
+                        latest.append(dmgdata[i])
+                        fl[0]=1
+                        #print(kdk_data_latest)
+                        i+=1
+                    if  maxnx[1] == dmgdata[i]["build"][:2]and fl[1]==0:
+                        latest.append(dmgdata[i])
+                        fl[1]=1
+                        i+=1
+                    if  maxnx[2] == dmgdata[i]["build"][:2]and fl[2]==0:
+                        latest.append(dmgdata[i])
+                        fl[2]=1
+                        i+=1
+                    if  maxnx[3] == dmgdata[i]["build"][:2]and fl[3]==0:
+                        latest.append(dmgdata[i])
+                        fl[3]=1
+                        i+=1
+                    if i==len(dmgdata)-1:
+                        break
+                    else:
+                        i+=1
+                        continue
+                #self.kdk_data_full=self.kdk_data
+                latest=latest[::-1]
+                model["dmgFiles"]=latest
+                self.latest_dmgs=model
+
             except requests.exceptions.RequestException as e:
                 logging.info(f"请求发生异常: {e}")
             finally:
                 if dmgdata is not None:
                     logging.info("Got it!")
-                    self.available_simplehac_dmgs = dmgdata
+                    self.available_simplehac_dmgs=self.latest_dmgs
+                    self.dmgs_all = dmgdata_all
                     self.dmgs = dmgdata
                     logging.info(type(dmgdata))
                 else:
@@ -242,7 +304,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self._display_available_dmgs()
 
     def generate_signed_url(self, download_url, aeskey):
-        API_URL = 'https://oclpapi.simplehac.cn/DMG/down.php'
+        API_URL = 'https://oclpapi.simplehac.cn/DMG/api/down.php'
 
         parsed_url = urllib.parse.urlparse(download_url)
         file_name = urllib.parse.unquote(parsed_url.path.split('/')[-1])
@@ -251,6 +313,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
         expire_time = timestamp + 300  # 秒
 
         sign_data = f"oclpmod{file_name}{expire_time}{aeskey}"
+
         sign = hashlib.md5(sign_data.encode('utf-8')).hexdigest()
 
         signed_url = f"{API_URL}?origin={urllib.parse.quote(file_name)}&sign={sign}&t={expire_time}"
@@ -263,7 +326,10 @@ class macOSInstallerDownloadFrame(wx.Frame):
         bundles = [wx.BitmapBundle.FromBitmaps(icon) for icon in self.icons]
 
         self.frame_modal.Destroy()
-        self.frame_modal = wx.Dialog(self, title="选择SimpleHac DMG镜像", size=(505, 500))
+        # 调整对话框尺寸，确保足够显示所有列
+        dialog_width = 505 if show_full else 500
+        dialog_height = 500 if show_full else 380
+        self.frame_modal = wx.Dialog(self, title="选择SimpleHac DMG镜像", size=(dialog_width, dialog_height))
 
         title_label = wx.StaticText(self.frame_modal, label="选择此镜像 由SimpleHac提供支持", pos=(-1, -1))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
@@ -273,13 +339,23 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self.list = wx.ListCtrl(self.frame_modal, id, style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_NO_HEADER | wx.BORDER_SUNKEN)
         self.list.SetSmallImages(bundles)
 
-        self.list.InsertColumn(0, "Title", width=175)
-        self.list.InsertColumn(1, "Version", width=50)
-        self.list.InsertColumn(2, "Build", width=75)
-        self.list.InsertColumn(3, "Size", width=75)
-        self.list.InsertColumn(4, "Release Date", width=100)
+        # 调整列宽，确保总宽度不超过对话框宽度
+        if show_full:
+            # 显示全部版本时的列宽
+            self.list.InsertColumn(0, "Title", width=175)
+            self.list.InsertColumn(1, "Version", width=50)
+            self.list.InsertColumn(2, "Build", width=75)
+            self.list.InsertColumn(3, "Size", width=75)
+            self.list.InsertColumn(4, "Release Date", width=100)
+        else:
+            # 不显示全部版本时的列宽（更紧凑）
+            self.list.InsertColumn(0, "Title", width=160)
+            self.list.InsertColumn(1, "Version", width=45)
+            self.list.InsertColumn(2, "Build", width=70)
+            self.list.InsertColumn(3, "Size", width=70)
+            self.list.InsertColumn(4, "Date", width=100)  # 保持日期列但使用更短的标题
 
-        dmgs = self.available_simplehac_dmgs
+        dmgs = self.available_simplehac_dmgs if show_full is False else self.dmgs_all
 
         if dmgs:
             locale.setlocale(locale.LC_TIME, '')
@@ -300,7 +376,11 @@ class macOSInstallerDownloadFrame(wx.Frame):
                     self.list.SetItem(index, 1, version)
                     self.list.SetItem(index, 2, build)
                     self.list.SetItem(index, 3, size)
-                    self.list.SetItem(index, 4, release_date)
+                    date_format = "%x"
+                    try:
+                        self.list.SetItem(index, 4, release_date.split("T")[0].strftime(date_format) if "T" in release_date else release_date)
+                    except:
+                        self.list.SetItem(index, 4, release_date)
                 else:
                     print(f"数据格式错误: {item}")
             if self.fetched_aes_key_status != 200:
@@ -314,77 +394,112 @@ class macOSInstallerDownloadFrame(wx.Frame):
 
         if not show_full:
             self.list.Select(-1)
+            self.frame_modal.SetSize((490, 370))
 
         self.list.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.on_select_list)
         self.list.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_select_list)
 
-        self.select_button = wx.Button(self.frame_modal, label="下载", pos=(-1, -1), size=(150, -1))
-        self.select_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-        self.select_button.Bind(wx.EVT_BUTTON, lambda event, installers=dmgs: self.on_download_dmg(installers))
-        self.dmgs = dmgs
-        self.select_button.SetToolTip("下载选定的DMG")
-        self.select_button.SetDefault()
-        if show_full:
-            self.select_button.Disable()
+        # 创建模拟StaticBox的面板
+        rectbox = wx.Panel(self.frame_modal)
+        rectbox.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
+        rectbox.SetMinSize((-1, 46))  # 增加高度以便按钮上下居中
 
-        self.copy_button = wx.Button(self.frame_modal, label="复制链接", pos=(-1, -1), size=(80, -1))
+        # 创建按钮，父窗口设为rectbox
+        self.copy_button = wx.Button(rectbox, label="复制链接", size=(70, 30))
+        self.select_button = wx.Button(rectbox, label="下载", size=(130, 30))
+
+        # 设置按钮属性
         self.copy_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
+        self.select_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         if show_full:
             self.copy_button.Disable()
+            self.select_button.Disable()
+        self.select_button.SetToolTip("下载选定的DMG")
+        self.select_button.SetDefault()
         self.copy_button.SetToolTip("复制选定DMG的下载链接")
         self.copy_button.Bind(wx.EVT_BUTTON, lambda event, installers=dmgs: self.on_copy_dmg_link(installers))
+        self.select_button.Bind(wx.EVT_BUTTON, lambda event, installers=dmgs: self.on_download_dmg(installers))
 
-        return_button = wx.Button(self.frame_modal, label="返回", pos=(-1, -1), size=(150, -1))
+        # 使用BoxSizer实现完美居中
+        rectsizer = wx.BoxSizer(wx.HORIZONTAL)
+        rectsizer.AddStretchSpacer(1)
+        rectsizer.Add(self.copy_button, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        rectsizer.Add(self.select_button, 0, wx.ALIGN_CENTER_VERTICAL)
+        rectsizer.AddStretchSpacer(1)
+        
+        # 外层垂直sizer确保按钮在面板中垂直居中
+        outer_sizer = wx.BoxSizer(wx.VERTICAL)
+        outer_sizer.AddStretchSpacer(1)
+        outer_sizer.Add(rectsizer, 1, wx.EXPAND | wx.ALL, 5)
+        outer_sizer.AddStretchSpacer(1)
+        
+        rectbox.SetSizer(outer_sizer)
+
+        self.olderversions_checkbox = wx.CheckBox(self.frame_modal, label="显示老版本/测试版本")
+        if show_full is True:
+            self.olderversions_checkbox.SetValue(True)
+        self.olderversions_checkbox.Bind(wx.EVT_CHECKBOX, lambda event: self._display_available_dmgs(event, self.olderversions_checkbox.GetValue()))
+
+        return_button = wx.Button(self.frame_modal, label="返回", size=(150, 30))
         return_button.Bind(wx.EVT_BUTTON, self.on_return_to_main_menu)
         return_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
 
-        rectbox = wx.StaticBox(self.frame_modal, -1)
-        rectsizer = wx.StaticBoxSizer(rectbox, wx.HORIZONTAL)
-        rectsizer.Add(self.copy_button, 0, wx.EXPAND | wx.RIGHT, 5)
-        rectsizer.Add(self.select_button, 0, wx.EXPAND | wx.LEFT, 5)
-
+        checkboxsizer = wx.BoxSizer(wx.HORIZONTAL)
+        checkboxsizer.Add(self.olderversions_checkbox, 0, wx.ALIGN_CENTRE | wx.RIGHT, 5)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.AddSpacer(10)
         sizer.Add(title_label, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
         sizer.Add(self.list, 1, wx.EXPAND | wx.ALL, 10)
-        sizer.Add(rectsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
+        sizer.Add(rectbox, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 80)
         sizer.AddSpacer(10)
+        sizer.Add(checkboxsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 15)
         sizer.Add(return_button, 0, wx.ALIGN_CENTRE | wx.BOTTOM, 15)
 
         self.frame_modal.SetSizer(sizer)
         self.frame_modal.ShowWindowModal()
+
     def _display_available_installers(self, event: wx.Event = None, show_full: bool = False) -> None:
         """
         Display available installers in frame
         """
-
-
         bundles = [wx.BitmapBundle.FromBitmaps(icon) for icon in self.icons]
 
         self.frame_modal.Destroy()
-        self.frame_modal = wx.Dialog(self, title="选择macOS安装器", size=(505, 500))
-
+        dialog_width = 505 if show_full else 500
+        dialog_height = 500 if show_full else 380
+        self.frame_modal = wx.Dialog(self, title="选择macOS安装器", size=(dialog_width, dialog_height))
+    
         # Title: Select macOS Installer
         title_label = wx.StaticText(self.frame_modal, label="选择此macOS", pos=(-1,-1))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
-
+    
         # macOS Installers list
         id = wx.NewIdRef()
-
+    
         self.list = wx.ListCtrl(self.frame_modal, id, style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_NO_HEADER | wx.BORDER_SUNKEN)
         self.list.SetSmallImages(bundles)
-
-        self.list.InsertColumn(0, "Title",        width=175)
-        self.list.InsertColumn(1, "Version",      width=50)
-        self.list.InsertColumn(2, "Build",        width=75)
-        self.list.InsertColumn(3, "Size",         width=75)
-        self.list.InsertColumn(4, "Release Date", width=100)
-
+    
+        # 调整列宽，确保总宽度不超过对话框宽度
+        if show_full:
+            # 显示全部版本时的列宽
+            self.list.InsertColumn(0, "Title", width=175)
+            self.list.InsertColumn(1, "Version", width=50)
+            self.list.InsertColumn(2, "Build", width=75)
+            self.list.InsertColumn(3, "Size", width=75)
+            self.list.InsertColumn(4, "Release Date", width=100)
+        else:
+            # 不显示全部版本时的列宽（更紧凑）
+            self.list.InsertColumn(0, "Title", width=160)
+            self.list.InsertColumn(1, "Version", width=45)
+            self.list.InsertColumn(2, "Build", width=70)
+            self.list.InsertColumn(3, "Size", width=70)
+            self.list.InsertColumn(4, "Date", width=100)  # 保持日期列但使用更短的标题
+    
         installers = self.available_installers_latest if show_full is False else self.available_installers
         if show_full is False:
             self.frame_modal.SetSize((490, 370))
-
+    
         if installers:
             locale.setlocale(locale.LC_TIME, '')
             logging.info(f"Available installers on SUCatalog ({'All entries' if show_full else 'Latest only'}):")
@@ -395,57 +510,72 @@ class macOSInstallerDownloadFrame(wx.Frame):
                 self.list.SetItem(index, 1, item['Version'])
                 self.list.SetItem(index, 2, item['Build'])
                 self.list.SetItem(index, 3, utilities.human_fmt(item['InstallAssistant']['Size']))
-                self.list.SetItem(index, 4, item['PostDate'].strftime("%x"))
+                date_format = "%x"
+                self.list.SetItem(index, 4, item['PostDate'].strftime(date_format))
         else:
             logging.error("No installers found on SUCatalog")
-            wx.MessageDialog(self.frame_modal, "Failed to download Installer Catalog from Apple", "Error", wx.OK | wx.ICON_ERROR).ShowModal()
-
+            wx.MessageDialog(self.frame_modal, "未能从Apple服务器获取更新信息。", "Error", wx.OK | wx.ICON_ERROR).ShowModal()
+    
         if show_full is False:
             self.list.Select(-1)
-
+    
         self.list.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.on_select_list)
         self.list.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_select_list)
-
-        self.select_button = wx.Button(self.frame_modal, label="下载", pos=(-1, -1), size=(150, -1))
+    
+        rectbox = wx.Panel(self.frame_modal)
+        rectbox.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
+        rectbox.SetMinSize((-1, 46))
+    
+        self.copy_button = wx.Button(rectbox, label="复制链接", size=(70, 30))
+        self.select_button = wx.Button(rectbox, label="下载", size=(130, 30))
+    
+        self.copy_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         self.select_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
+    
+        if show_full is True:
+            self.select_button.Disable()
+            self.copy_button.Disable()
+    
         self.select_button.Bind(wx.EVT_BUTTON, lambda event, installers=installers: self.on_download_installer(installers))
         self.select_button.SetToolTip("下载选定的macOS")
         self.select_button.SetDefault()
-        if show_full is True:
-            self.select_button.Disable()
-
-        self.copy_button = wx.Button(self.frame_modal, label="复制链接", pos=(-1, -1), size=(80, -1))
-        self.copy_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-        if show_full is True:
-            self.copy_button.Disable()
-        self.copy_button.SetToolTip("Copy the download link of the selected macOS Installer.")
+        self.copy_button.SetToolTip("复制所选 macOS 安装程序的下载链接。")
         self.copy_button.Bind(wx.EVT_BUTTON, lambda event, installers=installers: self.on_copy_link(installers))
-
+    
         return_button = wx.Button(self.frame_modal, label="返回", pos=(-1, -1), size=(150, -1))
         return_button.Bind(wx.EVT_BUTTON, self.on_return_to_main_menu)
         return_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-
+    
+        rectsizer = wx.BoxSizer(wx.HORIZONTAL)
+        rectsizer.AddStretchSpacer(1)
+        rectsizer.Add(self.copy_button, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        rectsizer.Add(self.select_button, 0, wx.ALIGN_CENTER_VERTICAL)
+        rectsizer.AddStretchSpacer(1)
+        
+        outer_sizer = wx.BoxSizer(wx.VERTICAL)
+        outer_sizer.AddStretchSpacer(1)
+        outer_sizer.Add(rectsizer, 1, wx.EXPAND | wx.ALL, 5)
+        outer_sizer.AddStretchSpacer(1)
+        
+        rectbox.SetSizer(outer_sizer)
+    
         self.showolderversions_checkbox = wx.CheckBox(self.frame_modal, label="显示老版本/测试版本", pos=(-1, -1))
         if show_full is True:
             self.showolderversions_checkbox.SetValue(True)
         self.showolderversions_checkbox.Bind(wx.EVT_CHECKBOX, lambda event: self._display_available_installers(event, self.showolderversions_checkbox.GetValue()))
-
-        rectbox = wx.StaticBox(self.frame_modal, -1)
-        rectsizer = wx.StaticBoxSizer(rectbox, wx.HORIZONTAL)
-        rectsizer.Add(self.copy_button, 0, wx.EXPAND | wx.RIGHT, 5)
-        rectsizer.Add(self.select_button, 0, wx.EXPAND | wx.LEFT, 5)
-
+    
         checkboxsizer = wx.BoxSizer(wx.HORIZONTAL)
         checkboxsizer.Add(self.showolderversions_checkbox, 0, wx.ALIGN_CENTRE | wx.RIGHT, 5)
-
+    
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.AddSpacer(10)
         sizer.Add(title_label, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
         sizer.Add(self.list, 1, wx.EXPAND | wx.ALL, 10)
-        sizer.Add(rectsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 0)
+        sizer.Add(rectbox, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 80)
+        sizer.AddSpacer(10)
         sizer.Add(checkboxsizer, 0, wx.ALIGN_CENTRE | wx.ALL, 15)
         sizer.Add(return_button, 0, wx.ALIGN_CENTRE | wx.BOTTOM, 15)
-
+    
         self.frame_modal.SetSizer(sizer)
         self.frame_modal.ShowWindowModal()
 
@@ -525,7 +655,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
             dir_dialog.Destroy()
             file_name = f"/Install+{title}+{version}+{build}+with+OC&FirPE+SimpleHac.dmg"
 
-            download_obj = network_handler.DownloadObject(download_url, save_path+file_name, size)
+            download_obj = network_handler.DownloadObject(download_url, save_path+file_name, network_handler.DownloadObject.convert_size(self, str(size)))
 
             gui_download.DownloadFrame(
                 self,

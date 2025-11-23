@@ -58,7 +58,7 @@ class LegacyUSBHOST(BaseHardware):
         """
         if self.native_os() is True:
             return {}
-
+        
         return {
             "旧版USB扩展": {
                 PatchType.OVERWRITE_SYSTEM_VOLUME: {
@@ -67,33 +67,14 @@ class LegacyUSBHOST(BaseHardware):
                         "AppleUSBAudio.kext": "14.7.6",  
                         "AppleUSBCDC.kext": "14.7.6",  
                         "AppleUSBCommon.kext": "14.7.6",  
-                        "AppleUSBDeviceMux.kext": "14.7.6",  
-                        "AppleUSBDeviceNCM.kext": "14.7.6",  
-                        "AppleUSBDisplays.kext": "14.7.6",  
-                        "AppleUSBDMM.kext": "14.7.6",  
-                        "AppleUSBECM.kext": "14.7.6",  
-                        "AppleUSBEEM.kext": "14.7.6",  
-                        "AppleUSBEthernet.kext": "14.7.6",  
-                        "AppleUSBEthernetHost.kext": "14.7.6",  
-                        "AppleUSBHostS5L8930X.kext": "14.7.6",  
-                        "AppleUSBHostS5L8960X.kext": "14.7.6",  
-                        "AppleUSBHostT7000.kext": "14.7.6",  
-                        "AppleUSBHostT8002.kext": "14.7.6",  
-                        "AppleUSBHostT8011.kext": "14.7.6",  
-                        "AppleUSBHostT8020.kext": "14.7.6",  
-                        "AppleUSBHSIC.kext": "14.7.6",  
-                        "AppleUSBiBridge.kext": "14.7.6",  
-                        "AppleUSBLightningAdapter.kext": "14.7.6",  
-                        "AppleUSBMike.kext": "14.7.6",  
-                        "AppleUSBNCM.kext": "14.7.6",  
-                        "AppleUSBNetworking.kext": "14.7.6",  
-                        "AppleUSBRealtek8153Patcher.kext": "14.7.6",  
-                        "AppleUSBSerial.kext": "14.7.6",  
-                        "AppleUSBWCM.kext": "14.7.6",  
                         "IOUSBDeviceFamily.kext": "14.7.6",  
                         "IOUSBFamily.kext": "14.7.6",  
                         "IOUSBHostFamily.kext": "14.7.6",  
-                        "IOUSBMassStorageDriver.kext": "14.7.6"  
+                        "IOAccessoryManager.kext": "14.7.6",
+                        "IOAccessoryPortUSB.kext": "14.7.6",
+                    },
+                    "/System/Library/Frameworks": {
+                        "IOUSBHost.framework": "14.6.1",
                     },
                 },
             },

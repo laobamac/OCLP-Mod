@@ -28,6 +28,9 @@ class T1SecurityChip(BaseHardware):
         """
         Targeting T1 Security Chip
         """
+        if self._xnu_major == os_data.tahoe.value:
+            return False
+        
         return self._computer.t1_chip
 
 

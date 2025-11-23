@@ -211,7 +211,9 @@ class PatcherValidation:
 
         logging.info("Validating Root Patch File integrity")
 
-        time.sleep(2)
+        time.sleep(4)
+
+        logging.info("Ready to unmount PSPKG")
 
         self._unmount_dmg()
 

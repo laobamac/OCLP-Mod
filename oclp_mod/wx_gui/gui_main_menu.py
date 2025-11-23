@@ -403,13 +403,15 @@ class MainFrame(wx.Frame):
     
     def on_download_kdk_package(self, event: wx.Event = None):
         kdk_window = gui_kdk_dl.DownloadKDKFrame(
-            parent=self
+            parent=self,
+            global_constants=self.constants,
         )
         kdk_window.Show()
 
     def on_download_ml_package(self, event: wx.Event = None):
         ml_window = gui_ml_dl.DownloadMLFrame(
-            parent=self
+            parent=self,
+            global_constants=self.constants,
         )
         ml_window.Show()
 

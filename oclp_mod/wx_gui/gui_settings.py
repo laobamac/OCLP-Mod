@@ -49,7 +49,7 @@ class SettingsFrame(wx.Frame):
 
         self.settings = self._settings()
 
-        self.frame_modal = wx.Dialog(parent, title=title, size=(600, 685))
+        self.frame_modal = wx.Dialog(parent, title=title, size=(600, 700))
 
         self._generate_elements(self.frame_modal)
         self.frame_modal.ShowWindowModal()
@@ -719,13 +719,30 @@ class SettingsFrame(wx.Frame):
                         "安装旧版USB环境扩展"
                     ],
                 },
+                "允许安装旧版启动台": {
+                    "type": "checkbox",
+                    "value": self.constants.allow_launchpad_patch,
+                    "variable": "allow_launchpad_patch",
+                    "description": [
+                        "在macOS Tahoe Beta 4及更高版本恢复启动台",
+                    ],
+                },
+                "使用的启动台版本": {
+                    "type": "choice",
+                    "choices": ["26.0 Beta 4","26.0 Beta 2"],
+                    "value": self.constants.launchpad_verison,
+                    "variable": "launchpad_verison",
+                    "description": [
+                        "设置要移植的启动台版本",
+                    ],
+                },
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
                 "Non-Metal配置": {
                     "type": "title",
                 },
-                "Log out required to apply changes to SkyLight": {
+                "需要重新登录来应用SkyLight插件": {
                     "type": "sub_title",
                 },
                 "暗黑模式菜单": {
@@ -733,19 +750,18 @@ class SettingsFrame(wx.Frame):
                     "value": self._get_system_settings("Moraea_DarkMenuBar"),
                     "variable": "Moraea_DarkMenuBar",
                     "description": [
-                        "如果启用了 Beta 菜单栏，"
-                        "菜单栏颜色将根据需要动态"
-                        "变化。"
+                        "如果启用了 Beta 菜单栏，",
+                        "菜单栏颜色将根据需要动态变化。"
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
                 },
-                "Beta Blur": {
+                "测试版毛玻璃": {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea_BlurBeta"),
                     "variable": "Moraea_BlurBeta",
                     "description": [
-                        "Control window blur behaviour.",
+                        "控制毛玻璃行为。",
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
@@ -764,15 +780,13 @@ class SettingsFrame(wx.Frame):
                 "wrap_around 2": {
                     "type": "wrap_around",
                 },
-                "Beta Menu Bar": {
+                "测试版菜单栏": {
                     "type": "checkbox",
                     "value": self._get_system_settings("Amy.MenuBar2Beta"),
                     "variable": "Amy.MenuBar2Beta",
                     "description": [
-                        "支持动态颜色变化。"
-                        "注意：此设置仍在试验阶段。"
-                        "如果遇到问题，请"
-                        "禁用此设置。"
+                        "支持动态颜色变化。注意：此设置仍在试验阶段。",
+                        "如果遇到问题，请禁用此设置。"
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
@@ -802,7 +816,7 @@ class SettingsFrame(wx.Frame):
                 "通用": {
                     "type": "title",
                 },
-                "Allow native models": {
+                "允许原生机型": {
                     "type": "checkbox",
                     "value": self.constants.allow_oc_everywhere,
                     "variable": "allow_oc_everywhere",
@@ -823,6 +837,15 @@ class SettingsFrame(wx.Frame):
                         # "Ignore app updates",
                     ],
                     "override_function": self._update_global_settings,
+                },
+                "使用SimpleHac API下载所需资源": {
+                    "type": "checkbox",
+                    "value": self.constants.use_github_proxy,
+                    "variable": "use_github_proxy",
+                    "description": [
+                        "通过SimpleHac API下载Github资源",
+                        "关闭后将直接请求Github",
+                    ],
                 },
                 "wrap_around 1": {
                     "type": "wrap_around",
@@ -1024,7 +1047,7 @@ class SettingsFrame(wx.Frame):
         # Textbox: Custom Serial Number
         custom_serial_number_textbox = wx.TextCtrl(panel, pos=(custom_serial_number_label.GetPosition()[0] - 27, custom_serial_number_label.GetPosition()[1] + 20), size=(200, 25))
         custom_serial_number_textbox.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-        custom_serial_number_textbox.SetToolTip("Enter a custom serial number here. This will be used for the SMBIOS and iMessage.\n\nNote: This will not be used if the \"Use Custom Serial Number\" checkbox is not checked.")
+        custom_serial_number_textbox.SetToolTip("在此处输入自定义序列号。这将用于 SMBIOS 和 iMessage。\n\n注意：如果未选中 \"使用自定义序列号\" 复选框，则不会使用该复选按钮。")
         custom_serial_number_textbox.Bind(wx.EVT_TEXT, self.on_custom_serial_number_textbox)
         custom_serial_number_textbox.SetValue(self.constants.custom_serial_number)
         self.custom_serial_number_textbox = custom_serial_number_textbox

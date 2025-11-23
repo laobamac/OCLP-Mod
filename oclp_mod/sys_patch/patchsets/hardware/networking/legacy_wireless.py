@@ -52,6 +52,9 @@ class LegacyWireless(BaseHardware):
         """
         Targeting Legacy Wireless
         """
+        if self._xnu_major == os_data.tahoe.value:
+            return False
+        
         if (
             isinstance(self._computer.wifi, device_probe.Broadcom)
             and self._computer.wifi.chipset in [device_probe.Broadcom.Chipsets.AirPortBrcm4331, device_probe.Broadcom.Chipsets.AirPortBrcm43224]

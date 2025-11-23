@@ -166,6 +166,8 @@ class BaseHardware(BasePatchset):
             return "12.5"
         if self._xnu_float < self.macOS_14_4:
             return "12.5-23"
+        if self._xnu_major == os_data.tahoe.value:
+            return "12.5-25"
         return "12.5-23.4"
 
 

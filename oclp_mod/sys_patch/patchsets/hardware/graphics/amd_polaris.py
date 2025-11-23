@@ -35,6 +35,9 @@ class AMDPolaris(BaseHardware):
         """
         Targeting AMD Polaris GPUs with CPUs lacking AVX2.0 or missing Framebuffer patches (ie. MacBookPro13,3 and MacBookPro14,3)
         """
+        if self._xnu_major == os_data.tahoe.value:
+            return False
+        
         return self._is_gpu_architecture_present(
             gpu_architectures=[
                 device_probe.AMD.Archs.Polaris

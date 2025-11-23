@@ -16,10 +16,13 @@ import atexit
 from typing import Union
 from pathlib import Path
 
+from ..constants import Constants
+
 from . import utilities
 
 SESSION = requests.Session()
 
+settings = Constants()
 
 class DownloadStatus(enum.Enum):
     """
@@ -41,7 +44,16 @@ class NetworkUtilities:
         self.url: str = url
 
         if self.url is None:
-            self.url = "https://oclpapi.simplehac.cn/"
+            if settings.use_github_proxy == True:
+                self.url = "https://next.oclpapi.simplehac.cn/"
+            else:
+                self.url = "https://dortania.github.io/"
+
+        # 配置SESSION，禁用SSL验证
+        SESSION.verify = False
+        # 忽略不安全的HTTPS请求警告
+        import urllib3
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
     def verify_network_connection(self) -> bool:
@@ -53,14 +65,18 @@ class NetworkUtilities:
         """
 
         try:
-            requests.head(self.url, timeout=5, allow_redirects=True)
+            # 禁用SSL验证
+            response = requests.head(self.url, timeout=5, allow_redirects=True, verify=False)
+            if response.status_code == 404:
+                return False
+            else:
+                return True
+        except requests.exceptions.SSLError:
+            # SSL错误也认为网络可用（因为只是证书问题，不是网络连接问题）
+            logging.warning(f"SSL证书验证失败，但网络连接正常: {self.url}")
             return True
-        except (
-            requests.exceptions.Timeout,
-            requests.exceptions.TooManyRedirects,
-            requests.exceptions.ConnectionError,
-            requests.exceptions.HTTPError
-        ):
+        except Exception as e:
+            logging.debug(f"网络检测异常: {self.url} -> 错误: {str(e)}")
             return False
 
     def validate_link(self) -> bool:
@@ -101,6 +117,9 @@ class NetworkUtilities:
         result: requests.Response = None
 
         try:
+            # 确保禁用SSL验证
+            kwargs['verify'] = False
+            kwargs['timeout'] = kwargs.get('timeout', 30)
             result = SESSION.get(url, **kwargs)
         except (
             requests.exceptions.Timeout,
@@ -111,6 +130,15 @@ class NetworkUtilities:
             logging.warn(f"Error calling requests.get: {error}")
             # Return empty response object
             return requests.Response()
+        except requests.exceptions.SSLError as ssl_error:
+            logging.warn(f"SSL错误，尝试不使用验证: {ssl_error}")
+            # 重试一次，不使用SSL验证
+            try:
+                kwargs['verify'] = False
+                result = SESSION.get(url, **kwargs)
+            except Exception as retry_error:
+                logging.error(f"重试下载失败: {retry_error}")
+                return requests.Response()
 
         return result
 
@@ -178,7 +206,7 @@ class DownloadObject:
         self.error:             bool = False
         self.should_stop:       bool = False
         self.download_complete: bool = False
-        self.has_network:       bool = NetworkUtilities(self.url).verify_network_connection()
+        self.has_network:       bool = True  # 假设有网络，实际在下载时验证
 
         self.active_thread: threading.Thread = None
 
@@ -187,8 +215,9 @@ class DownloadObject:
         self.checksum = None
         self._checksum_storage: hash = None
 
-        if self.has_network:
-            self._populate_file_size()
+        # 注释掉初始的文件大小获取，在下载时再获取
+        # if self.has_network:
+        #     self._populate_file_size()
 
 
     def __del__(self) -> None:
@@ -273,7 +302,7 @@ class DownloadObject:
         """
 
         try:
-            result = SESSION.head(self.url, allow_redirects=True, timeout=5)
+            result = SESSION.head(self.url, allow_redirects=True, timeout=5, verify=False)
             if 'Content-Length' in result.headers:
                 self.total_file_size = float(result.headers['Content-Length'])
                 if self.size != None:
@@ -347,13 +376,33 @@ class DownloadObject:
         utilities.disable_sleep_while_running()
 
         try:
-            if not self.has_network:
-                raise Exception("没有网络连接")
-
+            # 直接尝试下载，不进行前置网络检测
+            logging.info(f"开始下载: {self.url}")
+            
             if self._prepare_working_directory(self.filepath) is False:
                 raise Exception(self.error_msg)
 
-            response = NetworkUtilities().get(self.url, stream=True, timeout=10)
+            # 在下载前获取文件大小
+            self._populate_file_size()
+
+            # 使用相同的SESSION确保一致性
+            response = SESSION.get(self.url, stream=True, timeout=30, allow_redirects=True)
+            
+            # 详细记录响应信息
+            logging.info(f"下载响应状态码: {response.status_code}")
+            if response.history:
+                logging.info(f"经历了重定向: {[r.status_code for r in response.history]}")
+
+            # 检查响应状态 - 200表示成功
+            if response.status_code != 200:
+                raise Exception(f"服务器返回错误状态码: {response.status_code}")
+
+            # 如果_populate_file_size没有获取到大小，尝试从响应头获取
+            if self.total_file_size == 0.0 and 'Content-Length' in response.headers:
+                content_length = response.headers['Content-Length']
+                if content_length and content_length.isdigit():
+                    self.total_file_size = float(content_length)
+                    logging.info(f"从响应头获取到文件大小: {utilities.human_fmt(self.total_file_size)}")
 
             with open(self.filepath, 'wb') as file:
                 atexit.register(self.stop)
@@ -365,7 +414,7 @@ class DownloadObject:
                         self.downloaded_file_size += len(chunk)
                         if self.should_checksum:
                             self._update_checksum(chunk)
-                        if display_progress and i % 100:
+                        if display_progress and i % 100 == 0:
                             # 不要在这里使用日志记录，因为我们会向日志文件中大量写入
                             if self.total_file_size == 0.0:
                                 print(f"已下载 {utilities.human_fmt(self.downloaded_file_size)} 的 {self.filename}")
@@ -383,6 +432,8 @@ class DownloadObject:
             self.error_msg = str(e)
             self.status = DownloadStatus.ERROR
             logging.error(f"下载时出错 {self.url}: {self.error_msg}")
+            # 添加详细错误信息
+            logging.error(f"完整错误: {str(e)}")
 
         self.status = DownloadStatus.COMPLETE
         utilities.enable_sleep_after_running()

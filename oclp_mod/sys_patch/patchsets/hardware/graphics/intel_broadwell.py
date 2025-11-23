@@ -32,6 +32,9 @@ class IntelBroadwell(BaseHardware):
         """
         Targeting Intel Broadwell GPUs
         """
+        if self._xnu_major == os_data.tahoe.value:
+            return False
+        
         return self._is_gpu_architecture_present(
             gpu_architectures=[
                 device_probe.Intel.Archs.Broadwell
@@ -69,11 +72,12 @@ class IntelBroadwell(BaseHardware):
                     "/System/Library/Extensions": {
                         "AppleIntelBDWGraphics.kext":            self._resolve_monterey_framebuffers(),
                         "AppleIntelBDWGraphicsFramebuffer.kext": self._resolve_monterey_framebuffers(),
-                        "AppleIntelBDWGraphicsGLDriver.bundle":  "12.5",
-                        "AppleIntelBDWGraphicsMTLDriver.bundle": "12.5-22" if self._xnu_major < os_data.sequoia else "12.5-24",
-                        "AppleIntelBDWGraphicsVADriver.bundle":  "12.5",
-                        "AppleIntelBDWGraphicsVAME.bundle":      "12.5",
-                        "AppleIntelGraphicsShared.bundle":       "12.5",
+                        "AppleIntelBDWGraphicsGLDriver.bundle":  "12.5" if self._xnu_major < os_data.tahoe else "12.5-25",
+                        "AppleIntelBDWGraphicsMTLDriver.bundle": "12.5-22" if self._xnu_major < os_data.sequoia.value else (
+                                                         "12.5-24" if self._xnu_major == os_data.sequoia.value else "12.5-25"),
+                        "AppleIntelBDWGraphicsVADriver.bundle":  "12.5" if self._xnu_major < os_data.tahoe else "12.5-25",
+                        "AppleIntelBDWGraphicsVAME.bundle":      "12.5" if self._xnu_major < os_data.tahoe else "12.5-25",
+                        "AppleIntelGraphicsShared.bundle":       "12.5" if self._xnu_major < os_data.tahoe else "12.5-25",
                     },
                 },
             },

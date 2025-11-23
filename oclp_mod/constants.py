@@ -13,8 +13,8 @@ from .detections import device_probe
 class Constants:
     def __init__(self) -> None:
         # Patcher Versioning
-        self.patcher_version:                 str = "2.6.5"  # oclp-mod
-        self.patcher_support_pkg_version:     str = "1.9.7"  # PatcherSupportPkg
+        self.patcher_version:                 str = "2.6.7"  # oclp-mod
+        self.patcher_support_pkg_version:     str = "1.9.8"  # PatcherSupportPkg
         self.copyright_date:                  str = "Copyright © 2020-2025 Dortania and laobamac"
         self.patcher_name:                    str = "OCLP-Mod"
 
@@ -243,7 +243,10 @@ class Constants:
         self.apfs_trim_timeout:      bool = True  #  Set APFS Trim timeout
         self.custom_sip_value:        int = None  #  Set custom SIP value
         self.allow_usb_patch:        bool = False #  Allow USB Patch on Tahoe
-        self.allow_hda_patch:        bool = False #  Allow HDA Patch on Tahoe
+        self.allow_hda_patch:        bool = True #  Allow HDA Patch on Tahoe
+        self.use_github_proxy:       bool = True #  Use proxy to get resources on Github
+        self.allow_launchpad_patch:  bool = False # Allow LaunchPad Patch on Tahoe
+        self.launchpad_verison:      str  = "26.0 Beta 4"  # Set launchpad used
 
         ## Non-Metal OS support
         self.legacy_accel_support = [
@@ -808,6 +811,10 @@ class Constants:
     @property
     def icon_path_macos_sequoia(self):
         return self.icns_resource_path / Path("Sequoia.icns")
+    
+    @property
+    def icon_path_macos_tahoe(self):
+        return self.icns_resource_path / Path("Tahoe.icns")
 
     @property
     def gui_path(self):
@@ -843,6 +850,7 @@ class Constants:
             str(self.icon_path_macos_ventura),
             str(self.icon_path_macos_sonoma),
             str(self.icon_path_macos_sequoia),
+            str(self.icon_path_macos_tahoe),
         ]
 
     sbm_values = [

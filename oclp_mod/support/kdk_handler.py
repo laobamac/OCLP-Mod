@@ -24,10 +24,10 @@ from . import (
 
 KDK_INSTALL_PATH: str  = "/Library/Developer/KDKs"
 KDK_INFO_PLIST:   str  = "KDKInfo.plist"
-KDK_API_LINK:     str  = "https://oclpapi.simplehac.cn/KdkSupportPkg/manifest.json"
+KDK_API_LINK_PROXY:     str  = "https://next.oclpapi.simplehac.cn/KdkSupportPkg/manifest.json"
+KDK_API_LINK_ORIGIN:     str  = "https://dortania.github.io/KdkSupportPkg/manifest.json"
 
 KDK_ASSET_LIST:   list = None
-
 
 class KernelDebugKitObject:
     """
@@ -107,6 +107,11 @@ class KernelDebugKitObject:
         logging.info("从 KdkSupportPkg API 拉取 KDK 列表")
         if KDK_ASSET_LIST:
             return KDK_ASSET_LIST
+        
+        if self.constants.use_github_proxy == True:
+            KDK_API_LINK:  str = KDK_API_LINK_PROXY
+        else:
+            KDK_API_LINK:  str = KDK_API_LINK_ORIGIN
 
         try:
             results = network_handler.NetworkUtilities().get(
@@ -202,6 +207,8 @@ class KernelDebugKitObject:
 
         # 如果没有精确匹配，检查最接近的匹配
         if self.kdk_url == "":
+            # 收集所有可能的候选版本
+            candidate_kdks = []
             for kdk in remote_kdk_version:
                 kdk_version = cast(packaging.version.Version, packaging.version.parse(kdk["version"]))
                 if kdk_version > parsed_version:
@@ -210,14 +217,30 @@ class KernelDebugKitObject:
                     continue
                 if kdk_version.minor not in range(parsed_version.minor - 1, parsed_version.minor + 1):
                     continue
+                
+                candidate_kdks.append(kdk)
 
-                # KDK 列表已经按版本和日期排序，因此第一个匹配的是最接近的匹配
-                self.kdk_closest_match_url = kdk["url"]
-                self.kdk_closest_match_url_build = kdk["build"]
-                self.kdk_closest_match_url_version = kdk["version"]
-                self.kdk_closest_match_url_expected_size = kdk["fileSize"]
+            # 按构建号排序，选择最接近的上一个版本
+            if candidate_kdks:
+                # 按构建号排序（降序，最新的在前）
+                candidate_kdks.sort(key=lambda x: x["build"], reverse=True)
+                
+                # 选择构建号小于等于当前构建的最新版本
+                closest_kdk = None
+                for kdk in candidate_kdks:
+                    if kdk["build"] <= host_build:
+                        closest_kdk = kdk
+                        break
+                
+                # 如果没有找到小于等于的版本，选择最小的版本（最老的）
+                if closest_kdk is None:
+                    closest_kdk = candidate_kdks[-1]  # 排序后最后一个是最小的
+                
+                self.kdk_closest_match_url = closest_kdk["url"]
+                self.kdk_closest_match_url_build = closest_kdk["build"]
+                self.kdk_closest_match_url_version = closest_kdk["version"]
+                self.kdk_closest_match_url_expected_size = closest_kdk["fileSize"]
                 self.kdk_url_is_exactly_match = False
-                break
 
         if self.kdk_url == "":
             if self.kdk_closest_match_url == "":
@@ -275,14 +298,16 @@ class KernelDebugKitObject:
             logging.error(self.error_msg)
             return None
 
+        logging.info(f"返回 KDK 的 DownloadUrl: {self.kdk_url}")
         logging.info(f"返回 KDK 的 DownloadObject: {Path(self.kdk_url).name}")
+        logging.info(f"返回的KDK预期大小: {network_handler.DownloadObject.convert_size(self, str(self.kdk_url_expected_size))}")
         self.success = True
 
         kdk_download_path = self.constants.kdk_download_path if override_path == "" else Path(override_path)
         kdk_plist_path = Path(f"{kdk_download_path.parent}/{KDK_INFO_PLIST}") if override_path == "" else Path(f"{Path(override_path).parent}/{KDK_INFO_PLIST}")
 
         self._generate_kdk_info_plist(kdk_plist_path)
-        return network_handler.DownloadObject(self.kdk_url, kdk_download_path)
+        return network_handler.DownloadObject(self.kdk_url, kdk_download_path, network_handler.DownloadObject.convert_size(self, str(self.kdk_url_expected_size)))
 
 
     def _generate_kdk_info_plist(self, plist_path: str) -> None:
