@@ -199,12 +199,12 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self.Show()
 
         def _fetch_dmg():
-            apiurl = "https://oclpapi.simplehac.cn/DMG/api?token=oclpmod"
-            aesurl = "https://oclpapi.simplehac.cn/DMG/data/aeskey.txt"
+            dmgdataurl = "https://next.oclpapi.simplehac.cn/DMG/data/dmgs.json"
+            aesurl = "https://next.oclpapi.simplehac.cn/DMG/data/aeskey.txt"
 
             try:
                 # 发送 GET 请求
-                response = requests.get(apiurl)
+                response = requests.get(dmgdataurl)
                 aes = requests.get(aesurl)
 
                 # 检查响应状态码是否为 200
@@ -655,7 +655,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
             dir_dialog.Destroy()
             file_name = f"/Install+{title}+{version}+{build}+with+OC&FirPE+SimpleHac.dmg"
 
-            download_obj = network_handler.DownloadObject(download_url, save_path+file_name, size)
+            download_obj = network_handler.DownloadObject(download_url, save_path+file_name, network_handler.DownloadObject.convert_size(self, str(size)))
 
             gui_download.DownloadFrame(
                 self,

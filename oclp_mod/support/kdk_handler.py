@@ -24,7 +24,7 @@ from . import (
 
 KDK_INSTALL_PATH: str  = "/Library/Developer/KDKs"
 KDK_INFO_PLIST:   str  = "KDKInfo.plist"
-KDK_API_LINK_PROXY:     str  = "https://oclpapi.simplehac.cn/KdkSupportPkg/manifest.json"
+KDK_API_LINK_PROXY:     str  = "https://next.oclpapi.simplehac.cn/KdkSupportPkg/manifest.json"
 KDK_API_LINK_ORIGIN:     str  = "https://dortania.github.io/KdkSupportPkg/manifest.json"
 
 KDK_ASSET_LIST:   list = None
@@ -298,14 +298,16 @@ class KernelDebugKitObject:
             logging.error(self.error_msg)
             return None
 
+        logging.info(f"返回 KDK 的 DownloadUrl: {self.kdk_url}")
         logging.info(f"返回 KDK 的 DownloadObject: {Path(self.kdk_url).name}")
+        logging.info(f"返回的KDK预期大小: {network_handler.DownloadObject.convert_size(self, str(self.kdk_url_expected_size))}")
         self.success = True
 
         kdk_download_path = self.constants.kdk_download_path if override_path == "" else Path(override_path)
         kdk_plist_path = Path(f"{kdk_download_path.parent}/{KDK_INFO_PLIST}") if override_path == "" else Path(f"{Path(override_path).parent}/{KDK_INFO_PLIST}")
 
         self._generate_kdk_info_plist(kdk_plist_path)
-        return network_handler.DownloadObject(self.kdk_url, kdk_download_path)
+        return network_handler.DownloadObject(self.kdk_url, kdk_download_path, network_handler.DownloadObject.convert_size(self, str(self.kdk_url_expected_size)))
 
 
     def _generate_kdk_info_plist(self, plist_path: str) -> None:

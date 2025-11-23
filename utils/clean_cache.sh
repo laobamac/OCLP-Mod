@@ -20,4 +20,9 @@ find "$1" -type d -name "__pycache__" -exec rm -rf {} +
 echo "正在删除 $1 及其子目录中的所有 .DS_Store 文件..."
 find "$1" -type f -name ".DS_Store" -delete
 
+# 查找并删除所有Universal-Binaries_overlay和oclp-mod.plist
+echo "正在删除 $1/payloads下的Universal-Binaries_overlay和oclp-mod.plist"
+rm -rf $1/payloads/Universal-Binaries_overlay
+rm -rf $1/payloads/oclp-mod.plist
+
 echo "清理完成"

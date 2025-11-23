@@ -9,6 +9,7 @@ from ...base import PatchType
 from .....constants import Constants
 from ..... import constants
 from .....datasets.os_data import os_data
+from .....detections.amfi_detect import AmfiConfigDetectLevel
 
 
 class LegacyLaunchpad(BaseHardware):
@@ -51,6 +52,13 @@ class LegacyLaunchpad(BaseHardware):
         Apple no longer provides standalone kexts in the base OS
         """
         return False
+    
+    def required_amfi_level(self) -> AmfiConfigDetectLevel:
+        """
+        What level of AMFI configuration is required for this patch set
+        Currently defaulted to AMFI needing to be disabled
+        """
+        return AmfiConfigDetectLevel.NO_CHECK
 
 
     def patches(self) -> dict:

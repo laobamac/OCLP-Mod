@@ -17,7 +17,7 @@ from ..datasets import os_data
 
 
 METALLIB_INSTALL_PATH: str  = "/Library/Application Support/Dortania/MetallibSupportPkg"
-METALLIB_API_LINK_PROXY:     str  = "https://oclpapi.simplehac.cn/MetallibSupportPkg/manifest.json"
+METALLIB_API_LINK_PROXY:     str  = "https://next.oclpapi.simplehac.cn/MetallibSupportPkg/manifest.json"
 METALLIB_API_LINK_ORIGIN:     str  = "https://dortania.github.io/MetallibSupportPkg/manifest.json"
 
 METALLIB_ASSET_LIST:   list = None
@@ -253,7 +253,7 @@ class MetalLibraryObject:
         self.success = True
 
         metallib_download_path = self.constants.metallib_download_path if override_path == "" else Path(override_path)
-        return network_handler.DownloadObject(self.metallib_url, metallib_download_path)
+        return network_handler.DownloadObject(self.metallib_url, metallib_download_path, 76,000,000)
 
 
     def install_metallib(self, metallib: str = None) -> None:
