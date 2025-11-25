@@ -304,7 +304,7 @@ class macOSInstallerDownloadFrame(wx.Frame):
         self._display_available_dmgs()
 
     def generate_signed_url(self, download_url, aeskey):
-        API_URL = 'https://oclpapi.simplehac.cn/DMG/api/down.php'
+        API_URL = 'https://node.oclpapi.simplehac.cn/DMG/api/down.php'
 
         parsed_url = urllib.parse.urlparse(download_url)
         file_name = urllib.parse.unquote(parsed_url.path.split('/')[-1])
