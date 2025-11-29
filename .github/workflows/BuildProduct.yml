@@ -101,15 +101,6 @@ jobs:
           name: OCLP-Mod-Uninstaller.pkg
           path: ./dist/OCLP-Mod-Uninstaller.pkg
 
-      - name: Delete previous pre-release
-        if: github.event_name == 'push'
-        uses: dev-drprasad/delete-older-releases@v0.3.4
-        with:
-          keep_latest: 0
-          delete_prerelease_only: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Upload AutoPkg Package to Release
         if: github.event_name == 'release'
         uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
