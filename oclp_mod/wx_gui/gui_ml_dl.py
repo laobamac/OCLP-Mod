@@ -17,7 +17,7 @@ class DownloadProgressFrame(wx.Dialog):
     """下载进度对话框"""
     def __init__(self, parent, title, url, file_path, file_size=0):
         style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-        super(DownloadProgressFrame, self).__init__(parent, title=title, size=(520, 250), style=style)
+        super(DownloadProgressFrame, self).__init__(parent, title=title, size=(530, 265), style=style)
         
         self.parent = parent
         self.url = url
@@ -72,7 +72,7 @@ class DownloadProgressFrame(wx.Dialog):
         # 进度百分比和详细信息在同一行
         progress_info_sizer = wx.BoxSizer(wx.HORIZONTAL)
         
-        self.percent_label = wx.StaticText(panel, label="0%")
+        self.percent_label = wx.StaticText(panel, label="0%  ")
         percent_font = wx.Font(20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         self.percent_label.SetFont(percent_font)
         progress_info_sizer.Add(self.percent_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
@@ -87,9 +87,6 @@ class DownloadProgressFrame(wx.Dialog):
         self.progress_bar = wx.Gauge(panel, range=100, size=(460, 20))
         self.progress_bar.SetValue(0)
         progress_sizer.Add(self.progress_bar, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 10)
-        
-        # 添加一些底部间距，避免按钮被遮挡
-        progress_sizer.AddSpacer(10)
         
         main_sizer.Add(progress_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
         
@@ -217,7 +214,7 @@ class DownloadProgressFrame(wx.Dialog):
             # 更新进度条和百分比
             progress_value = progress_info['progress']
             self.progress_bar.SetValue(progress_value)
-            self.percent_label.SetLabel(f"{progress_value}%")
+            self.percent_label.SetLabel(f"{progress_value}%  ")
             
             # 格式化显示数据
             downloaded_str = self.format_file_size(progress_info['downloaded'])
