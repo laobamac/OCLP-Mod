@@ -346,7 +346,7 @@ class PatchSysVolume:
                 if '旧版启动台' in f.read():
                     if not os.path.exists("/Library/Preferences/FeatureFlags/Domain/"):
                         logging.info("- 创建 FeatureFlags 目录")
-                        subprocess_wrapper.run_as_root(["/bin/mkdir", "-p", "/Library/Preferences/FeatureFlags/Domain"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                        subprocess_wrapper.run_as_root_and_verify(["/bin/mkdir", "-p", "/Library/Preferences/FeatureFlags/Domain"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                     logging.info("- 启用旧版启动台")
                     subprocess_wrapper.run_as_root_and_verify(["/usr/bin/defaults", "write", "/Library/Preferences/FeatureFlags/Domain/SpotlightUI.plist", "SpotlightPlus", "-dict", "Enabled", "-bool", "false"])
 
