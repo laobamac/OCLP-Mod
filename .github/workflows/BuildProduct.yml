@@ -110,19 +110,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Pre-Release on Push
-        if: github.event_name == 'push'
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: push-${{ github.sha }}
-          name: Pre-release for ${{ github.sha }}
-          body: ${{ github.event.head_commit.message }}
-          prerelease: true
-          files: |
-            ./dist/AutoPkg-Assets.pkg
-            ./dist/OCLP-Mod.pkg
-            ./dist/OCLP-Mod-Uninstaller.pkg
-
       - name: Upload AutoPkg Package to Release
         if: github.event_name == 'release'
         uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d

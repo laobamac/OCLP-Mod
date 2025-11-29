@@ -44,12 +44,14 @@ class MetalLibraryObject:
         self.metallib_url:         str = ""
         self.metallib_url_build:   str = ""
         self.metallib_url_version: str = ""
+        self.metallib_file_size:   int = 0
 
         self.metallib_url_is_exactly_match: bool = False
 
         self.metallib_closest_match_url:         str = ""
         self.metallib_closest_match_url_build:   str = ""
         self.metallib_closest_match_url_version: str = ""
+        self.metallib_closest_match_file_size:   int = 0
 
         self.success: bool = False
 
@@ -93,6 +95,23 @@ class MetalLibraryObject:
         METALLIB_ASSET_LIST = results.json()
 
         return METALLIB_ASSET_LIST
+
+
+    def _get_file_size(self, url: str) -> int:
+        """
+        Get file size from URL with redirect support
+        """
+        try:
+            # 使用 HEAD 请求并允许重定向来获取文件大小
+            response = requests.head(url, verify=False, allow_redirects=True, timeout=10)
+            if response.status_code == 200:
+                content_length = response.headers.get('content-length')
+                if content_length:
+                    return int(content_length)
+        except Exception as e:
+            logging.warning(f"无法获取文件大小 {url}: {e}")
+        
+        return 0
 
 
     def _get_latest_metallib(self) -> None:
@@ -154,6 +173,8 @@ class MetalLibraryObject:
             self.metallib_url_build = metallib["build"]
             self.metallib_url_version = metallib["version"]
             self.metallib_url_is_exactly_match = True
+            # 获取文件大小
+            self.metallib_file_size = self._get_file_size(self.metallib_url)
             break
 
         # 如果没有精确匹配，检查最接近的匹配
@@ -172,6 +193,8 @@ class MetalLibraryObject:
                 self.metallib_closest_match_url_build = metallib["build"]
                 self.metallib_closest_match_url_version = metallib["version"]
                 self.metallib_url_is_exactly_match = False
+                # 获取文件大小
+                self.metallib_closest_match_file_size = self._get_file_size(self.metallib_closest_match_url)
                 break
 
         if self.metallib_url == "":
@@ -185,6 +208,7 @@ class MetalLibraryObject:
             self.metallib_url = self.metallib_closest_match_url
             self.metallib_url_build = self.metallib_closest_match_url_build
             self.metallib_url_version = self.metallib_closest_match_url_version
+            self.metallib_file_size = self.metallib_closest_match_file_size
         else:
             logging.info(f"找到 {self.host_build} ({self.host_version}) 的直接匹配")
 
@@ -200,9 +224,27 @@ class MetalLibraryObject:
         logging.info("推荐的 metallib 如下:")
         logging.info(f"- metallib 构建: {self.metallib_url_build}")
         logging.info(f"- metallib 版本: {self.metallib_url_version}")
+        logging.info(f"- metallib 大小: {self._format_file_size(self.metallib_file_size)}")
         logging.info(f"- metallib URL: {self.metallib_url}")
 
         self.success = True
+
+
+    def _format_file_size(self, size_bytes: int) -> str:
+        """
+        Format file size for display
+        """
+        if size_bytes == 0:
+            return "未知"
+        
+        size_names = ["B", "KB", "MB", "GB"]
+        i = 0
+        size = float(size_bytes)
+        while size >= 1024 and i < len(size_names) - 1:
+            size /= 1024.0
+            i += 1
+        
+        return f"{size:.2f} {size_names[i]}"
 
 
     def _local_metallib_installed(self, match: str = None, check_version: bool = False) -> str:
@@ -253,7 +295,7 @@ class MetalLibraryObject:
         self.success = True
 
         metallib_download_path = self.constants.metallib_download_path if override_path == "" else Path(override_path)
-        return network_handler.DownloadObject(self.metallib_url, metallib_download_path, 76,000,000)
+        return network_handler.DownloadObject(self.metallib_url, metallib_download_path, self.metallib_file_size)
 
 
     def install_metallib(self, metallib: str = None) -> None:

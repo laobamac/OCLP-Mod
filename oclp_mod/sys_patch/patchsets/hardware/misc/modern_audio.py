@@ -61,7 +61,6 @@ class ModernAudio(BaseHardware):
     def required_amfi_level(self) -> AmfiConfigDetectLevel:
         """
         What level of AMFI configuration is required for this patch set
-        Currently defaulted to AMFI needing to be disabled
         """
         return AmfiConfigDetectLevel.NO_CHECK
 
