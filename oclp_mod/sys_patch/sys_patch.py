@@ -38,6 +38,7 @@ This is because Apple removed on-disk binaries (ref: https://github.com/laobamac
 import logging
 import plistlib
 import subprocess
+import os
 
 from pathlib   import Path
 from functools import cache
@@ -54,6 +55,7 @@ from .utilities import (
 )
 
 from .. import constants
+from ..datasets.os_data import os_data
 
 from ..volume   import generate_copy_arguments
 
@@ -198,6 +200,12 @@ class PatchSysVolume:
         ).clean_auxiliary_kc()
 
         self.constants.root_patcher_succeeded = True
+
+        if (self.constants.detected_os >= os_data.os_data.tahoe):
+            if os.path.exists("/Library/Preferences/FeatureFlags/Domain/"):
+                logging.info("- 重置为新版聚焦")
+                subprocess_wrapper.run_as_root_and_verify(["/usr/bin/defaults", "write", "/Library/Preferences/FeatureFlags/Domain/SpotlightUI.plist", "SpotlightPlus", "-dict", "Enabled", "-bool", "true"])
+
         logging.info("- 卸载补丁完成")
         logging.info("\n请重启系统使补丁生效")
 
@@ -332,6 +340,15 @@ class PatchSysVolume:
             if Path(destination_path_file).exists():
                 subprocess_wrapper.run_as_root_and_verify(["/bin/rm", destination_path_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             subprocess_wrapper.run_as_root_and_verify(generate_copy_arguments(f"{self.constants.payload_path}/{file_name}", destination_path), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+        if self.constants.detected_os >= os_data.os_data.tahoe and os.path.exists(destination_path_file):
+            with open(destination_path_file, 'r', encoding='utf-8') as f:
+                if '旧版启动台' in f.read():
+                    if not os.path.exists("/Library/Preferences/FeatureFlags/Domain/"):
+                        logging.info("- 创建 FeatureFlags 目录")
+                        subprocess_wrapper.run_as_root(["/bin/mkdir", "-p", "/Library/Preferences/FeatureFlags/Domain"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    logging.info("- 启用旧版启动台")
+                    subprocess_wrapper.run_as_root_and_verify(["/usr/bin/defaults", "write", "/Library/Preferences/FeatureFlags/Domain/SpotlightUI.plist", "SpotlightPlus", "-dict", "Enabled", "-bool", "false"])
 
 
     def _patch_root_vol(self):
