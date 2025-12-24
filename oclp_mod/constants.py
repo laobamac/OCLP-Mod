@@ -13,8 +13,8 @@ from .detections import device_probe
 class Constants:
     def __init__(self) -> None:
         # Patcher Versioning
-        self.patcher_version:                 str = "2.6.9"  # oclp-mod
-        self.patcher_support_pkg_version:     str = "1.9.8"  # PatcherSupportPkg
+        self.patcher_version:                 str = "3.1.0"  # oclp-mod
+        self.patcher_support_pkg_version:     str = "1.9.9"  # PatcherSupportPkg
         self.copyright_date:                  str = "Copyright © 2020-2025 Dortania and laobamac"
         self.patcher_name:                    str = "OCLP-Mod"
 

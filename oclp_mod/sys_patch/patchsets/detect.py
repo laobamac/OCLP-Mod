@@ -92,6 +92,7 @@ class HardwarePatchsetValidation(StrEnum):
     NVDA_DRV_MISSING              = "验证: nvda_drv(_vrl)启动参数未添加"
     PATCHING_NOT_POSSIBLE         = "验证: 无法应用补丁"
     UNPATCHING_NOT_POSSIBLE       = "验证: 无法卸载补丁"
+    REPATCHING_NOT_SUPPORTED      = "验证: 根目录不纯净，请先卸载一次补丁再继续"
 
 
 class HardwarePatchsetDetection:
@@ -190,6 +191,40 @@ class HardwarePatchsetDetection:
 
         return "FileVault is Off" not in subprocess.run(["/usr/bin/fdesetup", "status"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT).stdout.decode()
 
+    def _validation_check_repatching_is_possible(self) -> bool:
+        """
+        Determine if repatching is not allowed
+        """
+        oclp_patch_path = "/System/Library/CoreServices/OpenCore-Legacy-Patcher.plist"
+        if not Path(oclp_patch_path).exists():
+            return self._is_root_volume_dirty()
+
+        oclp_plist = plistlib.load(open(oclp_patch_path, "rb"))
+
+        if self._constants.computer.oclp_sys_url != self._constants.commit_info[2]:
+            logging.error("Installed patches are from different commit, unpatching is required")
+            return True
+
+        wireless_keys = {"Legacy Wireless", "Modern Wireless Common"}
+
+        # Keep in sync with generate_patchset_plist
+        metadata_keys = {
+            "OpenCore Legacy Patcher",
+            "PatcherSupportPkg",
+            "Time Patched",
+            "Commit URL",
+            "Kernel Debug Kit Used",
+            "Metal Library Used",
+            "OS Version",
+            "Custom Signature",
+        }
+
+        existing_patches = set(oclp_plist) - wireless_keys - metadata_keys
+        if existing_patches:
+            logging.error(f"Patch(es) already installed: {', '.join(existing_patches)}, unpatching is required")
+            return True
+
+        return False
 
     def _validation_check_system_integrity_protection_enabled(self, configs: list[str]) -> bool:
         """
@@ -313,7 +348,27 @@ class HardwarePatchsetDetection:
         """
         return metallib_handler.MetalLibraryObject(self._constants, self._os_build, self._os_version).metallib_already_installed
 
+    def _is_root_volume_dirty(self) -> bool:
+        """
+        Determine if system volume is not sealed
+        """
+        # macOS 11.0 introduced sealed system volumes
+        if self._xnu_major < os_data.big_sur.value:
+            return False
+        
+        try:
+            content = plistlib.loads(subprocess.run(["/usr/sbin/diskutil", "info", "-plist", "/"], capture_output=True).stdout)
+        except plistlib.InvalidFileException:
+            raise RuntimeError("Failed to parse diskutil output.")
 
+        seal = content["Sealed"]
+
+        if "Broken" in seal:
+            logging.error(f"System volume is tainted, unpatching is required")
+            return True
+
+        return False
+    
     def _can_patch(self, requirements: dict, ignore_keys: list[str] = []) -> bool:
         """
         Check if patching is possible
@@ -506,6 +561,7 @@ class HardwarePatchsetDetection:
             HardwarePatchsetValidation.SIP_ENABLED:                 self._validation_check_system_integrity_protection_enabled(required_sip_configs),
             HardwarePatchsetValidation.SECURE_BOOT_MODEL_ENABLED:   self._validation_check_secure_boot_model_enabled(),
             HardwarePatchsetValidation.AMFI_ENABLED:                self._validation_check_amfi_enabled(highest_amfi_level),
+            HardwarePatchsetValidation.REPATCHING_NOT_SUPPORTED:    self._validation_check_repatching_is_possible(),
             HardwarePatchsetValidation.WHATEVERGREEN_MISSING:       self._validation_check_whatevergreen_missing() if has_nvidia_web_drivers is True else False,
             HardwarePatchsetValidation.FORCE_OPENGL_MISSING:        self._validation_check_force_opengl_missing()  if has_nvidia_web_drivers is True else False,
             HardwarePatchsetValidation.FORCE_COMPAT_MISSING:        self._validation_check_force_compat_missing()  if has_nvidia_web_drivers is True else False,
