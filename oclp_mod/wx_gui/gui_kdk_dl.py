@@ -250,12 +250,13 @@ class DownloadProgressFrame(wx.Dialog):
 class LoadingFrame(wx.Dialog):
     """加载中对话框"""
     
-    def __init__(self, parent, title: str):
+    def __init__(self, parent, title: str, message: str = "请稍候，正在从服务器加载数据..."):
         style = wx.STAY_ON_TOP
         super().__init__(parent, title=title, size=(350, 120), style=style)
         
         self.timer: Optional[wx.Timer] = None
         self.progress_value: int = 0
+        self.message = message
         
         self._init_ui()
         self.Centre()
@@ -276,7 +277,7 @@ class LoadingFrame(wx.Dialog):
         title_label.SetFont(title_font)
         text_sizer.Add(title_label, 0, wx.ALL, 5)
         
-        desc_label = wx.StaticText(panel, label="请稍候，正在从服务器加载数据...")
+        desc_label = wx.StaticText(panel, label=self.message)
         text_sizer.Add(desc_label, 0, wx.ALL, 2)
         
         loading_sizer.Add(text_sizer, 1, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 10)
@@ -298,6 +299,17 @@ class LoadingFrame(wx.Dialog):
         """更新加载动画"""
         self.progress_value = (self.progress_value + 5) % 100
         self.progress_bar.SetValue(self.progress_value)
+        
+    def update_message(self, message: str) -> None:
+        """更新加载消息"""
+        # 查找描述标签并更新文本
+        for child in self.GetChildren():
+            if isinstance(child, wx.Panel):
+                for panel_child in child.GetChildren():
+                    if isinstance(panel_child, wx.StaticText) and panel_child.GetLabel().startswith("请稍候"):
+                        panel_child.SetLabel(message)
+                        panel_child.Refresh()
+                        break
 
     def close(self) -> None:
         """关闭对话框"""
@@ -384,6 +396,14 @@ class DownloadKDKFrame(wx.Frame):
         self.refresh_button: Optional[wx.Button] = None
         self.copy_button: Optional[wx.Button] = None
         self.download_button: Optional[wx.Button] = None
+        self.api_source_button: Optional[wx.Button] = None
+        
+        # API源状态
+        self.current_api_index = 0 if self.constants.use_github_proxy else 1  # 0: proxy, 1: origin
+        self.api_sources = [
+            ("OMAPIv1 - 大陆", KDK_API_LINK_PROXY),
+            ("Github - 海外", KDK_API_LINK_ORIGIN)
+        ]
         
         self._init_ui()
         self.Centre()
@@ -409,6 +429,15 @@ class DownloadKDKFrame(wx.Frame):
         desc_text = wx.StaticText(panel, label="选择要下载的 Kernel Debug Kit (KDK) 版本:")
         main_sizer.Add(desc_text, 0, wx.ALL, 10)
         
+        # API源显示
+        source_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        source_label = wx.StaticText(panel, label="当前数据源:")
+        source_sizer.Add(source_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        
+        self.source_value = wx.StaticText(panel, label="代理源")
+        source_sizer.Add(self.source_value, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 15)
+        main_sizer.Add(source_sizer, 0, wx.LEFT | wx.BOTTOM, 10)
+        
         # 列表控件
         self.list_ctrl = DownloadListCtrl(panel)
         main_sizer.Add(self.list_ctrl, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
@@ -428,6 +457,11 @@ class DownloadKDKFrame(wx.Frame):
         title_font = wx.Font(16, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         title_text.SetFont(title_font)
         header_sizer.Add(title_text, 1, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 10)
+        
+        # API源切换按钮
+        self.api_source_button = wx.Button(parent, label="切换数据源")
+        self.api_source_button.Bind(wx.EVT_BUTTON, self._on_switch_api_source)
+        header_sizer.Add(self.api_source_button, 0, wx.ALL | wx.ALIGN_CENTER, 5)
         
         # 刷新按钮
         self.refresh_button = wx.Button(parent, label="刷新列表")
@@ -453,32 +487,110 @@ class DownloadKDKFrame(wx.Frame):
 
     def _start_loading_data(self) -> None:
         """开始加载数据"""
-        self.loading_dialog = LoadingFrame(self, "加载中")
+        source_name = self.api_sources[self.current_api_index][0]
+        message = f"请稍候，正在从{source_name}加载数据..."
+        self.loading_dialog = LoadingFrame(self, "加载中", message)
         self.loading_dialog.Show()
-        threading.Thread(target=self._fetch_kdk_data, daemon=True).start()
+        
+        # 更新界面显示当前数据源
+        self.source_value.SetLabel(source_name)
+        
+        threading.Thread(target=self._fetch_kdk_data_with_fallback, daemon=True).start()
 
-    def _fetch_kdk_data(self) -> None:
-        """获取 KDK 数据"""
+    def _fetch_kdk_data_with_fallback(self) -> None:
+        """获取KDK数据，支持失败后自动切换API源"""
         time.sleep(1)  # 让加载界面显示一会儿
         
-        kdk_api_link = KDK_API_LINK_PROXY if self.constants.use_github_proxy else KDK_API_LINK_ORIGIN
+        first_try_index = self.current_api_index
+        second_try_index = 1 if self.current_api_index == 0 else 0
+        
+        # 尝试第一个API源
+        first_success = self._try_fetch_api(first_try_index)
+        
+        if not first_success:
+            # 第一个API失败，尝试第二个API源
+            wx.CallAfter(self._update_loading_message, "第一个API源失败，尝试切换数据源...")
+            time.sleep(1)
             
-        try:
-            network_utils = network_handler.NetworkUtilities()
-            response = network_utils.get(kdk_api_link)
-            response.raise_for_status()
-            kdk_data = response.json()
-            wx.CallAfter(self.list_ctrl.SetData, kdk_data)
-        except Exception as e:
-            wx.CallAfter(wx.MessageBox, f"获取 KDK 信息失败: {e}", "错误", wx.OK | wx.ICON_ERROR)
+            second_success = self._try_fetch_api(second_try_index)
+            
+            if not second_success:
+                # 两个API源都失败
+                wx.CallAfter(self._show_api_error_dialog)
+            else:
+                # 第二个API成功，更新当前源
+                self.current_api_index = second_try_index
+                wx.CallAfter(self.source_value.SetLabel, self.api_sources[second_try_index][0])
+        else:
+            # 第一个API成功
+            wx.CallAfter(self.source_value.SetLabel, self.api_sources[first_try_index][0])
         
         wx.CallAfter(self._close_loading_dialog)
+
+    def _try_fetch_api(self, api_index: int) -> bool:
+        """尝试获取指定API的数据，返回是否成功"""
+        api_name, api_url = self.api_sources[api_index]
+        
+        try:
+            wx.CallAfter(self._update_loading_message, f"正在连接{api_name}...")
+            network_utils = network_handler.NetworkUtilities()
+            response = network_utils.get(api_url)
+            response.raise_for_status()
+            kdk_data = response.json()
+            
+            # 验证数据格式
+            if isinstance(kdk_data, list) and len(kdk_data) > 0 and 'build' in kdk_data[0]:
+                wx.CallAfter(self.list_ctrl.SetData, kdk_data)
+                return True
+            else:
+                wx.CallAfter(self._update_loading_message, f"{api_name}返回数据格式错误...")
+                return False
+                
+        except Exception as e:
+            error_msg = f"{api_name}请求失败: {e}"
+            wx.CallAfter(self._update_loading_message, error_msg)
+            return False
+
+    def _update_loading_message(self, message: str) -> None:
+        """更新加载对话框的消息"""
+        if self.loading_dialog:
+            self.loading_dialog.update_message(message)
+
+    def _show_api_error_dialog(self) -> None:
+        """显示API错误对话框"""
+        dlg = wx.MessageDialog(
+            self,
+            "无法从任何数据源获取KDK信息。\n\n可能的原因：\n1. 网络连接问题\n2. 代理服务器故障\n3. 数据源服务不可用\n\n请检查网络连接后重试，或手动切换数据源。",
+            "数据获取失败",
+            wx.OK | wx.ICON_ERROR
+        )
+        dlg.ShowModal()
+        dlg.Destroy()
 
     def _close_loading_dialog(self) -> None:
         """关闭加载对话框"""
         if self.loading_dialog:
             self.loading_dialog.close()
             self.loading_dialog = None
+
+    def _on_switch_api_source(self, event) -> None:
+        """切换API源"""
+        # 创建选择对话框
+        dlg = wx.SingleChoiceDialog(
+            self,
+            "请选择数据源：\n\n• 代理源：国内访问较快，但可能更新不及时\n• 原始源：GitHub原始数据，更新及时",
+            "切换数据源",
+            ["代理源", "原始源"]
+        )
+        dlg.SetSelection(self.current_api_index)
+        
+        if dlg.ShowModal() == wx.ID_OK:
+            new_index = dlg.GetSelection()
+            if new_index != self.current_api_index:
+                self.current_api_index = new_index
+                self._start_loading_data()
+        
+        dlg.Destroy()
 
     def _on_refresh(self, event) -> None:
         """刷新列表"""
