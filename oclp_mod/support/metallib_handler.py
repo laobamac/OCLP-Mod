@@ -71,30 +71,43 @@ class MetalLibraryObject:
         if METALLIB_ASSET_LIST:
             return METALLIB_ASSET_LIST
         
-        if self.constants.use_github_proxy == True:
-            METALLIB_API_LINK:  str = METALLIB_API_LINK_PROXY
+        # 根据配置决定 API 优先级
+        if self.constants.use_github_proxy:
+            # 使用代理优先
+            api_links = [
+                ("OMAPIv1 - 大陆", METALLIB_API_LINK_PROXY),
+                ("Github - 海外", METALLIB_API_LINK_ORIGIN),
+            ]
         else:
-            METALLIB_API_LINK:  str = METALLIB_API_LINK_ORIGIN
+            # 使用原始优先
+            api_links = [
+                ("Github - 海外", METALLIB_API_LINK_ORIGIN),
+                ("OMAPIv1 - 大陆", METALLIB_API_LINK_PROXY),
+            ]
+        
+        for api_name, api_link in api_links:
+            try:
+                logging.info(f"尝试连接 {api_name}: {api_link}")
+                results = network_handler.NetworkUtilities().get(
+                    api_link,
+                    headers={
+                        "User-Agent": f"OCLP/{self.constants.patcher_version}"
+                    },
+                    timeout=5
+                )
+                
+                if results.status_code == 200:
+                    logging.info(f"{api_name} 连接成功")
+                    METALLIB_ASSET_LIST = results.json()
+                    return METALLIB_ASSET_LIST
+                else:
+                    logging.warning(f"{api_name} 返回状态码 {results.status_code}")
+                    
+            except (requests.exceptions.Timeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError) as e:
+                logging.warning(f"{api_name} 连接失败: {e}")
 
-        try:
-            results = network_handler.NetworkUtilities().get(
-                METALLIB_API_LINK,
-                headers={
-                    "User-Agent": f"OCLP/{self.constants.patcher_version}"
-                },
-                timeout=5
-            )
-        except (requests.exceptions.Timeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError):
-            logging.info("无法联系 MetallibSupportPkg API")
-            return None
-
-        if results.status_code != 200:
-            logging.info("无法获取 Metallib 列表")
-            return None
-
-        METALLIB_ASSET_LIST = results.json()
-
-        return METALLIB_ASSET_LIST
+        logging.info("所有 API 连接均失败")
+        return None
 
 
     def _get_file_size(self, url: str) -> int:
