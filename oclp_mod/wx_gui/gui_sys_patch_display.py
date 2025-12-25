@@ -52,7 +52,7 @@ class SysPatchDisplayFrame(wx.Frame):
 
     def _generate_elements_display_patches(self, frame: wx.Frame = None) -> None:
         """
-        Generate UI elements for root patch frame
+        Generate UI elements for root patching frame
 
         Format:
             - Title label:        Post-Install Menu
@@ -107,82 +107,12 @@ class SysPatchDisplayFrame(wx.Frame):
         # can_unpatch: bool = not patches[HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE]
         can_unpatch: bool = not patches.get(HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE, False)
 
-        # 检查网络连接状态和无线网卡补丁
-        network_unavailable = patches.get(HardwarePatchsetValidation.MISSING_NETWORK_CONNECTION, False)
-        has_wireless_patches = any("无线网卡" in patch for patch in patches.keys())
-        
-        # 保存原始补丁列表用于后续判断
-        original_patches = patches.copy()
-        
-        # 如果网络未连接且存在无线网卡补丁，询问用户是否只安装无线网卡补丁
-        user_choice_wireless_only = False
-        if network_unavailable and has_wireless_patches:
-            # 询问用户是否只安装无线网卡补丁
-            dialog = wx.MessageDialog(
-                frame,
-                "网络未连接。检测到无线网卡相关补丁可用。\n\n"
-                "由于网络未连接，其他补丁可能需要网络下载组件，可能无法正常安装。\n"
-                "是否只安装无线网卡相关补丁？\n\n"
-                "选择『是』: 只显示无线网卡补丁\n"
-                "选择『否』: 显示所有可用补丁（安装其他补丁可能需要网络）",
-                "网络未连接 - 安装选项",
-                wx.YES_NO | wx.YES_DEFAULT | wx.ICON_QUESTION
-            )
-            
-            result = dialog.ShowModal()
-            dialog.Destroy()
-            
-            if result == wx.ID_YES:
-                # 用户选择只安装无线网卡补丁
-                user_choice_wireless_only = True
-                
-                # 过滤补丁，只保留无线网卡相关的
-                filtered_patches = {}
-                for patch_key, patch_value in patches.items():
-                    if "无线网卡" in patch_key:
-                        filtered_patches[patch_key] = patch_value
-                    elif patch_key.startswith("设置") or patch_key.startswith("验证"):
-                        # 保留设置和验证信息
-                        filtered_patches[patch_key] = patch_value
-                
-                # 更新补丁列表
-                patches = filtered_patches
-                
-                # 弹窗提示用户
-                wx.MessageBox(
-                    "已选择只安装无线网卡相关补丁。\n\n"
-                    "安装完成后，连接网络再回来安装其他补丁。",
-                    "无线网卡补丁选择",
-                    wx.OK | wx.ICON_INFORMATION,
-                    frame
-                )
-                
-                logging.info("用户选择只安装无线网卡相关补丁")
-            else:
-                # 用户选择显示所有补丁，显示警告
-                wx.MessageBox(
-                    "已选择显示所有可用补丁。\n\n"
-                    "请注意：由于网络未连接，某些补丁可能需要网络下载组件，可能无法正常安装。\n"
-                    "建议先安装无线网卡补丁，连接网络后再安装其他补丁。",
-                    "网络未连接警告",
-                    wx.OK | wx.ICON_WARNING,
-                    frame
-                )
-                
-                logging.info("用户选择显示所有可用补丁（网络未连接）")
-
         if not any(not patch.startswith("设置") and not patch.startswith("验证") and patches[patch] is True for patch in patches):
             logging.info("No applicable patches available")
             patches = {}
 
         # Check if OCLP has already applied the same patches
-        # 对于过滤后的补丁列表，需要基于原始补丁列表来判断是否有新补丁
-        if network_unavailable and has_wireless_patches and user_choice_wireless_only:
-            # 如果用户选择了只安装无线网卡补丁，使用过滤后的补丁列表来判断新补丁
-            no_new_patches = not self._check_if_new_patches_needed(patches) if patches else False
-        else:
-            # 其他情况使用原始补丁列表
-            no_new_patches = not self._check_if_new_patches_needed(original_patches) if original_patches else False
+        no_new_patches = not self._check_if_new_patches_needed(patches) if patches else False
 
         if not patches:
             # Prompt user with no patches found
@@ -204,33 +134,26 @@ class SysPatchDisplayFrame(wx.Frame):
                     if (not patch.startswith("设置") and not patch.startswith("验证") and patches[patch] is True):
                         if len(patch) > len(longest_patch):
                             longest_patch = patch
-                if longest_patch:
-                    anchor = wx.StaticText(frame, label=longest_patch, pos=(-1, available_label.GetPosition()[1] + 20))
-                    anchor.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-                    anchor.Centre(wx.HORIZONTAL)
-                    anchor.Hide()
+                anchor = wx.StaticText(frame, label=longest_patch, pos=(-1, available_label.GetPosition()[1] + 20))
+                anchor.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
+                anchor.Centre(wx.HORIZONTAL)
+                anchor.Hide()
 
                 logging.info("Available patches:")
                 for patch in patches:
                     if (not patch.startswith("设置") and not patch.startswith("验证") and patches[patch] is True):
                         i = i + 20
                         logging.info(f"- {patch}")
-                        if longest_patch:
-                            patch_label = wx.StaticText(frame, label=f"- {patch}", pos=(anchor.GetPosition()[0], available_label.GetPosition()[1] + i))
-                        else:
-                            patch_label = wx.StaticText(frame, label=f"- {patch}", pos=(-1, available_label.GetPosition()[1] + i))
-                            patch_label.Centre(wx.HORIZONTAL)
+                        patch_label = wx.StaticText(frame, label=f"- {patch}", pos=(anchor.GetPosition()[0], available_label.GetPosition()[1] + i))
                         patch_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
 
-                if i == 20 and longest_patch:
+                if i == 20:
                     patch_label.SetLabel(patch_label.GetLabel().replace("-", ""))
                     patch_label.Centre(wx.HORIZONTAL)
 
             if patches[HardwarePatchsetValidation.PATCHING_NOT_POSSIBLE] is True:
                 # Cannot patch due to the following reasons:
-                # 使用补丁列表的最后一个标签作为基准
-                last_patch_y = patch_label.GetPosition()[1]
-                patch_label = wx.StaticText(frame, label="无法安装补丁，原因:", pos=(-1, last_patch_y + 25))
+                patch_label = wx.StaticText(frame, label="无法安装补丁，原因:", pos=(-1, patch_label.GetPosition()[1] + 25))
                 patch_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
                 patch_label.Centre(wx.HORIZONTAL)
 
@@ -245,12 +168,10 @@ class SysPatchDisplayFrame(wx.Frame):
 
                     if len(patch) > len(longest_patch):
                         longest_patch = patch
-                
-                if longest_patch:
-                    anchor = wx.StaticText(frame, label=longest_patch.split('验证: ')[1], pos=(-1, patch_label.GetPosition()[1] + 20))
-                    anchor.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-                    anchor.Centre(wx.HORIZONTAL)
-                    anchor.Hide()
+                anchor = wx.StaticText(frame, label=longest_patch.split('验证: ')[1], pos=(-1, patch_label.GetPosition()[1] + 20))
+                anchor.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
+                anchor.Centre(wx.HORIZONTAL)
+                anchor.Hide()
 
                 i = 0
                 for patch in patches:
@@ -261,18 +182,11 @@ class SysPatchDisplayFrame(wx.Frame):
                     if patch in [HardwarePatchsetValidation.PATCHING_NOT_POSSIBLE, HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE]:
                         continue
 
-                    if longest_patch:
-                        patch_label = wx.StaticText(frame, label=f"- {patch.split('验证: ')[1]}", pos=(anchor.GetPosition()[0], anchor.GetPosition()[1] + i))
-                    else:
-                        patch_label = wx.StaticText(frame, label=f"- {patch.split('验证: ')[1]}", pos=(-1, patch_label.GetPosition()[1] + 20))
-                        patch_label.Centre(wx.HORIZONTAL)
+                    patch_label = wx.StaticText(frame, label=f"- {patch.split('验证: ')[1]}", pos=(anchor.GetPosition()[0], anchor.GetPosition()[1] + i))
                     patch_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
                     i = i + 20
 
-                if i == 20 and longest_patch:
-                    patch_label.SetLabel(patch_label.GetLabel().replace("-", ""))
-                    patch_label.Centre(wx.HORIZONTAL)
-                elif i == 20 and not longest_patch:
+                if i == 20:
                     patch_label.SetLabel(patch_label.GetLabel().replace("-", ""))
                     patch_label.Centre(wx.HORIZONTAL)
 
@@ -283,15 +197,14 @@ class SysPatchDisplayFrame(wx.Frame):
 
                     patch_text = f"{self.constants.computer.oclp_sys_version}, {date}"
 
-                    # 获取当前最后一个标签的位置
-                    last_label_y = patch_label.GetPosition()[1]
-                    patch_label = wx.StaticText(frame, label="上一次补丁安装时间:", pos=(-1, last_label_y + 25))
+                    patch_label = wx.StaticText(frame, label="上一次补丁安装时间:", pos=(-1, patch_label.GetPosition().y + 25))
                     patch_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
                     patch_label.Centre(wx.HORIZONTAL)
 
-                    patch_label = wx.StaticText(frame, label=patch_text, pos=(available_label.GetPosition()[0] - 10, patch_label.GetPosition()[1] + 20))
+                    patch_label = wx.StaticText(frame, label=patch_text, pos=(available_label.GetPosition().x - 10, patch_label.GetPosition().y + 20))
                     patch_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
                     patch_label.Centre(wx.HORIZONTAL)
+
 
         # Button: Start Root Patching
         start_button = wx.Button(frame, label="开始安装驱动补丁", pos=(10, patch_label.GetPosition().y + 25), size=(170, 30))
@@ -317,7 +230,7 @@ class SysPatchDisplayFrame(wx.Frame):
             start_button.Disable()
         else:
             self.available_patches = True
-            if patches.get(HardwarePatchsetValidation.PATCHING_NOT_POSSIBLE, False) is True or no_new_patches is True:
+            if patches[HardwarePatchsetValidation.PATCHING_NOT_POSSIBLE] is True or no_new_patches is True:
                 start_button.Disable()
             elif no_new_patches is False:
                 start_button.SetDefault()

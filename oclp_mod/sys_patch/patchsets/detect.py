@@ -455,13 +455,13 @@ class HardwarePatchsetDetection:
             logging.info("网络补丁已应用，需要网络连接")
             return requirements, device_properties
 
-        if not any([key.startswith("Networking:") for key in device_properties.keys()]):
+        if not any([key.startswith("网卡") for key in device_properties.keys()]):
             logging.info("网络补丁不适用，需要网络连接")
             return requirements, device_properties
 
         logging.info("网络补丁适用，移除其他补丁")
         for key in list(device_properties.keys()):
-            if key.startswith("Networking:"):
+            if key.startswith("网卡"):
                 continue
             device_properties.pop(key, None)
 
