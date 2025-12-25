@@ -364,7 +364,7 @@ class HardwarePatchsetDetection:
         seal = content["Sealed"]
 
         if "Broken" in seal:
-            logging.error(f"System volume is tainted, unpatching is required")
+            logging.error(f"系统卷已受损，需要取消修补")
             return True
 
         return False
