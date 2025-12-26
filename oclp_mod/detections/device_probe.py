@@ -7,6 +7,7 @@ import itertools
 import subprocess
 import plistlib
 import hashlib
+import re
 
 from pathlib import Path
 from dataclasses import dataclass, field
@@ -214,8 +215,26 @@ class PCIDevice:
                 # Virtual PCI devices provide a botched IOService path (us.electronic.kext.vusb)
                 # We only care about physical devices, so skip them
                 try:
-                    location = [hex(int(i, 16)) for i in ioreg.io_name_t_to_str(ioreg.IORegistryEntryGetLocationInPlane(entry, "IOService".encode(), None)[1]).split(",") + ["0"]]
-                    paths.append(f"Pci({location[0]},{location[1]})")
+                    # Extract location string and handle possible non-numeric prefixes
+                    location_str = ioreg.io_name_t_to_str(ioreg.IORegistryEntryGetLocationInPlane(entry, "IOService".encode(), None)[1])
+                    location_parts = location_str.split(",")
+                    
+                    location_hex = []
+                    for i in location_parts + ["0"]:
+                        i_clean = i.strip()
+                        # Try to extract numeric part from end of string
+                        match = re.search(r'(\d+)$', i_clean)
+                        if match:
+                            # Use the numeric part found
+                            location_hex.append(hex(int(match.group(1))))
+                        elif i_clean and i_clean.isdigit():
+                            # Already a plain number
+                            location_hex.append(hex(int(i_clean)))
+                        else:
+                            # Cannot parse, use default 0
+                            location_hex.append("0x0")
+                    
+                    paths.append(f"Pci({location_hex[0]},{location_hex[1]})")
                 except ValueError:
                     break
             elif ioreg.IOObjectConformsTo(entry, "IOACPIPlatformDevice".encode()):
