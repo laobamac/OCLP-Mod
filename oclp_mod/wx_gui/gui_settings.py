@@ -838,14 +838,17 @@ class SettingsFrame(wx.Frame):
                     ],
                     "override_function": self._update_global_settings,
                 },
-                "使用SimpleHac API下载所需资源": {
+                "移除未使用的KDK": {
                     "type": "checkbox",
-                    "value": self.constants.use_github_proxy,
-                    "variable": "use_github_proxy",
+                    "value": global_settings.GlobalEnviromentSettings().read_property("ShouldNukeKDKs") or self.constants.should_nuke_kdks,
+                    "variable": "ShouldNukeKDKs",
+                    "constants_variable": "should_nuke_kdks",
                     "description": [
-                        "通过SimpleHac API下载Github资源",
-                        "关闭后将直接请求Github",
+                        "当启用时，应用程序将从系统中移除",
+                        "未使用的KDK",
+                        "在根目录修补期间。",
                     ],
+                    "override_function": self._update_global_settings,
                 },
                 "wrap_around 1": {
                     "type": "wrap_around",
@@ -860,17 +863,28 @@ class SettingsFrame(wx.Frame):
                     ],
                     "override_function": self._update_global_settings,
                 },
-                "移除未使用的KDK": {
+                "使用SimpleHac API下载所需资源": {
                     "type": "checkbox",
-                    "value": global_settings.GlobalEnviromentSettings().read_property("ShouldNukeKDKs") or self.constants.should_nuke_kdks,
-                    "variable": "ShouldNukeKDKs",
-                    "constants_variable": "should_nuke_kdks",
+                    "value": self.constants.use_simplehacapi,
+                    "variable": "use_simplehacapi",
                     "description": [
-                        "当启用时，应用程序将从系统中移除",
-                        "未使用的KDK",
-                        "在根目录修补期间。",
+                        "通过SimpleHac API下载Github资源",
+                        "关闭后将直接请求Github",
                     ],
-                    "override_function": self._update_global_settings,
+                },
+                "SimpleHac API节点": {
+                    "type": "choice",
+                    "choices": [
+                        "OMAPIv1",
+                        "OMAPIv2",
+                    ],
+                    "value": self.constants.simplehacapi_url or "OMAPIv2",
+                    "variable": "simplehacapi_url",
+                    "description": [
+                        "选择SimpleHac API使用的节点，手动切",
+                        "换重启生效。不懂别瞎改，程序自动切换！",
+                    ],
+                    "condition": self.constants.use_simplehacapi,
                 },
                 "统计": {
                     "type": "title",

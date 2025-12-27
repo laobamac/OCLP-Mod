@@ -28,7 +28,7 @@ class Constants:
 
         # OpenCore Versioning
         # https://github.com/acidanthera/OpenCorePkg
-        self.opencore_version: str = "1.0.5"
+        self.opencore_version: str = "1.0.6"
 
         # Kext Versioning
         ## Acidanthera
@@ -244,9 +244,10 @@ class Constants:
         self.custom_sip_value:        int = None  #  Set custom SIP value
         self.allow_usb_patch:        bool = False #  Allow USB Patch on Tahoe
         self.allow_hda_patch:        bool = True #  Allow HDA Patch on Tahoe
-        self.use_github_proxy:       bool = True #  Use proxy to get resources on Github
+        self.use_simplehacapi:       bool = True #  Use SimpleHacAPI to get resources
+        self.simplehacapi_url:        str  = "OMAPIv1"  # SimpleHacAPI URL
         self.allow_launchpad_patch:  bool = False # Allow LaunchPad Patch on Tahoe
-        self.launchpad_verison:      str  = "26.0 Beta 4"  # Set launchpad used
+        self.launchpad_verison:       str  = "26.0 Beta 4"  # Set launchpad used
 
         ## Non-Metal OS support
         self.legacy_accel_support = [
