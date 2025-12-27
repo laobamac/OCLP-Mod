@@ -24,7 +24,9 @@ from . import (
 
 KDK_INSTALL_PATH: str  = "/Library/Developer/KDKs"
 KDK_INFO_PLIST:   str  = "KDKInfo.plist"
-KDK_API_LINK_PROXY:     str  = "https://next.oclpapi.simplehac.cn/KdkSupportPkg/manifest.json"
+KDK_INFO_JSON:    str  = "KdkSupportPkg/manifest.json"
+OMAPIv1:          str  = "https://next.oclpapi.simplehac.cn/"
+OMAPIv2:          str  = "https://subsequent.oclpapi.simplehac.cn/"
 KDK_API_LINK_ORIGIN:     str  = "https://dortania.github.io/KdkSupportPkg/manifest.json"
 
 KDK_ASSET_LIST:   list = None
@@ -108,21 +110,32 @@ class KernelDebugKitObject:
         if KDK_ASSET_LIST:
             return KDK_ASSET_LIST
         
-        # 根据配置决定 API 优先级
-        if self.constants.use_github_proxy:
-            # 使用代理优先
-            api_links = [
-                ("OMAPIv1 - 大陆", KDK_API_LINK_PROXY),
-                ("Github - 海外", KDK_API_LINK_ORIGIN),
-            ]
-        else:
-            # 使用原始优先
-            api_links = [
-                ("Github - 海外", KDK_API_LINK_ORIGIN),
-                ("OMAPIv1 - 大陆", KDK_API_LINK_PROXY),
-            ]
+        # 根据 constants 配置决定 API 链接
+        kdk_api_links = []
         
-        for api_name, api_link in api_links:
+        # 如果启用了代理，优先使用 SimpleHac API
+        if self.constants.use_simplehacapi:
+            # 根据配置的 API 节点选择链接
+            if self.constants.simplehacapi_url == "OMAPIv1":
+                kdk_api_links.append(("OMAPIv1", f"{OMAPIv1}{KDK_INFO_JSON}"))
+            else:
+                # 默认为 OMAPIv2
+                kdk_api_links.append(("OMAPIv2", f"{OMAPIv2}{KDK_INFO_JSON}"))
+            
+            # 添加备用链接
+            kdk_api_links.append(("Github - 海外", KDK_API_LINK_ORIGIN))
+        else:
+            # 不使用代理，优先使用原始链接
+            kdk_api_links.append(("Github - 海外", KDK_API_LINK_ORIGIN))
+            
+            # 添加备用 SimpleHac API 链接
+            if self.constants.simplehacapi_url == "OMAPIv1":
+                kdk_api_links.append(("OMAPIv1", f"{OMAPIv1}{KDK_INFO_JSON}"))
+            else:
+                kdk_api_links.append(("OMAPIv2", f"{OMAPIv2}{KDK_INFO_JSON}"))
+        
+        # 尝试连接 API
+        for api_name, api_link in kdk_api_links:
             try:
                 logging.info(f"尝试连接 {api_name}: {api_link}")
                 results = network_handler.NetworkUtilities().get(

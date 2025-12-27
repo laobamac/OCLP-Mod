@@ -44,7 +44,7 @@ class NetworkUtilities:
         self.url: str = url
 
         if self.url is None:
-            if settings.use_github_proxy == True:
+            if settings.use_simplehacapi == True:
                 self.url = "https://next.oclpapi.simplehac.cn/"
             else:
                 self.url = "https://dortania.github.io/"

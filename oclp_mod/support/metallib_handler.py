@@ -17,7 +17,9 @@ from ..datasets import os_data
 
 
 METALLIB_INSTALL_PATH: str  = "/Library/Application Support/Dortania/MetallibSupportPkg"
-METALLIB_API_LINK_PROXY:     str  = "https://next.oclpapi.simplehac.cn/MetallibSupportPkg/manifest.json"
+METALLIB_INFO_JSON:    str  = "MetallibSupportPkg/manifest.json"
+OMAPIv1:          str  = "https://next.oclpapi.simplehac.cn/"
+OMAPIv2:          str  = "https://subsequent.oclpapi.simplehac.cn/"
 METALLIB_API_LINK_ORIGIN:     str  = "https://dortania.github.io/MetallibSupportPkg/manifest.json"
 
 METALLIB_ASSET_LIST:   list = None
@@ -71,21 +73,32 @@ class MetalLibraryObject:
         if METALLIB_ASSET_LIST:
             return METALLIB_ASSET_LIST
         
-        # 根据配置决定 API 优先级
-        if self.constants.use_github_proxy:
-            # 使用代理优先
-            api_links = [
-                ("OMAPIv1 - 大陆", METALLIB_API_LINK_PROXY),
-                ("Github - 海外", METALLIB_API_LINK_ORIGIN),
-            ]
-        else:
-            # 使用原始优先
-            api_links = [
-                ("Github - 海外", METALLIB_API_LINK_ORIGIN),
-                ("OMAPIv1 - 大陆", METALLIB_API_LINK_PROXY),
-            ]
+        # 根据 constants 配置决定 API 链接
+        metallib_api_links = []
         
-        for api_name, api_link in api_links:
+        # 如果启用了代理，优先使用 SimpleHac API
+        if self.constants.use_simplehacapi:
+            # 根据配置的 API 节点选择链接
+            if self.constants.simplehacapi_url == "OMAPIv1":
+                metallib_api_links.append(("OMAPIv1", f"{OMAPIv1}{METALLIB_INFO_JSON}"))
+            else:
+                # 默认为 OMAPIv2
+                metallib_api_links.append(("OMAPIv2", f"{OMAPIv2}{METALLIB_INFO_JSON}"))
+            
+            # 添加备用链接
+            metallib_api_links.append(("Github - 海外", METALLIB_API_LINK_ORIGIN))
+        else:
+            # 不使用代理，优先使用原始链接
+            metallib_api_links.append(("Github - 海外", METALLIB_API_LINK_ORIGIN))
+            
+            # 添加备用 SimpleHac API 链接
+            if self.constants.simplehacapi_url == "OMAPIv1":
+                metallib_api_links.append(("OMAPIv1", f"{OMAPIv1}{METALLIB_INFO_JSON}"))
+            else:
+                metallib_api_links.append(("OMAPIv2", f"{OMAPIv2}{METALLIB_INFO_JSON}"))
+        
+        # 尝试连接 API
+        for api_name, api_link in metallib_api_links:
             try:
                 logging.info(f"尝试连接 {api_name}: {api_link}")
                 results = network_handler.NetworkUtilities().get(
