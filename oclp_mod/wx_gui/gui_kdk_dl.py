@@ -11,9 +11,10 @@ from ..support import network_handler
 from ..support.network_handler import DownloadObject
 
 # 常量定义
-KDK_API_LINK_PROXY = "https://next.oclpapi.simplehac.cn/KdkSupportPkg/manifest.json"
-KDK_API_LINK_ORIGIN = "https://dortania.github.io/KdkSupportPkg/manifest.json"
-
+OMAPIv1: str = "https://next.oclpapi.simplehac.cn/"
+OMAPIv2: str = "https://subsequent.oclpapi.simplehac.cn/"
+KDK_API_LINK_ORIGIN: str = "https://dortania.github.io/KdkSupportPkg/manifest.json"
+KDK_INFO_JSON: str = "KdkSupportPkg/manifest.json"
 
 class DownloadProgressFrame(wx.Dialog):
     """下载进度对话框"""
@@ -398,12 +399,8 @@ class DownloadKDKFrame(wx.Frame):
         self.download_button: Optional[wx.Button] = None
         self.api_source_button: Optional[wx.Button] = None
         
-        # API源状态
-        self.current_api_index = 0 if self.constants.use_github_proxy else 1  # 0: proxy, 1: origin
-        self.api_sources = [
-            ("OMAPIv1 - 大陆", KDK_API_LINK_PROXY),
-            ("Github - 海外", KDK_API_LINK_ORIGIN)
-        ]
+        # API源状态 - 根据constants配置初始化
+        self._init_api_sources()
         
         self._init_ui()
         self.Centre()
@@ -411,6 +408,55 @@ class DownloadKDKFrame(wx.Frame):
         
         # 在后台线程中加载数据
         self._start_loading_data()
+
+    def _init_api_sources(self) -> None:
+        """初始化API源"""
+        # 确定默认API源
+        default_index = 0  # 默认使用OMAPIv2
+        
+        if self.constants.use_simplehacapi:
+            # 使用SimpleHac API
+            if self.constants.simplehacapi_url == "OMAPIv1":
+                default_index = 0
+            else:
+                # OMAPIv2或其他
+                default_index = 1
+        else:
+            # 不使用代理，使用原始源
+            default_index = 2
+        
+        self.api_sources = [
+            ("OMAPIv1", f"{OMAPIv1}{KDK_INFO_JSON}"),
+            ("OMAPIv2", f"{OMAPIv2}{KDK_INFO_JSON}"),
+            ("Github - 海外", KDK_API_LINK_ORIGIN)
+        ]
+        
+        self.current_api_index = default_index
+
+    def _on_switch_api_source(self, event) -> None:
+        """切换API源"""
+        # 创建选择对话框
+        choices = []
+        for i, (name, url) in enumerate(self.api_sources):
+            display_name = name
+            if i == self.current_api_index:
+                display_name = f"✓ {name}"
+            choices.append(display_name)
+        
+        dlg = wx.SingleChoiceDialog(
+            self,
+            "请选择数据源：\n\n• OMAPIv1: SimpleHac API 第一代节点\n• OMAPIv2: SimpleHac API 第二代节点\n• Github - 海外: GitHub原始数据源",
+            "切换数据源",
+            choices
+        )
+        
+        if dlg.ShowModal() == wx.ID_OK:
+            new_index = dlg.GetSelection()
+            if new_index != self.current_api_index:
+                self.current_api_index = new_index
+                self._start_loading_data()
+        
+        dlg.Destroy()
 
     def _init_ui(self) -> None:
         """初始化用户界面"""
@@ -572,25 +618,6 @@ class DownloadKDKFrame(wx.Frame):
         if self.loading_dialog:
             self.loading_dialog.close()
             self.loading_dialog = None
-
-    def _on_switch_api_source(self, event) -> None:
-        """切换API源"""
-        # 创建选择对话框
-        dlg = wx.SingleChoiceDialog(
-            self,
-            "请选择数据源：\n\n• 代理源：国内访问较快，但可能更新不及时\n• 原始源：GitHub原始数据，更新及时",
-            "切换数据源",
-            ["代理源", "原始源"]
-        )
-        dlg.SetSelection(self.current_api_index)
-        
-        if dlg.ShowModal() == wx.ID_OK:
-            new_index = dlg.GetSelection()
-            if new_index != self.current_api_index:
-                self.current_api_index = new_index
-                self._start_loading_data()
-        
-        dlg.Destroy()
 
     def _on_refresh(self, event) -> None:
         """刷新列表"""

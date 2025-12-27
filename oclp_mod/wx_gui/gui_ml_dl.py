@@ -9,8 +9,10 @@ from .. import constants
 from ..constants import Constants
 
 # 常量定义
-METALLIB_API_LINK_PROXY = "https://next.oclpapi.simplehac.cn/MetallibSupportPkg/manifest.json"
-METALLIB_API_LINK_ORIGIN = "https://dortania.github.io/MetallibSupportPkg/manifest.json"
+OMAPIv1: str = "https://next.oclpapi.simplehac.cn/"
+OMAPIv2: str = "https://subsequent.oclpapi.simplehac.cn/"
+METALLIB_API_LINK_ORIGIN: str = "https://dortania.github.io/MetallibSupportPkg/manifest.json"
+METALLIB_INFO_JSON: str = "MetallibSupportPkg/manifest.json"
 
 
 class DownloadProgressFrame(wx.Dialog):
@@ -413,12 +415,8 @@ class DownloadMLFrame(wx.Frame):
         self.download_button: Optional[wx.Button] = None
         self.api_source_button: Optional[wx.Button] = None
         
-        # API源状态
-        self.current_api_index = 0 if self.constants.use_github_proxy else 1  # 0: proxy, 1: origin
-        self.api_sources = [
-            ("OMAPIv1 - 大陆", METALLIB_API_LINK_PROXY),
-            ("Github - 海外", METALLIB_API_LINK_ORIGIN)
-        ]
+        # API源状态 - 根据constants配置初始化
+        self._init_api_sources()
         
         self._init_ui()
         self.Centre()
@@ -426,6 +424,30 @@ class DownloadMLFrame(wx.Frame):
         
         # 在后台线程中加载数据
         self._start_loading_data()
+
+    def _init_api_sources(self) -> None:
+        """初始化API源"""
+        # 确定默认API源
+        default_index = 0  # 默认使用OMAPIv2
+        
+        if self.constants.use_simplehacapi:
+            # 使用SimpleHac API
+            if self.constants.simplehacapi_url == "OMAPIv1":
+                default_index = 0
+            else:
+                # OMAPIv2或其他
+                default_index = 1
+        else:
+            # 不使用代理，使用原始源
+            default_index = 2
+        
+        self.api_sources = [
+            ("OMAPIv1", f"{OMAPIv1}{METALLIB_INFO_JSON}"),
+            ("OMAPIv2", f"{OMAPIv2}{METALLIB_INFO_JSON}"),
+            ("Github - 海外", METALLIB_API_LINK_ORIGIN)
+        ]
+        
+        self.current_api_index = default_index
 
     def _init_ui(self) -> None:
         """初始化用户界面"""
@@ -449,7 +471,7 @@ class DownloadMLFrame(wx.Frame):
         source_label = wx.StaticText(panel, label="当前数据源:")
         source_sizer.Add(source_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
         
-        self.source_value = wx.StaticText(panel, label="代理源")
+        self.source_value = wx.StaticText(panel, label="OMAPIv2")
         source_sizer.Add(self.source_value, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 15)
         main_sizer.Add(source_sizer, 0, wx.LEFT | wx.BOTTOM, 10)
         
@@ -516,29 +538,25 @@ class DownloadMLFrame(wx.Frame):
         """获取MetalLib数据，支持失败后自动切换API源"""
         time.sleep(1)  # 让加载界面显示一会儿
         
-        first_try_index = self.current_api_index
-        second_try_index = 1 if self.current_api_index == 0 else 0
-        
-        # 尝试第一个API源
-        first_success = self._try_fetch_api(first_try_index)
-        
-        if not first_success:
-            # 第一个API失败，尝试第二个API源
-            wx.CallAfter(self._update_loading_message, "第一个API源失败，尝试切换数据源...")
-            time.sleep(1)
+        # 尝试所有API源
+        for i in range(len(self.api_sources)):
+            api_index = (self.current_api_index + i) % len(self.api_sources)
+            success = self._try_fetch_api(api_index)
             
-            second_success = self._try_fetch_api(second_try_index)
-            
-            if not second_success:
-                # 两个API源都失败
-                wx.CallAfter(self._show_api_error_dialog)
+            if success:
+                # 成功获取数据，更新当前源
+                if api_index != self.current_api_index:
+                    self.current_api_index = api_index
+                    wx.CallAfter(self.source_value.SetLabel, self.api_sources[api_index][0])
+                break
+            elif i < len(self.api_sources) - 1:
+                # 当前源失败，尝试下一个源
+                next_api_name = self.api_sources[(api_index + 1) % len(self.api_sources)][0]
+                wx.CallAfter(self._update_loading_message, f"当前源失败，尝试切换到 {next_api_name}...")
+                time.sleep(1)
             else:
-                # 第二个API成功，更新当前源
-                self.current_api_index = second_try_index
-                wx.CallAfter(self.source_value.SetLabel, self.api_sources[second_try_index][0])
-        else:
-            # 第一个API成功
-            wx.CallAfter(self.source_value.SetLabel, self.api_sources[first_try_index][0])
+                # 所有源都失败
+                wx.CallAfter(self._show_api_error_dialog)
         
         wx.CallAfter(self._close_loading_dialog)
 
@@ -551,15 +569,19 @@ class DownloadMLFrame(wx.Frame):
             
             # 禁用 SSL 证书验证
             response = requests.get(api_url, verify=False, timeout=30)
-            response.raise_for_status()
-            metallib_data = response.json()
             
-            # 验证数据格式
-            if isinstance(metallib_data, list) and len(metallib_data) > 0 and 'build' in metallib_data[0]:
-                wx.CallAfter(self.list_ctrl.SetData, metallib_data)
-                return True
+            if response.status_code == 200:
+                metallib_data = response.json()
+                
+                # 验证数据格式
+                if isinstance(metallib_data, list) and len(metallib_data) > 0 and 'build' in metallib_data[0]:
+                    wx.CallAfter(self.list_ctrl.SetData, metallib_data)
+                    return True
+                else:
+                    wx.CallAfter(self._update_loading_message, f"{api_name}返回数据格式错误...")
+                    return False
             else:
-                wx.CallAfter(self._update_loading_message, f"{api_name}返回数据格式错误...")
+                wx.CallAfter(self._update_loading_message, f"{api_name}返回状态码: {response.status_code}")
                 return False
                 
         except Exception as e:
@@ -592,13 +614,19 @@ class DownloadMLFrame(wx.Frame):
     def _on_switch_api_source(self, event) -> None:
         """切换API源"""
         # 创建选择对话框
+        choices = []
+        for i, (name, url) in enumerate(self.api_sources):
+            display_name = name
+            if i == self.current_api_index:
+                display_name = f"✓ {name}"
+            choices.append(display_name)
+        
         dlg = wx.SingleChoiceDialog(
             self,
-            "请选择数据源：\n\n• 代理源：国内访问较快，但可能更新不及时\n• 原始源：GitHub原始数据，更新及时",
+            "请选择数据源：\n\n• OMAPIv1: SimpleHac API 第一代节点\n• OMAPIv2: SimpleHac API 第二代节点\n• Github - 海外: GitHub原始数据源",
             "切换数据源",
-            ["代理源", "原始源"]
+            choices
         )
-        dlg.SetSelection(self.current_api_index)
         
         if dlg.ShowModal() == wx.ID_OK:
             new_index = dlg.GetSelection()
