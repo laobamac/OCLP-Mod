@@ -1,2 +1,6 @@
 .DS_Store
 com.laobamac.oclp-mod.privileged-helper
+__pycache__/
+*.pyc
+/build
+/dist

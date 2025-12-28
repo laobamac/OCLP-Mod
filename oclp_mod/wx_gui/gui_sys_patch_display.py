@@ -12,6 +12,7 @@ from pathlib import Path
 from .. import constants
 
 from ..sys_patch.patchsets import HardwarePatchsetDetection, HardwarePatchsetValidation
+from ..languages.language_handler import LanguageHandler
 
 from ..wx_gui import (
     gui_main_menu,
@@ -36,6 +37,7 @@ class SysPatchDisplayFrame(wx.Frame):
 
         self.title = title
         self.constants: constants.Constants = global_constants
+        self.language_handler: LanguageHandler = LanguageHandler(global_constants)
         self.frame_modal: wx.Dialog = None
         self.return_button: wx.Button = None
         self.available_patches: bool = False
@@ -47,7 +49,7 @@ class SysPatchDisplayFrame(wx.Frame):
 
         if self.constants.update_stage != gui_support.AutoUpdateStages.INACTIVE:
             if self.available_patches is False:
-                gui_support.RestartHost(self.frame).restart(message="不需要任何补丁!\n\n你想现在重启来安装OpenCore吗？")
+                gui_support.RestartHost(self.frame).restart(message=self.language_handler.get_translation("no_patches_needed_restart", "No patches needed!\n\nWould you like to restart now to install OpenCore?"))
 
 
     def _generate_elements_display_patches(self, frame: wx.Frame = None) -> None:
@@ -64,12 +66,12 @@ class SysPatchDisplayFrame(wx.Frame):
         """
         frame = self if not frame else frame
 
-        title_label = wx.StaticText(frame, label="安装驱动补丁", pos=(-1, 10))
+        title_label = wx.StaticText(frame, label=self.language_handler.get_translation("install_driver_patches_title", "Install Driver Patches"), pos=(-1, 10))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title_label.Centre(wx.HORIZONTAL)
 
         # Label: Fetching patches...
-        available_label = wx.StaticText(frame, label="正在匹配可供安装的补丁", pos=(-1, title_label.GetPosition()[1] + title_label.GetSize()[1] + 10))
+        available_label = wx.StaticText(frame, label=self.language_handler.get_translation("matching_available_patch", "Matching available patches for installation"), pos=(-1, title_label.GetPosition()[1] + title_label.GetSize()[1] + 10))
         available_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
         available_label.Centre(wx.HORIZONTAL)
 
@@ -100,14 +102,19 @@ class SysPatchDisplayFrame(wx.Frame):
         progress_bar.Hide()
         progress_bar_animation.stop_pulse()
 
-        available_label.SetLabel("可以安装的补丁:")
+        available_label.SetLabel(self.language_handler.get_translation("available_patches_label", "Available patches:"))
         available_label.Centre(wx.HORIZONTAL)
 
 
         # can_unpatch: bool = not patches[HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE]
         can_unpatch: bool = not patches.get(HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE, False)
 
-        if not any(not patch.startswith("设置") and not patch.startswith("验证") and patches[patch] is True for patch in patches):
+        # The patch system uses Chinese prefixes "设置:" and "验证:" in patch names
+        # We need to check for these specific prefixes
+        settings_prefix = "设置"
+        verification_prefix = "验证"
+        
+        if not any(not patch.startswith(settings_prefix) and not patch.startswith(verification_prefix) and patches[patch] is True for patch in patches):
             logging.info("No applicable patches available")
             patches = {}
 
@@ -116,7 +123,7 @@ class SysPatchDisplayFrame(wx.Frame):
 
         if not patches:
             # Prompt user with no patches found
-            patch_label = wx.StaticText(frame, label="不需要补丁", pos=(-1, available_label.GetPosition()[1] + 20))
+            patch_label = wx.StaticText(frame, label=self.language_handler.get_translation("no_patches_needed", "No patches needed"), pos=(-1, available_label.GetPosition()[1] + 20))
             patch_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
             patch_label.Centre(wx.HORIZONTAL)
 
@@ -124,14 +131,14 @@ class SysPatchDisplayFrame(wx.Frame):
             # Add Label for each patch
             i = 0
             if no_new_patches is True:
-                patch_label = wx.StaticText(frame, label="所有补丁已安装", pos=(-1, available_label.GetPosition()[1] + 20))
+                patch_label = wx.StaticText(frame, label=self.language_handler.get_translation("all_patches_installed", "All patches have been installed"), pos=(-1, available_label.GetPosition()[1] + 20))
                 patch_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
                 patch_label.Centre(wx.HORIZONTAL)
                 i = i + 20
             else:
                 longest_patch = ""
                 for patch in patches:
-                    if (not patch.startswith("设置") and not patch.startswith("验证") and patches[patch] is True):
+                    if (not patch.startswith(settings_prefix) and not patch.startswith(verification_prefix) and patches[patch] is True):
                         if len(patch) > len(longest_patch):
                             longest_patch = patch
                 anchor = wx.StaticText(frame, label=longest_patch, pos=(-1, available_label.GetPosition()[1] + 20))
@@ -141,7 +148,7 @@ class SysPatchDisplayFrame(wx.Frame):
 
                 logging.info("Available patches:")
                 for patch in patches:
-                    if (not patch.startswith("设置") and not patch.startswith("验证") and patches[patch] is True):
+                    if (not patch.startswith(settings_prefix) and not patch.startswith(verification_prefix) and patches[patch] is True):
                         i = i + 20
                         logging.info(f"- {patch}")
                         patch_label = wx.StaticText(frame, label=f"- {patch}", pos=(anchor.GetPosition()[0], available_label.GetPosition()[1] + i))
@@ -153,13 +160,13 @@ class SysPatchDisplayFrame(wx.Frame):
 
             if patches[HardwarePatchsetValidation.PATCHING_NOT_POSSIBLE] is True:
                 # Cannot patch due to the following reasons:
-                patch_label = wx.StaticText(frame, label="无法安装补丁，原因:", pos=(-1, patch_label.GetPosition()[1] + 25))
+                patch_label = wx.StaticText(frame, label=self.language_handler.get_translation("cannot_install_patches", "Unable to install patches, reason:"), pos=(-1, patch_label.GetPosition()[1] + 25))
                 patch_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
                 patch_label.Centre(wx.HORIZONTAL)
 
                 longest_patch = ""
                 for patch in patches:
-                    if not patch.startswith("验证"):
+                    if not patch.startswith(verification_prefix):
                         continue
                     if patches[patch] is False:
                         continue
@@ -168,21 +175,22 @@ class SysPatchDisplayFrame(wx.Frame):
 
                     if len(patch) > len(longest_patch):
                         longest_patch = patch
-                anchor = wx.StaticText(frame, label=longest_patch.split('验证: ')[1], pos=(-1, patch_label.GetPosition()[1] + 20))
+                anchor = wx.StaticText(frame, label=longest_patch.split(f'{verification_prefix}: ')[1] if f'{verification_prefix}: ' in longest_patch else longest_patch, pos=(-1, patch_label.GetPosition()[1] + 20))
                 anchor.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
                 anchor.Centre(wx.HORIZONTAL)
                 anchor.Hide()
 
                 i = 0
                 for patch in patches:
-                    if not patch.startswith("验证"):
+                    if not patch.startswith(verification_prefix):
                         continue
                     if patches[patch] is False:
                         continue
                     if patch in [HardwarePatchsetValidation.PATCHING_NOT_POSSIBLE, HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE]:
                         continue
 
-                    patch_label = wx.StaticText(frame, label=f"- {patch.split('验证: ')[1]}", pos=(anchor.GetPosition()[0], anchor.GetPosition()[1] + i))
+                    patch_text = patch.split(f'{verification_prefix}: ')[1] if f'{verification_prefix}: ' in patch else patch
+                    patch_label = wx.StaticText(frame, label=f"- {patch_text}", pos=(anchor.GetPosition()[0], anchor.GetPosition()[1] + i))
                     patch_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
                     i = i + 20
 
@@ -197,7 +205,7 @@ class SysPatchDisplayFrame(wx.Frame):
 
                     patch_text = f"{self.constants.computer.oclp_sys_version}, {date}"
 
-                    patch_label = wx.StaticText(frame, label="上一次补丁安装时间:", pos=(-1, patch_label.GetPosition().y + 25))
+                    patch_label = wx.StaticText(frame, label=self.language_handler.get_translation("last_patch_time", "Last patch installation time:"), pos=(-1, patch_label.GetPosition().y + 25))
                     patch_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
                     patch_label.Centre(wx.HORIZONTAL)
 
@@ -207,19 +215,19 @@ class SysPatchDisplayFrame(wx.Frame):
 
 
         # Button: Start Root Patching
-        start_button = wx.Button(frame, label="开始安装驱动补丁", pos=(10, patch_label.GetPosition().y + 25), size=(170, 30))
+        start_button = wx.Button(frame, label=self.language_handler.get_translation("start_driver_patch", "Start installing driver patches"), pos=(10, patch_label.GetPosition().y + 25), size=(170, 30))
         start_button.Bind(wx.EVT_BUTTON, lambda event: self.on_start_root_patching(patches))
         start_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         start_button.Centre(wx.HORIZONTAL)
 
         # Button: Revert Root Patches
-        revert_button = wx.Button(frame, label="删除已安装的补丁", pos=(10, start_button.GetPosition().y + start_button.GetSize().height - 5), size=(170, 30))
+        revert_button = wx.Button(frame, label=self.language_handler.get_translation("remove_patches", "Remove installed patches"), pos=(10, start_button.GetPosition().y + start_button.GetSize().height - 5), size=(170, 30))
         revert_button.Bind(wx.EVT_BUTTON, lambda event: self.on_revert_root_patching(patches))
         revert_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         revert_button.Centre(wx.HORIZONTAL)
 
         # Button: Return to Main Menu
-        return_button = wx.Button(frame, label="返回", pos=(10, revert_button.GetPosition().y + revert_button.GetSize().height), size=(150, 30))
+        return_button = wx.Button(frame, label=self.language_handler.get_translation("return", "Return"), pos=(10, revert_button.GetPosition().y + revert_button.GetSize().height), size=(150, 30))
         return_button.Bind(wx.EVT_BUTTON, self.on_return_dismiss if self.init_with_parent else self.on_return_to_main_menu)
         return_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         return_button.Centre(wx.HORIZONTAL)
@@ -300,7 +308,7 @@ class SysPatchDisplayFrame(wx.Frame):
         Thus we'll need to see if the exact same OCLP build was used already
         """
 
-        logging.info("检查是否需要新的补丁")
+        logging.info(self.language_handler.get_translation("checking_new_patches", "Checking if new patches are needed"))
 
 
         if self.constants.computer.oclp_sys_url != self.constants.commit_info[2]:
@@ -313,14 +321,18 @@ class SysPatchDisplayFrame(wx.Frame):
             # ie. all patches applicable
             return True
 
+        # The patch system uses Chinese prefixes "设置:" and "验证:" in patch names
+        settings_prefix = "设置"
+        verification_prefix = "验证"
+        
         oclp_plist_data = plistlib.load(open(oclp_plist, "rb"))
         for patch in patches:
-            if (not patch.startswith("设置") and not patch.startswith("验证") and patches[patch] is True):
+            if (not patch.startswith(settings_prefix) and not patch.startswith(verification_prefix) and patches[patch] is True):
                 # Patches should share the same name as the plist key
                 # See sys_patch/patchsets/base.py for more info
                 if patch.split(": ")[1] not in oclp_plist_data:
-                    logging.info(f"- 补丁 {patch} 没有安装")
+                    logging.info(self.language_handler.get_translation("patch_not_installed", "- Patch {patch} not installed").format(patch=patch))
                     return True
 
-        logging.info("没有检测到新的补丁需要安装")
+        logging.info(self.language_handler.get_translation("no_new_patches_detected", "No new patches detected that need installation"))
         return False

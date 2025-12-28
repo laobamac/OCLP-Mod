@@ -52,11 +52,11 @@ class OpenCoreLegacyPatcher:
         _test_dir = None
         try:
             _test_dir = Path.cwd()
-            logging.info(f"当前运行目录: {_test_dir}")
+            logging.info(f"Current working directory: {_test_dir}")
         except FileNotFoundError:
             _test_dir = Path(__file__).parent.parent.resolve()
             os.chdir(_test_dir)
-            logging.warning(f"当前运行目录无效,切换到: {_test_dir}")
+            logging.warning(f"Current working directory invalid, switching to: {_test_dir}")
 
 
     def _generate_base_data(self) -> None:

@@ -106,38 +106,38 @@ class KernelDebugKitObject:
 
         global KDK_ASSET_LIST
 
-        logging.info("从 KdkSupportPkg API 拉取 KDK 列表")
+        logging.info("Fetching KDK list from KdkSupportPkg API")
         if KDK_ASSET_LIST:
             return KDK_ASSET_LIST
         
-        # 根据 constants 配置决定 API 链接
+        # Determine API links based on constants configuration
         kdk_api_links = []
         
-        # 如果启用了代理，优先使用 SimpleHac API
+        # If proxy is enabled, prioritize SimpleHac API
         if self.constants.use_simplehacapi:
-            # 根据配置的 API 节点选择链接
+            # Select link based on configured API node
             if self.constants.simplehacapi_url == "OMAPIv1":
                 kdk_api_links.append(("OMAPIv1", f"{OMAPIv1}{KDK_INFO_JSON}"))
             else:
-                # 默认为 OMAPIv2
+                # Default to OMAPIv2
                 kdk_api_links.append(("OMAPIv2", f"{OMAPIv2}{KDK_INFO_JSON}"))
             
-            # 添加备用链接
-            kdk_api_links.append(("Github - 海外", KDK_API_LINK_ORIGIN))
+            # Add fallback link
+            kdk_api_links.append(("Github - Overseas", KDK_API_LINK_ORIGIN))
         else:
-            # 不使用代理，优先使用原始链接
-            kdk_api_links.append(("Github - 海外", KDK_API_LINK_ORIGIN))
+            # Not using proxy, prioritize original link
+            kdk_api_links.append(("Github - Overseas", KDK_API_LINK_ORIGIN))
             
-            # 添加备用 SimpleHac API 链接
+            # Add fallback SimpleHac API link
             if self.constants.simplehacapi_url == "OMAPIv1":
                 kdk_api_links.append(("OMAPIv1", f"{OMAPIv1}{KDK_INFO_JSON}"))
             else:
                 kdk_api_links.append(("OMAPIv2", f"{OMAPIv2}{KDK_INFO_JSON}"))
         
-        # 尝试连接 API
+        # Attempt API connections
         for api_name, api_link in kdk_api_links:
             try:
-                logging.info(f"尝试连接 {api_name}: {api_link}")
+                logging.info(f"Attempting connection to {api_name}: {api_link}")
                 results = network_handler.NetworkUtilities().get(
                     api_link,
                     headers={
@@ -147,28 +147,28 @@ class KernelDebugKitObject:
                 )
                 
                 if results.status_code == 200:
-                    logging.info(f"{api_name} 连接成功")
+                    logging.info(f"{api_name} connection successful")
                     KDK_ASSET_LIST = results.json()
                     return KDK_ASSET_LIST
                 else:
-                    logging.warning(f"{api_name} 返回状态码 {results.status_code}")
+                    logging.warning(f"{api_name} returned status code {results.status_code}")
                     
             except (requests.exceptions.Timeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError) as e:
-                logging.warning(f"{api_name} 连接失败: {e}")
+                logging.warning(f"{api_name} connection failed: {e}")
 
-        logging.info("所有 API 连接均失败")
+        logging.info("All API connections failed")
         return None
 
 
     def _get_latest_kdk(self, host_build: str = None, host_version: str = None) -> None:
         """
-        获取当前 macOS 版本的最新 KDK
+        Get the latest KDK for the current macOS version
 
         Parameters:
-            host_build (str, optional):   当前 macOS 版本的构建版本。
-                                          如果为空，则使用类中的 host_build。默认为 None。
-            host_version (str, optional): 当前 macOS 版本。
-                                          如果为空，则使用类中的 host_version。默认为 None。
+            host_build (str, optional):   Build version of current macOS.
+                                          If empty, uses host_build from class. Defaults to None.
+            host_version (str, optional): Current macOS version.
+                                          If empty, uses host_version from class. Defaults to None.
         """
 
         if host_build is None and host_version is None:

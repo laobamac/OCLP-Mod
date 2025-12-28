@@ -80,7 +80,7 @@ class MainFrame(wx.Frame):
         title_label.Centre(wx.HORIZONTAL)
 
         # Text: Model: {Build or Host Model}
-        model_label = wx.StaticText(self, label=f"型号: {self.constants.custom_model or self.constants.computer.real_model} ，modified by laobamac", pos=(-1, title_label.GetPosition()[1] + 25
+        model_label = wx.StaticText(self, label=f"Model: {self.constants.custom_model or self.constants.computer.real_model}, modified by laobamac", pos=(-1, title_label.GetPosition()[1] + 25
                                                                                                                                     ))
         model_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         model_label.Centre(wx.HORIZONTAL)
@@ -88,43 +88,43 @@ class MainFrame(wx.Frame):
 
         # Buttons:
         menu_buttons = {
-            "创建OpenCore引导": {
+            "Build and Install OpenCore": {
                 "function": self.on_build_and_install,
                 "description": [
-                    "提供额外的引导",
-                    "来启动高版本的系统",
-                    "需要使用.app或者其他安装器"
+                    "Provides additional bootloader",
+                    "to boot newer macOS versions",
+                    "Requires .app or other installer"
                 ],
                 "icon": str(self.constants.icns_resource_path / "OC-Build.icns"),
             },
-            "创建macOS安装器": {
+            "Create macOS Installer": {
                 "function": self.on_create_macos_installer,
                 "description": [
-                    "下载/烧录macOS安装器",
-                    "安装新macOS使用.",
+                    "Download/flash macOS installer",
+                    "for installing new macOS.",
                 ],
                 "icon": str(self.constants.icns_resource_path / "OC-Installer.icns"),
             },
-            "⚙️ 设置": {
+            "⚙️ Settings": {
                 "function": self.on_settings,
                 "description": [
                 ],
             },
-            "安装驱动补丁": {
+            "Post-Install Root Patch": {
                 "function": self.on_post_install_root_patch,
                 "description": [
-                    "安装硬件驱动补丁",
-                    "（在安装新版本macOS后",
-                    "进入系统再打）",
+                    "Install hardware driver patches",
+                    "(After installing new macOS version,",
+                    "enter the system and apply)",
                 ],
                 "icon": str(self.constants.icns_resource_path / "OC-Patch.icns"),
             },
 
-            "获取支持": {
+            "Get Support": {
                 "function": self.on_help,
                 "description": [
-                    "OCLP相关资源",
-                    "由laobamac汉化",
+                    "OCLP related resources",
+                    "Modified by laobamac",
                 ],
                 "icon": str(self.constants.icns_resource_path / "OC-Support.icns"),
             },
@@ -140,16 +140,16 @@ class MainFrame(wx.Frame):
             # place icon
             if "icon" in button_function:
                 icon = wx.StaticBitmap(self, bitmap=wx.Bitmap(button_function["icon"], wx.BITMAP_TYPE_ICON), pos=(button_x - 10, button_y), size=(64, 64))
-                if button_name == "安装驱动补丁":
+                if button_name == "Post-Install Root Patch":
                     icon.SetPosition((-1, button_y + 7))
-                if button_name == "创建macOS安装器":
+                if button_name == "Create macOS Installer":
                     icon.SetPosition((button_x - 5, button_y + 3))
-                if button_name == "获取支持":
+                if button_name == "Get Support":
                     # icon_mac.SetSize((80, 80))
                     icon.SetPosition((button_x - 7, button_y + 3))
-                if button_name == "创建OpenCore引导":
+                if button_name == "Build and Install OpenCore":
                     icon.SetSize((70, 70))
-            if button_name == "⚙️ 设置":
+            if button_name == "⚙️ Settings":
                 button_y += 5
                 button_x += 150
 
@@ -173,24 +173,24 @@ class MainFrame(wx.Frame):
 
             button_y += 25
 
-            if button_name == "创建OpenCore引导":
+            if button_name == "Build and Install OpenCore":
                 self.build_button = button
                 if gui_support.CheckProperties(self.constants).host_can_build() is False:
                     button.Disable()
-            elif button_name == "安装驱动补丁":
+            elif button_name == "Post-Install Root Patch":
                 if self.constants.detected_os < os_data.os_data.big_sur:
                     button.Disable()
-            elif button_name == "⚙️ 设置":
+            elif button_name == "⚙️ Settings":
                   button.SetSize((100, -1))
                   #button.Centre(wx.HORIZONTAL)
                   description_label.Centre(wx.HORIZONTAL)
-                  kdk_button = wx.Button(self, label="KDK下载", pos=(button_x - 50, button.GetPosition()[1]), size=(100, 30))
+                  kdk_button = wx.Button(self, label="Download KDK", pos=(button_x - 50, button.GetPosition()[1]), size=(100, 30))
                   kdk_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
                   kdk_button.Bind(wx.EVT_BUTTON, lambda event: self.on_download_kdk_package(event))
-                  ml_button = wx.Button(self, label="MetalLib下载", pos=(button_x + 190, button.GetPosition()[1]), size=(100, 30))
+                  ml_button = wx.Button(self, label="Dl. MetalLib", pos=(button_x + 190, button.GetPosition()[1]), size=(100, 30))
                   ml_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
                   ml_button.Bind(wx.EVT_BUTTON, lambda event: self.on_download_ml_package(event))
-                  #button_y += 60  # 调整按钮的垂直位置
+                  #button_y += 60  # Adjust button vertical position
 
             index += 1
             if index == rollover:
@@ -217,8 +217,8 @@ class MainFrame(wx.Frame):
             # Notify user they're booting an unsupported configuration
             pop_up = wx.MessageDialog(
                 self,
-                f"我们发现您当前正在引导为其他单元构建的 OpenCore: {self.constants.computer.build_model}\n\n我们构建配置以匹配各个单元，并且不能与不同的 Mac 混合或重复使用。\n\n请构建并安装新的 OpenCore 配置，然后重新启动您的 Mac。",
-                "检测到不支持的配置！",
+                f"We see you're currently booting OpenCore built for another unit: {self.constants.computer.build_model}\n\nWe build configurations to match individual units and cannot be mixed or reused with different Macs.\n\nPlease build and install a new OpenCore configuration and then restart your Mac.",
+                "Unsupported Configuration Detected!",
                 style=wx.OK | wx.ICON_EXCLAMATION
             )
             pop_up.ShowModal()
@@ -231,7 +231,7 @@ class MainFrame(wx.Frame):
             pop_up = wx.MessageDialog(
                 self,
                 f"OCLP-Mod has been updated to the latest version: {self.constants.patcher_version}\n\nWould you like to update OpenCore and your root volume patches?",
-                "更新成功!",
+                "Update Successful!",
                 style=wx.YES_NO | wx.YES_DEFAULT | wx.ICON_INFORMATION
             )
             pop_up.ShowModal()
@@ -331,20 +331,20 @@ class MainFrame(wx.Frame):
         try:
             changelog = response["body"].split("## Asset Information")[0]
         except: #if user constantly checks for updates, github will rate limit them
-            changelog = """## 获取更新日志失败
+            changelog = """## Failed to fetch changelog
 
-请前往Github RELEASE页面查看"""
+Please visit Github RELEASE page"""
 
         html_markdown = markdown2.markdown(changelog, extras=["tables"])
         html_css = css_data.updater_css
-        frame = wx.Dialog(None, -1, title="😘OCLP-Mod发现更新了捏！", size=(650, 500))
+        frame = wx.Dialog(None, -1, title="😘 OCLP-Mod Update Found!", size=(650, 500))
         frame.SetMinSize((650, 500))
         frame.SetWindowStyle(wx.STAY_ON_TOP)
         panel = wx.Panel(frame)
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.AddSpacer(10)
-        self.title_text = wx.StaticText(panel, label="新版本OCLP-Mod可以下载了！")
-        self.description = wx.StaticText(panel, label=f"OCLP-Mod {oclp_version} 已发布   你现在安装的是 {self.constants.patcher_version}{'' if not self.constants.commit_info[0].startswith('refs/tags') else ''}， 你想现在更新吗？")
+        self.title_text = wx.StaticText(panel, label="New version of OCLP-Mod is available!")
+        self.description = wx.StaticText(panel, label=f"OCLP-Mod {oclp_version} has been released. You currently have {self.constants.patcher_version}{'' if not self.constants.commit_info[0].startswith('refs/tags') else ''}. Would you like to update now?")
         self.title_text.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         self.description.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         self.web_view = wx.html2.WebView.New(panel, style=wx.BORDER_SUNKEN)
@@ -364,11 +364,11 @@ class MainFrame(wx.Frame):
         self.web_view.SetPage(html_code, "")
         self.web_view.Bind(wx.html2.EVT_WEBVIEW_NEWWINDOW, self._onWebviewNav)
         self.web_view.EnableContextMenu(False)
-        self.close_button = wx.Button(panel, label="忽略")
+        self.close_button = wx.Button(panel, label="Ignore")
         self.close_button.Bind(wx.EVT_BUTTON, lambda event: frame.EndModal(wx.ID_CANCEL))
-        self.view_button = wx.Button(panel, ID_GITHUB, label="在Github上查看")
+        self.view_button = wx.Button(panel, ID_GITHUB, label="View on Github")
         self.view_button.Bind(wx.EVT_BUTTON, lambda event: frame.EndModal(ID_GITHUB))
-        self.install_button = wx.Button(panel, label="下载并安装")
+        self.install_button = wx.Button(panel, label="Download and Install")
         self.install_button.Bind(wx.EVT_BUTTON, lambda event: frame.EndModal(ID_UPDATE))
         self.install_button.SetDefault()
 

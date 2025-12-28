@@ -39,19 +39,19 @@ class HelpFrame(wx.Frame):
 
         frame = self if not frame else frame
 
-        title_label = wx.StaticText(frame, label="OCLP资源", pos=(-1,5))
+        title_label = wx.StaticText(frame, label="OCLP Resources", pos=(-1,5))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title_label.Centre(wx.HORIZONTAL)
 
-        text_label = wx.StaticText(frame, label="可用资源:", pos=(-1,30))
+        text_label = wx.StaticText(frame, label="Available resources:", pos=(-1,30))
         text_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         text_label.Centre(wx.HORIZONTAL)
 
         buttons = {
-            "官方指南":           self.constants.guide_link,
-            "官方支持":   "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-            "官方Discord社区": self.constants.discord_link,
-            "SimpleHac资源社": "https://www.simplehac.cn"
+            "Official Guide":           self.constants.guide_link,
+            "Official Support":   "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "Official Discord Community": self.constants.discord_link,
+            "SimpleHac Resources": "https://www.simplehac.cn"
         }
 
         for button in buttons:
@@ -60,7 +60,7 @@ class HelpFrame(wx.Frame):
             help_button.Centre(wx.HORIZONTAL)
 
         # Button: Return to Main Menu
-        return_button = wx.Button(frame, label="返回", pos=(-1, help_button.GetPosition()[1] + help_button.GetSize()[1]), size=(150, 30))
+        return_button = wx.Button(frame, label="Return", pos=(-1, help_button.GetPosition()[1] + help_button.GetSize()[1]), size=(150, 30))
         return_button.Bind(wx.EVT_BUTTON, lambda event: frame.Close())
         return_button.Centre(wx.HORIZONTAL)
 

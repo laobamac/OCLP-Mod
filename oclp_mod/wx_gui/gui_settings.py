@@ -12,6 +12,7 @@ import subprocess
 from pathlib import Path
 
 from .. import constants
+from ..languages.language_handler import LanguageHandler
 
 from ..sys_patch import sys_patch
 
@@ -44,12 +45,12 @@ class SettingsFrame(wx.Frame):
         self.constants: constants.Constants = global_constants
         self.title: str = title
         self.parent: wx.Frame = parent
-
+        self.language_handler = LanguageHandler(self.constants)
         self.hyperlink_colour = (25, 179, 231)
 
         self.settings = self._settings()
 
-        self.frame_modal = wx.Dialog(parent, title=title, size=(600, 700))
+        self.frame_modal = wx.Dialog(parent, title=title, size=(600, 685))
 
         self._generate_elements(self.frame_modal)
         self.frame_modal.ShowWindowModal()
@@ -67,24 +68,24 @@ class SettingsFrame(wx.Frame):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.AddSpacer(10)
 
-        model_label = wx.StaticText(frame, label="目标机型", pos=(-1, -1))
+        model_label = wx.StaticText(frame, label=self.language_handler.get_translation("Target_model"), pos=(-1, -1))
         model_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
         sizer.Add(model_label, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
-        model_choice = wx.Choice(frame, choices=model_array.SupportedSMBIOS + ["主机机型"], pos=(-1, -1), size=(150, -1))
+        model_choice = wx.Choice(frame, choices=model_array.SupportedSMBIOS + [self.language_handler.get_translation("Host_model")], pos=(-1, -1), size=(150, -1))
         model_choice.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         model_choice.Bind(wx.EVT_CHOICE, lambda event: self.on_model_choice(event, model_choice))
-        selection = self.constants.custom_model if self.constants.custom_model else "主机机型"
+        selection = self.constants.custom_model if self.constants.custom_model else self.language_handler.get_translation("Host_model")
         model_choice.SetSelection(model_choice.FindString(selection))
         sizer.Add(model_choice, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
-        model_description = wx.StaticText(frame, label="覆写Patcher将要仿冒的机型", pos=(-1, -1))
+        model_description = wx.StaticText(frame, label=self.language_handler.get_translation("Themodelthatthepatcherisgoingtoimitate."), pos=(-1, -1))
         model_description.SetFont(gui_support.font_factory(11, wx.FONTWEIGHT_NORMAL))
         sizer.Add(model_description, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
         tabs = list(self.settings.keys())
         if not Path("~/.laobamac_developer").expanduser().exists():
-            tabs.remove("开发者")
+            tabs.remove("Developer")
         for tab in tabs:
             panel = wx.Panel(notebook)
             notebook.AddPage(panel, tab)
@@ -92,7 +93,7 @@ class SettingsFrame(wx.Frame):
         sizer.Add(notebook, 1, wx.EXPAND | wx.ALL, 10)
 
         # Add return button
-        return_button = wx.Button(frame, label="返回", pos=(-1, -1), size=(100, 30))
+        return_button = wx.Button(frame, label=self.language_handler.get_translation("back", "kembali"), pos=(-1, -1), size=(100, 30))
         return_button.Bind(wx.EVT_BUTTON, self.on_return)
         return_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         sizer.Add(return_button, 0, wx.ALIGN_CENTER | wx.ALL, 10)
@@ -190,6 +191,7 @@ class SettingsFrame(wx.Frame):
                     else:
                         choice.Bind(wx.EVT_CHOICE, lambda event, variable=setting: self.on_choice(event, variable))
                     height += 10
+                    
                 elif setting_info["type"] == "button":
                     button = wx.Button(panel, label=setting, pos=(width + 25, 10 + height), size = (200,-1))
                     button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
@@ -242,125 +244,130 @@ class SettingsFrame(wx.Frame):
         socketed_gpu_models = socketed_imac_models + ["MacPro3,1", "MacPro4,1", "MacPro5,1", "Xserve2,1", "Xserve3,1"]
 
         settings = {
-            "创建": {
-                "概览": {
+            self.language_handler.get_translation("membuat"): {
+                self.language_handler.get_translation("ringkasan"): {
                     "type": "title",
                 },
-                "固件启动": {
+                self.language_handler.get_translation("Booting_firmware"): {
                     "type": "checkbox",
                     "value": self.constants.firewire_boot,
                     "variable": "firewire_boot",
                     "description": [
-                        "启用从火线驱动器",
-                        "启动macOS",
+                        self.language_handler.get_translation("enable_fireware_driver"),
+                        self.language_handler.get_translation("start_macos"),
                     ],
                     "condition": not (generate_smbios.check_firewire(self.constants.custom_model or self.constants.computer.real_model) is False)
                 },
-                "XHCI启动": {
+                self.language_handler.get_translation("start_XHCI"): {
                     "type": "checkbox",
                     "value": self.constants.xhci_boot,
                     "variable": "xhci_boot",
                     "description": [
-                        "在没有原生支持的系统上，启用从",
-                        "USB 3.0扩展卡启动macOS。",
+                        self.language_handler.get_translation("In_a_system_without_native_support_activate"),
+                        self.language_handler.get_translation("usb_expansion"),
                     ],
                     "condition": not gui_support.CheckProperties(self.constants).host_has_cpu_gen(cpu_data.CPUGen.ivy_bridge) # Sandy Bridge and older do not natively support XHCI booting
                 },
-                "NVMe启动": {
+                self.language_handler.get_translation("booting_nvme"): {
                     "type": "checkbox",
                     "value": self.constants.nvme_boot,
                     "variable": "nvme_boot",
                     "description": [
-                        "启用macOS中对",
-                        "NVMe驱动器的非原生",
-                        "支持",
-                        "注意：需要你的机器支持NVMe",
-                        "OC才可以从NVMe驱动器启动。",
+                        self.language_handler.get_translation("start_macos"),
+                        self.language_handler.get_translation("Non-original_NVMe_drive"),
+                        self.language_handler.get_translation("support"),
+                        self.language_handler.get_translation("Note:_Your_machine_must_support_NVMe."),
+                        self.language_handler.get_translation("OC_can_be_booted_from_the_NVMe_drive."),
                     ],
                     "condition": not gui_support.CheckProperties(self.constants).host_has_cpu_gen(cpu_data.CPUGen.ivy_bridge) # Sandy Bridge and older do not natively support NVMe booting
                 },
                 "wrap_around 2": {
                     "type": "wrap_around",
                 },
-                "OpenCore签名保护": {
+                self.language_handler.get_translation("Protection_of_OpenCore_Digital_Signature"): {
                     "type": "checkbox",
                     "value": self.constants.vault,
                     "variable": "vault",
                     "description": [
-                        "对OpenCore进行数字签名，以防止",
-                        "篡改&破坏"
+                        self.language_handler.get_translation("description_digitaly_signin"),
                     ],
                 },
 
-                "显示OpenCore引导界面": {
+                self.language_handler.get_translation("Displaying_the_OpenCore_boot_interface"): {
                     "type": "checkbox",
                     "value": self.constants.showpicker,
                     "variable": "showpicker",
                     "description": [
-                        "禁用时，用户可以按住ESC键",
-                        "在固件中显示选择器",
+                        self.language_handler.get_translation("when_deactive"),
                     ],
                 },
-                "引导界面等待时间": {
+                self.language_handler.get_translation("Boot_interface_wait_time"): {
                     "type": "spinctrl",
                     "value": self.constants.oc_timeout,
                     "variable": "oc_timeout",
                     "description": [
-                        "在引导选择器选择默认",
-                        "条目之前的超时时间（秒）。",
-                        "设置为0表示无超时。",
+                        self.language_handler.get_translation("On_the_boot_selector,_choose_default."),
+                        self.language_handler.get_translation("Time_runs_out_a_second_before_entering."),
+                        self.language_handler.get_translation("Setting_this_to_0_means_there_is_no_deadline."),
                     ],
 
                     "min": 0,
                     "max": 60,
                 },
-                "MacPro3,1/Xserve2,1 解决方案": {
+                self.language_handler.get_translation("MacPro3.1/Xserve2.1Solutions"): {
                     "type": "checkbox",
                     "value": self.constants.force_quad_thread,
                     "variable": "force_quad_thread",
                     "description": [
-                        "在这些单元上限制最大线程数为4。",
-                        "macOS Sequoia及更高版本需要。",
+                        self.language_handler.get_translation("Limitthemaximumnumberofthreadsonthisunitto4."),
+                        self.language_handler.get_translation("RequiredformacOSSequoiaandnewerversions."),
                     ],
                     "condition": (self.constants.custom_model and self.constants.custom_model in ["MacPro3,1", "Xserve2,1"]) or self.constants.computer.real_model in ["MacPro3,1", "Xserve2,1"]
                 },
-                "调试": {
+                self.language_handler.get_translation("Debugging"): {
                     "type": "title",
                 },
 
-                "啰嗦模式": {
+#                "Mode Verbose": {
+#                    "type": "checkbox",
+#                    "value": self.constants.verbose_debug,
+#                    "variable": "verbose_debug",
+#                    "description": [
+#                       self.language_handler.get_translation("Outputverboseinformationupon_startup"),
+#                    ],
+#                },
+
+                self.language_handler.get_translation("verbose_debug"): {
                     "type": "checkbox",
                     "value": self.constants.verbose_debug,
                     "variable": "verbose_debug",
                     "description": [
-                        "启动时输出详细信息",
+                        self.language_handler.get_translation("Outputverboseinformationupon_startup"),
                     ],
-
-                },
-                "调试版本驱动": {
+                },            
+            
+                self.language_handler.get_translation("debug_version_driver"): {
                     "type": "checkbox",
                     "value": self.constants.kext_debug,
                     "variable": "kext_debug",
                     "description": [
-                        "使用kext的DEBUG版本，并",
-                        "启用额外的内核日志记录。",
+                        self.language_handler.get_translation("use_debug"),
                     ],
                 },
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "调试版本OpenCore": {
+                self.language_handler.get_translation("debugging_OpenCore_version"): {
                     "type": "checkbox",
                     "value": self.constants.opencore_debug,
                     "variable": "opencore_debug",
                     "description": [
-                        "使用OpenCore的DEBUG版本，并",
-                        "启用额外的内核日志记录。",
+                        self.language_handler.get_translation("Use_the_DEBUG_version")
                     ],
                 },
             },
-            "额外": {
-                "通用（可持续生效）": {
+            self.language_handler.get_translation("Additional"): {
+                self.language_handler.get_translation("Universal(effectivesustainability)"): {
                     "type": "title",
                 },
                 "WOL": {
@@ -368,19 +375,19 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.enable_wake_on_wlan,
                     "variable": "enable_wake_on_wlan",
                     "description": [
-                        "默认情况下禁用，因为在某些系统上从唤醒状态可能会",
-                        "导致性能下降",
-                        "仅适用于BCM943224、331、",
-                        "360和3602芯片组。",
+                        self.language_handler.get_translation("Disabled_by_default"),
+                        self.language_handler.get_translation("Causes_performance_degradation"),
+                        self.language_handler.get_translation("Applicable_only_to_BCM943224,_331,"),
+                        self.language_handler.get_translation("360and3602chipsets."),
                     ],
                 },
-                "禁用雷电⚡️": {
+                self.language_handler.get_translation("Disable_Thunder"): {
                     "type": "checkbox",
                     "value": self.constants.disable_tb,
                     "variable": "disable_tb",
                     "description": [
-                        "针对有故障",
-                        "导致PCH可能会偶尔崩溃的MacBookPro11,x。",
+                        self.language_handler.get_translation("Regarding_the_malfunction"),
+                        self.language_handler.get_translation("PCHmayoccasionallycrashonMacBookPro11,x."),
                     ],
                     "condition": (self.constants.custom_model and self.constants.custom_model in ["MacBookPro11,1", "MacBookPro11,2", "MacBookPro11,3"]) or self.constants.computer.real_model in ["MacBookPro11,1", "MacBookPro11,2", "MacBookPro11,3"]
                 },
@@ -389,105 +396,104 @@ class SettingsFrame(wx.Frame):
                     "value": self.constants.dGPU_switch,
                     "variable": "dGPU_switch",
                     "description": [
-                        "允许在Windows中暴露iGPU",
-                        "用于基于dGPU的MacBooks。",
+                        self.language_handler.get_translation("Allow_exposing_iGPU_in_Windows"),
+                        self.language_handler.get_translation("UsedfordGPU-basedMacBooks"),
                     ],
                 },
-                "禁用CPUFriend": {
+                self.language_handler.get_translation("Disable_CPUFriend"): {
                     "type": "checkbox",
                     "value": self.constants.disallow_cpufriend,
                     "variable": "disallow_cpufriend",
                     "description": [
-                    "禁用不支持型号的",
-                    "CPUFriend",
+                    self.language_handler.get_translation("DisableCPUFriendforunsupportedmodels.")
                     ],
                 },
-                "禁用mediaanalysisd服务": {
+                self.language_handler.get_translation("Disablethemediaanalysisdservice"): {
                     "type": "checkbox",
                     "value": self.constants.disable_mediaanalysisd,
                     "variable": "disable_mediaanalysisd",
                     "description": [
-                        "对于使用3802-Based GPU的iCloud",
-                        "Photos，这可能会延缓",
-                        "CPU占用",
+                        self.language_handler.get_translation("RegardingiCloudusing3802-BasedGPUs"),
+                        self.language_handler.get_translation("Photos,this_may_delay."),
+                        self.language_handler.get_translation("CPU_usage"),
                     ],
                     "condition": gui_support.CheckProperties(self.constants).host_has_3802_gpu()
                 },
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "允许使用AppleALC音频": {
+                self.language_handler.get_translation("Allow_the_use_of_AppleALC_audio"): {
                     "type": "checkbox",
                     "value": self.constants.set_alc_usage,
                     "variable": "set_alc_usage",
                     "description": [
-                        "如果适用，允许AppleALC管理音频",
-                        "仅在主机缺少GOP ROM时禁用。",
+                        self.language_handler.get_translation("AllowAppleALCtomanageaudioifapplicable."),
+                        self.language_handler.get_translation("DisabledonlywhenthehostlackstheGOPROM."),
                     ],
                 },
-                "写入NVRAM": {
+                self.language_handler.get_translation("WritetoNVRAM"): {
                     "type": "checkbox",
                     "value": self.constants.nvram_write,
                     "variable": "nvram_write",
                     "description": [
-                        "允许OpenCore写入NVRAM。",
-                        "在有故障或",
-                        "降级的NVRAM系统上禁用。",
+                        self.language_handler.get_translation("AllowOpenCoretowritetoNVRAM."),
+                        self.language_handler.get_translation("Incaseoramalfunctionor"),
+                        self.language_handler.get_translation("DisabledondowngradedNVRAMsystem."),
                     ],
                 },
 
-                "第三方NVMe电源管理": {
+                self.language_handler.get_translation("Third-partyNVMepowermanagement"): {
                     "type": "checkbox",
                     "value": self.constants.allow_nvme_fixing,
                     "variable": "allow_nvme_fixing",
                     "description": [
-                        "在 macOS 中启用未被提供的",
-                        "NVMe 电源管理",
+                        self.language_handler.get_translation("EnableunprovidedfeaturesinmacOS"),
+                        self.language_handler.get_translation("NVMepowermanagement"),
                     ],
                 },
-                "第三方SATA电源管理": {
+                self.language_handler.get_translation("Third-partySATApowermanagement"): {
                     "type": "checkbox",
                     "value": self.constants.allow_3rd_party_drives,
                     "variable": "allow_3rd_party_drives",
                     "description": [
-                        "在 macOS 中启用未被提供的",
-                        "SATA 电源管理",
+                        self.language_handler.get_translation("EnableunprovidedfeaturesinmacOS"),
+                        self.language_handler.get_translation("SATA_power_management"),
                     ],
                     "condition": not bool(self.constants.computer.third_party_sata_ssd is False and not self.constants.custom_model)
                 },
-                "Trim相关": {
+                self.language_handler.get_translation("Trim_related"): {
                     "type": "checkbox",
                     "value": self.constants.apfs_trim_timeout,
                     "variable": "apfs_trim_timeout",
                     "description": [
-                        "建议所有用户使用，即使有故障",
-                        "SSDs 可能也会从禁用此功能中受益。",
+                        self.language_handler.get_translation("Itisrecommendedthatallusersuseit,evenifthereareissues."),
+                        self.language_handler.get_translation("SSDsmayalsobenefitfromdisablingthisfeature."),
                     ],
                 },
             },
-            "高级": {
-                "杂项": {
+            self.language_handler.get_translation("advanced"): {
+                self.language_handler.get_translation("Various_kinds"): {
                     "type": "title",
                 },
-                "Disable Firmware Throttling": {
+                self.language_handler.get_translation("Disable_Firmware_Throttling"): {
                     "type": "checkbox",
                     "value": self.constants.disable_fw_throttle,
                     "variable": "disable_fw_throttle",
                     "description": [
-                        "禁用基于固件的限制",
-                        "由缺少硬件引起",
-                        "例如缺少显示器、电池等",
+                        self.language_handler.get_translation("Disable_firmware-based_restrictions"),
+                        self.language_handler.get_translation("Caused_by_lack_of_hardware"),
+                        self.language_handler.get_translation("Forexample,missingmonitors,batteries,etc."),
                     ],
                 },
-                "Software DeMUX": {
+                self.language_handler.get_translation("Software_DeMUX"): {
                     "type": "checkbox",
                     "value": self.constants.software_demux,
                     "variable": "software_demux",
                     "description": [
-                        "启用基于软件的 DeMUX",
-                        "适用于 MacBookPro8,2 和 MacBookPro8,3.",
-                        "防止有故障的 dGPU 启用",
-                        "注意：需要相关的 NVRAM 参数：",
+                        self.language_handler.get_translation("Enable_software-based_DeMUX"),
+                        self.language_handler.get_translation("Applicable_to_MacBookPro8,2_and_MacBookPro8,3."),
+                        self.language_handler.get_translation("Prevent_the_faulty_dGPU_from_being_enabled."),
+                        self.language_handler.get_translation("Note:Relevant_NVRAM_parameters_are_required:"),
                         "'gpu-power-prefs'.",
                     ],
                     "warning": "This settings requires 'gpu-power-prefs' NVRAM argument to be set to '1'.\n\nIf missing and this option is toggled, the system will not boot\n\nFull command:\nnvram FA4CE28D-B62F-4C99-9CC3-6815686E30F9:gpu-power-prefs=%01%00%00%00",
@@ -496,7 +502,7 @@ class SettingsFrame(wx.Frame):
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "启用不支持的功能": {
+                self.language_handler.get_translation("Enable_unsupported_features"): {
                     "type": "choice",
                     "choices": [
                         "Enabled",
@@ -506,9 +512,9 @@ class SettingsFrame(wx.Frame):
                     "value": "Enabled",
                     "variable": "",
                     "description": [
-                        "配置 FeatureUnlock 等级.",
-                        "如果您的系统提示建议降低",
-                        "由于遇到内存不稳定",
+                        self.language_handler.get_translation("Configure_FeatureUnlock_level."),
+                        self.language_handler.get_translation("If_your_system_prompts_to_suggest_lowering"),
+                        self.language_handler.get_translation("Due_to_encountering_unstable_memory."),
                     ],
                 },
                 "Populate FeatureUnlock Override": {
@@ -516,44 +522,44 @@ class SettingsFrame(wx.Frame):
                     "function": self._populate_fu_override,
                     "args": wx.Frame,
                 },
-                "休眠方案": {
+                self.language_handler.get_translation("Sleep_Plan"): {
                     "type": "checkbox",
                     "value": self.constants.disable_connectdrivers,
                     "variable": "disable_connectdrivers",
                     "description": [
-                        "仅加载最低 EFI 驱动程序",
-                        "防止休眠问题",
-                        "注意：这可能会中断从",
-                        "外置硬盘的启动",
+                        self.language_handler.get_translation("Load_only_the_minimum_EFI_drivers"),
+                        self.language_handler.get_translation("Prevent_sleep_issues"),
+                        self.language_handler.get_translation("Note:This_may_interrupt_from"),
+                        self.language_handler.get_translation("Booting_from_an_external_hard_drive"),
                     ],
                 },
-                "显卡": {
+                self.language_handler.get_translation("Graphics_card"): {
                     "type": "title",
                 },
-                "AMD GOP 注入": {
+                self.language_handler.get_translation("AMD_GOP_injection"): {
                     "type": "checkbox",
                     "value": self.constants.amd_gop_injection,
                     "variable": "amd_gop_injection",
                     "description": [
-                        "注入AMD GOP来显示",
-                        "启动界面",
+                        self.language_handler.get_translation("Inject_AMD_GOP_to_display"),
+                        self.language_handler.get_translation("Start_screen"),
                     ],
                     "condition": not bool((not self.constants.custom_model and self.constants.computer.real_model not in socketed_gpu_models) or (self.constants.custom_model and self.constants.custom_model not in socketed_gpu_models))
                 },
-                "Nvidia GOP 注入": {
+                self.language_handler.get_translation("Nvidia_GOP_injection"): {
                     "type": "checkbox",
                     "value": self.constants.nvidia_kepler_gop_injection,
                     "variable": "nvidia_kepler_gop_injection",
                     "description": [
-                        "注入Nvidia Kepler GOP来显示",
-                        "启动界面",
+                        self.language_handler.get_translation("Inject_Nvidia_Kepler_GOP_for_sisplay"),
+                        self.language_handler.get_translation("Start_screen"),
                     ],
                     "condition": not bool((not self.constants.custom_model and self.constants.computer.real_model not in socketed_gpu_models) or (self.constants.custom_model and self.constants.custom_model not in socketed_gpu_models))
                 },
                 "wrap_around 2": {
                     "type": "wrap_around",
                 },
-                "显卡覆写": {
+                self.language_handler.get_translation("Graphics_card_overwrite"): {
                     "type": "choice",
                     "choices": [
                         "None",
@@ -566,8 +572,8 @@ class SettingsFrame(wx.Frame):
                     "value": "None",
                     "variable": "",
                     "description": [
-                        "覆盖检测到的/假设的 MXM显卡",
-                        "适用于MXM-based iMacs.",
+                        self.language_handler.get_translation("Cover_detected/hypothetical_MXM_graphics_card"),
+                        self.language_handler.get_translation("Applicable_to_MXM-based_iMacs."),
                     ],
                     "condition": bool((not self.constants.custom_model and self.constants.computer.real_model in socketed_imac_models) or (self.constants.custom_model and self.constants.custom_model in socketed_imac_models))
                 },
@@ -578,42 +584,42 @@ class SettingsFrame(wx.Frame):
                 },
 
             },
-            "安全": {
-                "内核安全": {
+            self.language_handler.get_translation("Security"): {
+                self.language_handler.get_translation("Kernel_Security"): {
                     "type": "title",
                 },
-                "禁用资源库验证": {
+                self.language_handler.get_translation("Disable_resource_library_validation"): {
                     "type": "checkbox",
                     "value": self.constants.disable_cs_lv,
                     "variable": "disable_cs_lv",
                     "description": [
-                        "在打补丁时注入修改后",
-                        "的系统文件时需要",
+                        self.language_handler.get_translation("After_injecting_modifications_while_patching"),
+                        self.language_handler.get_translation("When_the_system_files_are_needed"),
                     ],
                 },
-                "禁用 AMFI": {
+                self.language_handler.get_translation("Disable_AMFI"): {
                     "type": "checkbox",
                     "value": self.constants.disable_amfi,
                     "variable": "disable_amfi",
                     "description": [
-                        "在打补丁时注入修改后",
-                        "的系统文件时需要",
+                        self.language_handler.get_translation("After_injecting_modifications_while_patching"),
+                        self.language_handler.get_translation("When_the_system_files_are_needed"),
                     ],
                 },
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "安全启动机型": {
+                self.language_handler.get_translation("Safe_boot_model"): {
                     "type": "checkbox",
                     "value": self.constants.secure_status,
                     "variable": "secure_status",
                     "description": [
-                        "设置 Apple 安全启动模型标识符",
-                        "如果已经仿冒，则匹配 T2 模型",
-                        "注意：与驱动补丁不兼容",
+                        self.language_handler.get_translation("Set_Apple_Secure_Boot_Model_Identifier"),
+                        self.language_handler.get_translation("If_it_has_been_counterfeited,then_match_the_T2_model."),
+                        self.language_handler.get_translation("Note:Incompatible_with_driver_patches"),
                     ],
                 },
-                "系统完整性保护（SIP）": {
+                self.language_handler.get_translation("System_Integrity_Protection_(SIP)"): {
                     "type": "title",
                 },
                 "Populate SIP": {
@@ -623,156 +629,142 @@ class SettingsFrame(wx.Frame):
                 },
             },
             "SMBIOS": {
-                "机型覆写": {
+                self.language_handler.get_translation("Model_Replacement"): {
                     "type": "title",
                 },
-                "SMBIOS 覆写等级": {
+                self.language_handler.get_translation("SMBIOS_Replacement_Level"): {
                     "type": "choice",
                     "choices": [
-                        "None",
-                        "Minimal",
-                        "Moderate",
-                        "Advanced",
+                        self.language_handler.get_translation("None"),
+                        self.language_handler.get_translation("Minimal"),
+                        self.language_handler.get_translation("Moderate"),
+                        self.language_handler.get_translation("advanced"),
                     ],
                     "value": self.constants.serial_settings,
                     "variable": "serial_settings",
                     "description": [
-                        "支持的级别：",
-                        "    - 无：无",
-                        "   - 小: 覆写 Board ID.",
-                        "   - 中: 覆写 Model.",
-                        "   - 高: 覆写 Model 和 serial.",
+                        self.language_handler.get_translation("Supported_levels:"),
+                        self.language_handler.get_translation("- None:_None"),
+                        self.language_handler.get_translation("- Small:_Board_ID."),
+                        self.language_handler.get_translation("- Inside:_Change_Model."),
+                        self.language_handler.get_translation("- Height:_Change_model_and_serial.")
                     ],
                 },
 
-                "SMBIOS 机型覆写": {
+                self.language_handler.get_translation("SMBIOS_Model_Replacement"): {
                     "type": "choice",
-                    "choices": models + ["Default"],
+                    "choices": models + [self.language_handler.get_translation("Default")],
                     "value": self.constants.override_smbios,
                     "variable": "override_smbios",
                     "description": [
-                        "设置仿冒的机型",
+                        self.language_handler.get_translation("Prepare_a_fake_model"),
                     ],
 
                 },
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "允许覆写原生支持的Mac": {
+                self.language_handler.get_translation("Enables_replacement_of_natively_supported_Macs"): {
                     "type": "checkbox",
                     "value": self.constants.allow_native_spoofs,
                     "variable": "allow_native_spoofs",
                     "description": [
-                        "允许 OpenCore 仿冒原生",
-                        "受支持的Mac.",
-                        "主要用于启用",
-                        "不受支持的 Mac 上的 Universal Control",
+                        "",
+                        self.language_handler.get_translation("Allow_OpenCore_to_mimic_native"),
+                        self.language_handler.get_translation("Supported_Mac."),
+                        self.language_handler.get_translation("Mainly_used_to_activate"),
+                        self.language_handler.get_translation("Universal_Control_on_unsupported_Mac"),
                     ],
                 },
-                "序列号覆写": {
+                self.language_handler.get_translation("Serial_number_overwrite"): {
                     "type": "title",
                 },
-                "Populate 序列号覆写": {
+                "Populate Serial Override": {
                     "type": "populate",
                     "function": self._populate_serial_spoofing_settings,
                     "args": wx.Frame,
                 },
             },
-            "补丁": {
-                "根目录补丁": {
+            self.language_handler.get_translation("Patching"): {
+                self.language_handler.get_translation("Patch_root_directory"): {
                     "type": "title",
                 },
-                "TeraScale 2 Acceleration": {
+                self.language_handler.get_translation("TeraScale_2_Acceleration"): {
                     "type": "checkbox",
                     "value": global_settings.GlobalEnviromentSettings().read_property("MacBookPro_TeraScale_2_Accel") or self.constants.allow_ts2_accel,
                     "variable": "MacBookPro_TeraScale_2_Accel",
                     "constants_variable": "allow_ts2_accel",
                     "description": [
-                        "启用 AMD TeraScale 2 GPU",
-                        "在 MacBookPro8,2 和",
-                        "MacBookPro8,3 上的加速。",
-                        "默认情况下这是禁用的，因为",
-                        "这些型号的 GPU 常见故障。"
+                        self.language_handler.get_translation("Activating_AMD_TeraScale_2_GPU"),
+                        self.language_handler.get_translation("On_the_MacBookPro8,2_and"),
+                        self.language_handler.get_translation("Acceleration_on_MacBookPro8,3."),
+                        self.language_handler.get_translation("This_is_disabled_by_default_because"),
+                        self.language_handler.get_translation("This_GPU_model_has_common_failures.")
                     ],
                     "override_function": self._update_global_settings,
                     "condition": not bool(self.constants.computer.real_model not in ["MacBookPro8,2", "MacBookPro8,3"])
                 },
-                "允许安装旧版HDA环境扩展补丁": {
+                self.language_handler.get_translation("Allow_the_installation_of_the_old_HDA_environment_extension_patch"): {
                     "type": "checkbox",
                     "value": self.constants.allow_hda_patch,
                     "variable": "allow_hda_patch",
                     "description": [
-                        "允许在Tahoe及以上系统",
-                        "启用AppleHDA驱动声卡",
-                        "搭配AppleALC.kext"
+                        "",
+                        self.language_handler.get_translation("Allowed_on_Tahoe_system_and_above"),
+                        self.language_handler.get_translation("Activate_the_AppleHDA_driver_for_the_sound_card"),
+                        self.language_handler.get_translation("With_AppleALC.kext")
                     ],
                 },
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "允许安装旧版USB环境扩展补丁": {
+                self.language_handler.get_translation("Allow_the_installation_of_the_old_USB_environment_extension_patch"): {
                     "type": "checkbox",
                     "value": self.constants.allow_usb_patch,
                     "variable": "allow_usb_patch",
                     "description": [
-                        "允许在Tahoe及以上系统",
-                        "安装旧版USB环境扩展"
-                    ],
-                },
-                "允许安装旧版启动台": {
-                    "type": "checkbox",
-                    "value": self.constants.allow_launchpad_patch,
-                    "variable": "allow_launchpad_patch",
-                    "description": [
-                        "在macOS Tahoe Beta 4及更高版本恢复启动台",
-                    ],
-                },
-                "使用的启动台版本": {
-                    "type": "choice",
-                    "choices": ["26.0 Beta 4","26.0 Beta 2"],
-                    "value": self.constants.launchpad_verison,
-                    "variable": "launchpad_verison",
-                    "description": [
-                        "设置要移植的启动台版本",
+                        "",
+                        self.language_handler.get_translation("Allowed_on_Tahoe_system_and_above"),
+                        self.language_handler.get_translation("Installing_USB_Legacy_Environment_Extension")
                     ],
                 },
                 "wrap_around 1": {
                     "type": "wrap_around",
                 },
-                "Non-Metal配置": {
+                self.language_handler.get_translation("Non-Metal_Configuration"): {
                     "type": "title",
                 },
-                "需要重新登录来应用SkyLight插件": {
+                self.language_handler.get_translation("Logout_is_required_to_apply_changes_to_SkyLight"): {
                     "type": "sub_title",
                 },
-                "暗黑模式菜单": {
+                self.language_handler.get_translation("Dark_Mode_Menu"): {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea_DarkMenuBar"),
                     "variable": "Moraea_DarkMenuBar",
                     "description": [
-                        "如果启用了 Beta 菜单栏，",
-                        "菜单栏颜色将根据需要动态变化。"
+                        self.language_handler.get_translation("If_the_Beta_menu_bar_is_activated,the_menu_bar_color_will_be_dynamic_as_needed"),
+                        # self.language_handler.get_translation("change")
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
                 },
-                "测试版毛玻璃": {
+                self.language_handler.get_translation("beta_blur"): {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea_BlurBeta"),
                     "variable": "Moraea_BlurBeta",
                     "description": [
-                        "控制毛玻璃行为。",
+                        self.language_handler.get_translation("Control_window_blur_behaviour."),
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
 
                 },
-                "加载光标（彩虹圈圈）解决方案": {
+                self.language_handler.get_translation("Solution_to_load_the_cursor_(rainbow_circle)"): {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea.EnableSpinHack"),
                     "variable": "Moraea.EnableSpinHack",
                     "description": [
-                        "注意：可能会占用更多 CPU 资源。",
+                        self.language_handler.get_translation("Note:May_use_more_CPU_resources."),
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
@@ -780,55 +772,51 @@ class SettingsFrame(wx.Frame):
                 "wrap_around 2": {
                     "type": "wrap_around",
                 },
-                "测试版菜单栏": {
+                self.language_handler.get_translation("Beta_Menu_Bar"): {
                     "type": "checkbox",
                     "value": self._get_system_settings("Amy.MenuBar2Beta"),
                     "variable": "Amy.MenuBar2Beta",
                     "description": [
-                        "支持动态颜色变化。注意：此设置仍在试验阶段。",
-                        "如果遇到问题，请禁用此设置。"
+                        self.language_handler.get_translation("support_for_dynamic_color")
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
                 },
-                "禁用 Beta Rim": {
+                self.language_handler.get_translation("Disable_Beta_Rim"): {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea_RimBetaDisabled"),
                     "variable": "Moraea_RimBetaDisabled",
                     "description": [
-                        "控制窗口边缘的渲染效果",
+                        self.language_handler.get_translation("Control_the_window_edge_rendering_effect"),
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
                 },
-                "控制桌面小部件颜色强制执行": {
+                self.language_handler.get_translation("Control_the_application_of_widget_colors_on_the_desktop"): {
                     "type": "checkbox",
                     "value": self._get_system_settings("Moraea_ColorWidgetDisabled"),
                     "variable": "Moraea_ColorWidgetDisabled",
                     "description": [
-                        "控制桌面小部件颜色强制执行",
+                        self.language_handler.get_translation("Control_the_application_of_widget_colors_on_the_desktop"),
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
                 },
             },
-            "App": {
-                "通用": {
+            self.language_handler.get_translation("App"): {
+                self.language_handler.get_translation("General"): {
                     "type": "title",
                 },
-                "允许原生机型": {
+                self.language_handler.get_translation("Allow_native_models"): {
                     "type": "checkbox",
                     "value": self.constants.allow_oc_everywhere,
                     "variable": "allow_oc_everywhere",
                     "description": [
-                        "允许在原生支持的Mac上安装OpenCore。",
-                        "注意这不会允许不支持的",
-                        "macOS版本安装在",
-                        "你的系统上。"
+                        self.language_handler.get_translation("Allows_the_installation_of_OpenCore")
                     ],
-                    "注意": "这个选项仅应在您的Mac原生支持您想要运行的操作系统时使用。\n\n如果您当前正在运行一个不支持的操作系统，这个选项将会导致启动失败。\n\n仅在原生Mac上切换以启用操作系统特性。\n\n您确定要继续吗？",
+                    "attention": self.language_handler.get_translation("attention_this_option_should"),
                 },
-                "忽略App更新": {
+                self.language_handler.get_translation("Ignore_app_updates"): {
                     "type": "checkbox",
                     "value": global_settings.GlobalEnviromentSettings().read_property("IgnoreAppUpdates") or self.constants.ignore_updates,
                     "variable": "IgnoreAppUpdates",
@@ -838,55 +826,29 @@ class SettingsFrame(wx.Frame):
                     ],
                     "override_function": self._update_global_settings,
                 },
-                "移除未使用的KDK": {
+                "wrap_around 1": {
+                    "type": "wrap_around",
+                },
+                self.language_handler.get_translation("Disabled_Report"): {
+                    "type": "checkbox",
+                    "value": global_settings.GlobalEnviromentSettings().read_property("DisableCrashAndAnalyticsReporting"),
+                    "variable": "DisableCrashAndAnalyticsReporting",
+                    "description": [
+                        self.language_handler.get_translation("When_enabled,_the_patch_will_not_report_any_information_to_laobamac.")
+                    ],
+                    "override_function": self._update_global_settings,
+                },
+                self.language_handler.get_translation("Remove_unused_KDK"): {
                     "type": "checkbox",
                     "value": global_settings.GlobalEnviromentSettings().read_property("ShouldNukeKDKs") or self.constants.should_nuke_kdks,
                     "variable": "ShouldNukeKDKs",
                     "constants_variable": "should_nuke_kdks",
                     "description": [
-                        "当启用时，应用程序将从系统中移除",
-                        "未使用的KDK",
-                        "在根目录修补期间。",
+                        self.language_handler.get_translation("WhenenabledtheapplicationwillremoveunusedKDKsfromthesystemduringrootdirectorypatching"),
                     ],
                     "override_function": self._update_global_settings,
                 },
-                "wrap_around 1": {
-                    "type": "wrap_around",
-                },
-                "禁用报告": {
-                    "type": "checkbox",
-                    "value": global_settings.GlobalEnviromentSettings().read_property("DisableCrashAndAnalyticsReporting"),
-                    "variable": "DisableCrashAndAnalyticsReporting",
-                    "description": [
-                        "当启用时，修补程序将不会",
-                        "向laobamac报告任何信息。",
-                    ],
-                    "override_function": self._update_global_settings,
-                },
-                "使用SimpleHac API下载所需资源": {
-                    "type": "checkbox",
-                    "value": self.constants.use_simplehacapi,
-                    "variable": "use_simplehacapi",
-                    "description": [
-                        "通过SimpleHac API下载Github资源",
-                        "关闭后将直接请求Github",
-                    ],
-                },
-                "SimpleHac API节点": {
-                    "type": "choice",
-                    "choices": [
-                        "OMAPIv1",
-                        "OMAPIv2",
-                    ],
-                    "value": self.constants.simplehacapi_url or "OMAPIv2",
-                    "variable": "simplehacapi_url",
-                    "description": [
-                        "选择SimpleHac API使用的节点，手动切",
-                        "换重启生效。不懂别瞎改，程序自动切换！",
-                    ],
-                    "condition": self.constants.use_simplehacapi,
-                },
-                "统计": {
+                self.language_handler.get_translation("Statistics"): {
                     "type": "title",
                 },
                 "Populate Stats": {
@@ -895,17 +857,17 @@ class SettingsFrame(wx.Frame):
                     "args": wx.Frame,
                 },
             },
-            "开发者": {
-                "验证": {
+            "Developer": {
+                "Verification": {
                     "type": "title",
                 },
-                "安装最新日构建版本 🧪": {
+                "Install Latest Nightly Build 🧪": {
                     "type": "button",
                     "function": self.on_nightly,
                     "description": [
-                        "如果你已经在这里，我假设你已经准备好了",
-                        "冒着系统变砖的风险 🧱。",
-                        "在盲目更新前请检查更新日志。",
+                        "If you're here, I assume you're ready to",
+                        "risk bricking your system 🧱.",
+                        "Please check the changelog before blindly updating.",
                     ],
                 },
                 "Trigger Exception": {
@@ -925,10 +887,10 @@ class SettingsFrame(wx.Frame):
                     ],
                 },
 
-                "开发者补丁选项": {
+                "Developer Patch Options": {
                     "type": "title",
                 },
-                "挂载根目录": {
+                "Mount Root Volume": {
                     "type": "button",
                     "function": self.on_mount_root_vol,
                     "description": [
@@ -940,11 +902,11 @@ class SettingsFrame(wx.Frame):
                 "wrap_around 2": {
                     "type": "wrap_around",
                 },
-                "保存根目录": {
+                "Bless Root Volume": {
                     "type": "button",
                     "function": self.on_bless_root_vol,
                     "description": [
-                        "重建内核缓存并祈祷快照别寄（bushi 🙏",
+                        "Rebuild kernel cache and pray snapshot doesn't break 🙏",
                     ],
                 },
             },
@@ -957,9 +919,9 @@ class SettingsFrame(wx.Frame):
         """
         Sets model to use for patching.
         """
-
+    
         selection = model_choice.GetStringSelection()
-        if selection == "主机机型":
+        if selection == self.language_handler.get_translation("Host_model"):
             selection = self.constants.computer.real_model
             self.constants.custom_model = None
             logging.info(f"Using Real Model: {self.constants.computer.real_model}")
@@ -972,7 +934,7 @@ class SettingsFrame(wx.Frame):
 
 
 
-        self.parent.model_label.SetLabel(f"机型: {selection}")
+        self.parent.model_label.SetLabel(f"Model: {selection}")
         self.parent.model_label.Centre(wx.HORIZONTAL)
 
         self.frame_modal.Destroy()
@@ -983,31 +945,42 @@ class SettingsFrame(wx.Frame):
             screen_location=self.parent.GetPosition()
         )
 
-
     def _populate_sip_settings(self, panel: wx.Frame) -> None:
-
         horizontal_spacer = 250
 
         # Look for title on frame
         sip_title: wx.StaticText = None
         for child in panel.GetChildren():
-            if child.GetLabel() == "系统完整性保护（SIP）":
+            if child.GetLabel() == self.language_handler.get_translation("System_Integrity_Protection_(SIP)"):
                 sip_title = child
                 break
 
+        # Calculate center position based on title
+        title_pos = sip_title.GetPosition()
+        title_width = sip_title.GetSize().width
+        center_x = title_pos.x + (title_width // 2)
 
         # Label: Flip individual bits corresponding to XNU's csr.h
         # If you're unfamiliar with how SIP works, do not touch this menu
-        sip_label = wx.StaticText(panel, label="反转对应于", pos=(sip_title.GetPosition()[0] - 20, sip_title.GetPosition()[1] + 30))
+        sip_label = wx.StaticText(panel, label=self.language_handler.get_translation("Reverse_corresponds_to"))
         sip_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
+
+        # Calculate label position to be centered
+        label_width = sip_label.GetSize().width
+        sip_label.SetPosition((center_x - (label_width // 2), title_pos.y + 30))
 
         # Hyperlink: csr.h
         spacer = 1 if self.constants.detected_os >= os_data.os_data.big_sur else 3
-        sip_csr_h = wx.adv.HyperlinkCtrl(panel, id=wx.ID_ANY, label="XNU's csr.h", url="https://github.com/apple-oss-distributions/xnu/blob/xnu-8020.101.4/bsd/sys/csr.h", pos=(sip_label.GetPosition()[0] + sip_label.GetSize()[0] + 4, sip_label.GetPosition()[1] + spacer))
+        sip_csr_h = wx.adv.HyperlinkCtrl(panel, id=wx.ID_ANY, label="XNU's csr.h",
+                                         url="https://github.com/apple-oss-distributions/xnu/blob/xnu-8020.101.4/bsd/sys/csr.h")
         sip_csr_h.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         sip_csr_h.SetHoverColour(self.hyperlink_colour)
         sip_csr_h.SetNormalColour(self.hyperlink_colour)
         sip_csr_h.SetVisitedColour(self.hyperlink_colour)
+
+        # Position hyperlink next to label
+        hyperlink_x = sip_label.GetPosition().x + sip_label.GetSize().width + 4
+        sip_csr_h.SetPosition((hyperlink_x, sip_label.GetPosition().y + spacer))
 
         # Label: SIP Status
         if self.constants.custom_sip_value is not None:
@@ -1016,14 +989,22 @@ class SettingsFrame(wx.Frame):
             self.sip_value = 0x00
         else:
             self.sip_value = 0x803
-        sip_configured_label = wx.StaticText(panel, label=f"当前设置的SIP: {hex(self.sip_value)}", pos=(sip_label.GetPosition()[0] + 35, sip_label.GetPosition()[1] + 20))
+
+        sip_configured_label = wx.StaticText(panel,
+                                             label=f"{self.language_handler.get_translation('Current_set_SIP:')} {hex(self.sip_value)}")
         sip_configured_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
+        # Center this label
+        configured_width = sip_configured_label.GetSize().width
+        sip_configured_label.SetPosition((center_x - (configured_width // 2), sip_label.GetPosition().y + 20))
         self.sip_configured_label = sip_configured_label
 
         # Label: SIP Status
-        sip_booted_label = wx.StaticText(panel, label=f"当前启动的SIP: {hex(py_sip_xnu.SipXnu().get_sip_status().value)}", pos=(sip_configured_label.GetPosition()[0], sip_configured_label.GetPosition()[1] + 20))
+        sip_booted_label = wx.StaticText(panel,
+                                         label=f"{self.language_handler.get_translation('Currently_started_SIP:')} {hex(py_sip_xnu.SipXnu().get_sip_status().value)}")
         sip_booted_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-
+        # Center this label
+        booted_width = sip_booted_label.GetSize().width
+        sip_booted_label.SetPosition((center_x - (booted_width // 2), sip_configured_label.GetPosition().y + 20))
 
         # SIP toggles
         entries_per_row = len(sip_data.system_integrity_protection.csr_values) // 2
@@ -1031,12 +1012,18 @@ class SettingsFrame(wx.Frame):
         vertical_spacer = 25
         index = 1
         for sip_bit in sip_data.system_integrity_protection.csr_values_extended:
-            self.sip_checkbox = wx.CheckBox(panel, label=sip_data.system_integrity_protection.csr_values_extended[sip_bit]["name"].split("CSR_")[1], pos = (vertical_spacer, sip_booted_label.GetPosition()[1] + 20 + horizontal_spacer))
+            self.sip_checkbox = wx.CheckBox(panel, label=
+            sip_data.system_integrity_protection.csr_values_extended[sip_bit]["name"].split("CSR_")[1])
             self.sip_checkbox.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-            self.sip_checkbox.SetToolTip(f'Description: {sip_data.system_integrity_protection.csr_values_extended[sip_bit]["description"]}\nValue: {hex(sip_data.system_integrity_protection.csr_values_extended[sip_bit]["value"])}\nIntroduced in: macOS {sip_data.system_integrity_protection.csr_values_extended[sip_bit]["introduced_friendly"]}')
+            self.sip_checkbox.SetToolTip(
+                f'Description: {sip_data.system_integrity_protection.csr_values_extended[sip_bit]["description"]}\nValue: {hex(sip_data.system_integrity_protection.csr_values_extended[sip_bit]["value"])}\nIntroduced in: macOS {sip_data.system_integrity_protection.csr_values_extended[sip_bit]["introduced_friendly"]}')
 
-            if self.sip_value & sip_data.system_integrity_protection.csr_values_extended[sip_bit]["value"] == sip_data.system_integrity_protection.csr_values_extended[sip_bit]["value"]:
+            if self.sip_value & sip_data.system_integrity_protection.csr_values_extended[sip_bit]["value"] == \
+                    sip_data.system_integrity_protection.csr_values_extended[sip_bit]["value"]:
                 self.sip_checkbox.SetValue(True)
+
+            # Position checkbox
+            self.sip_checkbox.SetPosition((vertical_spacer, sip_booted_label.GetPosition().y + 20 + horizontal_spacer))
 
             horizontal_spacer += 20
             if index == entries_per_row:
@@ -1046,40 +1033,82 @@ class SettingsFrame(wx.Frame):
             index += 1
             self.sip_checkbox.Bind(wx.EVT_CHECKBOX, self.on_sip_value)
 
-
     def _populate_serial_spoofing_settings(self, panel: wx.Frame) -> None:
         title: wx.StaticText = None
         for child in panel.GetChildren():
-            if child.GetLabel() == "序列号覆写":
+            if child.GetLabel() == self.language_handler.get_translation("Serial_number_overwrite"):
                 title = child
                 break
 
+        # Calculate positions based on title position
+        title_pos = title.GetPosition()
+
+        # Field dimensions
+        field_width = 200
+        spacing = 20
+
+        # Calculate center position relative to title
+        # We'll use the title's x position as our reference point
+        center_x = title_pos.x + (title.GetSize().width // 2)
+
+        # Position for left field (Custom Serial Number)
+        left_x = center_x - field_width - spacing // 2
+
+        # Position for right field (Custom Board Serial Number)
+        right_x = center_x + spacing // 2
+
+        # Vertical positions
+        label_y = title_pos.y + 30
+        textbox_y = label_y + 20
+        button_y = textbox_y + 40
+
         # Label: Custom Serial Number
-        custom_serial_number_label = wx.StaticText(panel, label="自定义序列号", pos=(title.GetPosition()[0] - 150, title.GetPosition()[1] + 30))
+        custom_serial_number_label = wx.StaticText(
+            panel,
+            label=self.language_handler.get_translation("custom_serial"),
+            pos=(left_x, label_y)
+        )
         custom_serial_number_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
 
         # Textbox: Custom Serial Number
-        custom_serial_number_textbox = wx.TextCtrl(panel, pos=(custom_serial_number_label.GetPosition()[0] - 27, custom_serial_number_label.GetPosition()[1] + 20), size=(200, 25))
+        custom_serial_number_textbox = wx.TextCtrl(
+            panel,
+            pos=(left_x, textbox_y),
+            size=(field_width, 25)
+        )
         custom_serial_number_textbox.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-        custom_serial_number_textbox.SetToolTip("在此处输入自定义序列号。这将用于 SMBIOS 和 iMessage。\n\n注意：如果未选中 \"使用自定义序列号\" 复选框，则不会使用该复选按钮。")
+        custom_serial_number_textbox.SetToolTip("Enter a custom serial number here...")
         custom_serial_number_textbox.Bind(wx.EVT_TEXT, self.on_custom_serial_number_textbox)
         custom_serial_number_textbox.SetValue(self.constants.custom_serial_number)
         self.custom_serial_number_textbox = custom_serial_number_textbox
 
         # Label: Custom Board Serial Number
-        custom_board_serial_number_label = wx.StaticText(panel, label="自定义主板序列号", pos=(title.GetPosition()[0] + 120, custom_serial_number_label.GetPosition()[1]))
+        custom_board_serial_number_label = wx.StaticText(
+            panel,
+            label=self.language_handler.get_translation("custom_board_serial"),
+            pos=(right_x, label_y)
+        )
         custom_board_serial_number_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_BOLD))
 
         # Textbox: Custom Board Serial Number
-        custom_board_serial_number_textbox = wx.TextCtrl(panel, pos=(custom_board_serial_number_label.GetPosition()[0] - 5, custom_serial_number_textbox.GetPosition()[1]), size=(200, 25))
+        custom_board_serial_number_textbox = wx.TextCtrl(
+            panel,
+            pos=(right_x, textbox_y),
+            size=(field_width, 25)
+        )
         custom_board_serial_number_textbox.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
-        custom_board_serial_number_textbox.SetToolTip("Enter a custom board serial number here. This will be used for the SMBIOS and iMessage.\n\nNote: This will not be used if the \"Use Custom Board Serial Number\" checkbox is not checked.")
+        custom_board_serial_number_textbox.SetToolTip("Enter a custom board serial number here...")
         custom_board_serial_number_textbox.Bind(wx.EVT_TEXT, self.on_custom_board_serial_number_textbox)
         custom_board_serial_number_textbox.SetValue(self.constants.custom_board_serial_number)
         self.custom_board_serial_number_textbox = custom_board_serial_number_textbox
 
-        # Button: Generate Serial Number (below)
-        generate_serial_number_button = wx.Button(panel, label=f"生成 S/N: {self.constants.custom_model or self.constants.computer.real_model}", pos=(title.GetPosition()[0] - 30, custom_board_serial_number_label.GetPosition()[1] + 60), size=(200, 25))
+        # Button: Generate Serial Number (centered below both fields)
+        generate_serial_number_button = wx.Button(
+            panel,
+            label=f"{self.language_handler.get_translation('generate_serial')} {self.constants.custom_model or self.constants.computer.real_model}",
+            pos=(center_x - 100, button_y),
+            size=(200, 25)
+        )
         generate_serial_number_button.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         generate_serial_number_button.Bind(wx.EVT_BUTTON, self.on_generate_serial_number)
 
@@ -1087,28 +1116,28 @@ class SettingsFrame(wx.Frame):
     def _populate_app_stats(self, panel: wx.Frame) -> None:
         title: wx.StaticText = None
         for child in panel.GetChildren():
-            if child.GetLabel() == "统计":
+            if child.GetLabel() == self.language_handler.get_translation("Statistics"):
                 title = child
                 break
 
-        lines = f"""软件信息:
-    软件版本: {self.constants.patcher_version}
-    补丁支持包版本: {self.constants.patcher_support_pkg_version}
-    软件路径: {self.constants.launcher_binary}
-    软件加载: {self.constants.payload_path}
+        lines = f"""{self.language_handler.get_translation('Software_Information')}:
+    {self.language_handler.get_translation("Software_version")}: {self.constants.patcher_version}
+    {self.language_handler.get_translation("Patch_support_package_version")}: {self.constants.patcher_support_pkg_version}
+    {self.language_handler.get_translation("Software_Path")}: {self.constants.launcher_binary}
+    {self.language_handler.get_translation("Software_loading")}: {self.constants.payload_path}
 
 Commit Information:
     Branch: {self.constants.commit_info[0]}
     Date: {self.constants.commit_info[1]}
     URL: {self.constants.commit_info[2] if self.constants.commit_info[2] != "" else "N/A"}
 
-启动信息:
+{self.language_handler.get_translation("Startup_information")}:
     Booted OS: XNU {self.constants.detected_os} ({self.constants.detected_os_version})
     Booted Patcher Version: {self.constants.computer.oclp_version}
     Booted OpenCore Version: {self.constants.computer.opencore_version}
     Booted OpenCore Disk: {self.constants.booted_oc_disk}
 
-硬件信息:
+{self.language_handler.get_translation("Hardware_Information")}:
     {pprint.pformat(self.constants.computer, indent=4)}
 """
         # TextCtrl: properties
@@ -1225,7 +1254,7 @@ Commit Information:
         else:
             self.constants.custom_sip_value = hex(self.sip_value)
 
-        self.sip_configured_label.SetLabel(f"当前配置的SIP: {hex(self.sip_value)}")
+        self.sip_configured_label.SetLabel(f"Currently Configured SIP: {hex(self.sip_value)}")
 
     def on_choice(self, event: wx.Event, label: str) -> None:
         """
@@ -1235,7 +1264,7 @@ Commit Information:
 
 
     def on_generate_serial_number(self, event: wx.Event) -> None:
-        dlg = wx.MessageDialog(self.frame_modal, "使用序列号覆写时请小心，这只能在合法获得并需要重新覆写序列号的机器上使用。\n\n注意：新的序列号仅通过 OpenCore 覆盖，不会永久安装到 ROM 中。\n\n如果系统不需要仿冒，滥用此设置可能会破坏电源管理和操作系统。\n\nlaobamac 不容忍在被盗设备上使用OCLP-Mod！如经发现，OCLP-Mod将根据法律与MIT License追究责任。\n\n您确定要继续吗？", "警告", wx.YES_NO | wx.ICON_WARNING | wx.NO_DEFAULT)
+        dlg = wx.MessageDialog(self.frame_modal, "Be careful when using serial number override, this should only be used on machines that are legally obtained and need to re-override the serial number.\n\nNote: The new serial number is only overridden via OpenCore and will not be permanently installed in ROM.\n\nAbusing this setting may break power management and the operating system if the system doesn't need spoofing.\n\nlaobamac does not tolerate the use of OCLP-Mod on stolen devices! If discovered, OCLP-Mod will hold you accountable according to law and MIT License.\n\nAre you sure you want to continue?", "Warning", wx.YES_NO | wx.ICON_WARNING | wx.NO_DEFAULT)
         if dlg.ShowModal() != wx.ID_YES:
             return
 
@@ -1245,7 +1274,7 @@ Commit Information:
             self.custom_serial_number_textbox.SetValue(macserial_output[0])
             self.custom_board_serial_number_textbox.SetValue(macserial_output[1])
         else:
-            wx.MessageBox(f"生成序列号失败:\n\n{macserial_output}", "错误", wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(f"Failed to generate serial number:\n\n{macserial_output}", "Error", wx.OK | wx.ICON_ERROR)
 
 
     def on_custom_serial_number_textbox(self, event: wx.Event) -> None:

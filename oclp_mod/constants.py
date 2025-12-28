@@ -13,10 +13,17 @@ from .detections import device_probe
 class Constants:
     def __init__(self) -> None:
         # Patcher Versioning
-        self.patcher_version:                 str = "3.1.3"  # oclp-mod
+        self.patcher_version:                 str = "3.1.2"  # oclp-mod
         self.patcher_support_pkg_version:     str = "1.9.9"  # PatcherSupportPkg
         self.copyright_date:                  str = "Copyright © 2020-2025 Dortania and laobamac"
         self.patcher_name:                    str = "OCLP-Mod"
+        
+        # Language Support
+        self.current_language: str = "English"  # Default language
+        self.language_options = {
+            "English": "English",
+            "中文": "中文"
+        }
 
         # URLs
         self.url_patcher_support_pkg:         str = "https://github.com/laobamac/PatcherSupportPkg/releases/download/"

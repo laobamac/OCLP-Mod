@@ -14,11 +14,11 @@ from ..wx_gui import gui_support
 class AboutFrame(wx.Frame):
 
     def __init__(self, global_constants: constants.Constants) -> None:
-        if wx.FindWindowByName("关于"):
+        if wx.FindWindowByName("About"):
             return
 
         logging.info("Generating About frame")
-        super(AboutFrame, self).__init__(None, title="关于", size=(350, 350), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
+        super(AboutFrame, self).__init__(None, title="About", size=(350, 350), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
         self.constants: constants.Constants = global_constants
         self.Centre()
         self.hyperlink_colour = (25, 179, 231)
@@ -36,16 +36,16 @@ class AboutFrame(wx.Frame):
         title.Centre(wx.HORIZONTAL)
 
         # Set version
-        version = wx.StaticText(frame, label=f"版本: {self.constants.patcher_version}", pos=(-1, title.GetPosition()[1] + title.GetSize()[1] + 5))
+        version = wx.StaticText(frame, label=f"Version: {self.constants.patcher_version}", pos=(-1, title.GetPosition()[1] + title.GetSize()[1] + 5))
         version.SetFont(gui_support.font_factory(11, wx.FONTWEIGHT_NORMAL))
         version.Centre(wx.HORIZONTAL)
 
         # Description
         description = [
-            "这是一个喜欢咕咕的高中生Mod的OCLP",
-            "SimpleHac[laobamac]修改并汉化",
-            "SimpleHac资源社：www.simplehac.cn",
-            "Q群：965625664",
+            "OCLP Mod by a high school student who loves to code",
+            "Modified and translated by SimpleHac[laobamac]",
+            "SimpleHac Resources: www.simplehac.cn",
+            "QQ Group: 965625664",
         ]
         spacer = 5
         for line in description:
