@@ -8,6 +8,7 @@ from pathlib import Path
 from ..base import BasePatchset
 
 from ....constants import Constants
+from ....languages.language_handler import LanguageHandler
 
 from ....datasets.os_data       import os_data
 from ....datasets.sip_data      import system_integrity_protection
@@ -19,10 +20,10 @@ class HardwareVariant(StrEnum):
     """
     Hardware variant for patch set
     """
-    GRAPHICS:      str = "显卡"
-    NETWORKING:    str = "网卡"
-    AUDIO:         str = "音频"
-    MISCELLANEOUS: str = "杂项"
+    GRAPHICS:      str = "Graphics"
+    NETWORKING:    str = "Networking"
+    AUDIO:         str = "Audio"
+    MISCELLANEOUS: str = "Miscellaneous"
 
 
 class HardwareVariantGraphicsSubclass(StrEnum):
@@ -45,6 +46,7 @@ class BaseHardware(BasePatchset):
         self._os_build  = os_build
         self._constants = global_constants
         self._computer  = global_constants.computer
+        self._language_handler = LanguageHandler(global_constants)
 
         self._xnu_float = float(f"{self._xnu_major}.{self._xnu_minor}")
 
@@ -75,6 +77,22 @@ class BaseHardware(BasePatchset):
         What hardware variant is this patch set for
         """
         raise NotImplementedError
+
+
+    def _localized_hardware_variant(self) -> str:
+        """
+        Get localized name for hardware variant
+        """
+        variant = self.hardware_variant()
+        if variant == HardwareVariant.GRAPHICS:
+            return self._language_handler.get_translation("hw_variant_graphics", "Graphics")
+        elif variant == HardwareVariant.NETWORKING:
+            return self._language_handler.get_translation("hw_variant_networking", "Networking")
+        elif variant == HardwareVariant.AUDIO:
+            return self._language_handler.get_translation("hw_variant_audio", "Audio")
+        elif variant == HardwareVariant.MISCELLANEOUS:
+            return self._language_handler.get_translation("hw_variant_miscellaneous", "Miscellaneous")
+        return str(variant)
 
 
     def hardware_variant_graphics_subclass(self) -> HardwareVariantGraphicsSubclass:

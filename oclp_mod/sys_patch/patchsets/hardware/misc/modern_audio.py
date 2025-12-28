@@ -24,7 +24,7 @@ class ModernAudio(BaseHardware):
         """
         Display name for end users
         """
-        return f"{self.hardware_variant()}: 音频补丁"
+        return f"{self._localized_hardware_variant()}: {self._language_handler.get_translation('audio_patch', 'Audio Patch')}"
 
 
     def present(self) -> bool:
@@ -74,7 +74,7 @@ class ModernAudio(BaseHardware):
             return {}
 
         return {
-            "音频补丁": {
+            "Audio Patch": {
                 PatchType.MERGE_SYSTEM_VOLUME: {
                     "/System/Library/Extensions": {
                         "AppleHDA.kext": "15.6",

@@ -16,6 +16,7 @@ from .. import constants
 
 from ..datasets import os_data
 from ..volume   import generate_copy_arguments
+from ..languages.language_handler import LanguageHandler
 
 from . import (
     network_handler,
@@ -62,6 +63,7 @@ class KernelDebugKitObject:
         ) -> None:
 
         self.constants: constants.Constants = global_constants
+        self.language_handler: LanguageHandler = LanguageHandler(global_constants)
 
         self.host_build:   str = host_build    # ex. 20A5384c
         self.host_version: str = host_version  # ex. 11.0.1
@@ -273,7 +275,7 @@ class KernelDebugKitObject:
                 logging.warning(f"未找到适用于 {host_build} ({host_version}) 的 KDK")
                 self.error_msg = f"未找到适用于 {host_build} ({host_version}) 的 KDK"
                 return
-            logging.info(f"未找到 {host_build} 的直接匹配，回退到最接近的匹配")
+            logging.info(self.language_handler.get_translation("kdk_no_direct_match", "No direct match found for {host_build}, falling back to closest match").format(host_build=host_build))
             logging.info(f"最接近的匹配: {self.kdk_closest_match_url_build} ({self.kdk_closest_match_url_version})")
 
             self.kdk_url = self.kdk_closest_match_url
@@ -281,7 +283,7 @@ class KernelDebugKitObject:
             self.kdk_url_version = self.kdk_closest_match_url_version
             self.kdk_url_expected_size = self.kdk_closest_match_url_expected_size
         else:
-            logging.info(f"找到 {host_build} ({host_version}) 的直接匹配")
+            logging.info(self.language_handler.get_translation("kdk_found_direct_match", "Found direct match for {host_build} ({host_version})").format(host_build=host_build, host_version=host_version))
 
 
         # 检查此 KDK 是否已安装
@@ -292,10 +294,10 @@ class KernelDebugKitObject:
             self.success = True
             return
 
-        logging.info("推荐的 KDK 如下:")
-        logging.info(f"- KDK 构建版本: {self.kdk_url_build}")
-        logging.info(f"- KDK 版本: {self.kdk_url_version}")
-        logging.info(f"- KDK URL: {self.kdk_url}")
+        logging.info(self.language_handler.get_translation("kdk_recommended_title", "Recommended KDK is as follows:"))
+        logging.info(self.language_handler.get_translation("kdk_build_version", "- KDK Build Version: {build}").format(build=self.kdk_url_build))
+        logging.info(self.language_handler.get_translation("kdk_version", "- KDK Version: {version}").format(version=self.kdk_url_version))
+        logging.info(self.language_handler.get_translation("kdk_url", "- KDK URL: {url}").format(url=self.kdk_url))
 
         self.success = True
 
@@ -391,7 +393,7 @@ class KernelDebugKitObject:
         result = subprocess.run(["/usr/sbin/pkgutil", "--files", f"com.apple.pkg.KDK.{kdk_build}"], capture_output=True)
         if result.returncode != 0:
             # If pkg receipt is missing, we'll fallback to legacy validation
-            logging.info(f"{kdk_path.name}缺少pkg收据，回退到旧版验证")
+            logging.info(self.language_handler.get_translation("kdk_missing_pkg_receipt", "{kdk_name} missing pkg receipt, falling back to legacy validation").format(kdk_name=kdk_path.name))
             return self._local_kdk_valid_legacy(kdk_path)
 
         # Go through each line of the pkg receipt and ensure it exists
@@ -399,7 +401,7 @@ class KernelDebugKitObject:
             if not line.startswith("System/Library/Extensions"):
                 continue
             if not Path(f"{kdk_path}/{line}").exists():
-                logging.info(f"发现损坏的KDK ({kdk_path.name})，由于缺少文件: {line} 而删除")
+                logging.info(self.language_handler.get_translation("kdk_corrupted_missing_file", "Found corrupted KDK ({kdk_name}), removing due to missing file: {file}").format(kdk_name=kdk_path.name, file=line))
                 self._remove_kdk(kdk_path)
                 return False
 
@@ -428,7 +430,7 @@ class KernelDebugKitObject:
 
         for kext in KEXT_CATALOG:
             if not Path(f"{kdk_path}/System/Library/Extensions/{kext}").exists():
-                logging.info(f"发现损坏的KDK，由于缺少: {kdk_path}/System/Library/Extensions/{kext} 而删除")
+                logging.info(self.language_handler.get_translation("kdk_corrupted_missing_kext", "Found corrupted KDK, removing due to missing: {kdk_path}/System/Library/Extensions/{kext}").format(kdk_path=kdk_path, kext=kext))
                 self._remove_kdk(kdk_path)
                 return False
 

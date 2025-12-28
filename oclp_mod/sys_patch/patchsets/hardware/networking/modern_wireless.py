@@ -38,24 +38,24 @@ class ModernWireless(BaseHardware):
         )
 
         if intel_detected and bcm_detected:
-            self.patchName = "Intel/BCM双网卡"
-            return f"{self.hardware_variant()}: Intel/BCM双网卡"
+            self.patchName = self._language_handler.get_translation("wireless_intel_bcm_dual", "Intel/BCM Dual Wireless")
+            return f"{self._localized_hardware_variant()}: {self.patchName}"
         elif intel_detected:
-            self.patchName = "Intel无线网卡"
-            return f"{self.hardware_variant()}: Intel无线网卡"
+            self.patchName = self._language_handler.get_translation("wireless_intel", "Intel Wireless")
+            return f"{self._localized_hardware_variant()}: {self.patchName}"
         elif bcm_detected:
-            self.patchName = "BCM无线网卡"
-            return f"{self.hardware_variant()}: BCM无线网卡"
+            self.patchName = self._language_handler.get_translation("wireless_bcm", "BCM Wireless")
+            return f"{self._localized_hardware_variant()}: {self.patchName}"
         else:
-            self.patchName = "未知无线网卡"
-            return f"{self.hardware_variant()}: 未知无线网卡"
+            self.patchName = self._language_handler.get_translation("wireless_unknown", "Unknown Wireless")
+            return f"{self._localized_hardware_variant()}: {self.patchName}"
 
 
     def present(self) -> bool:
         """
         Targeting Modern Wireless
         """
-        # 检测Broadcom无线网卡
+        # Detect Broadcom wireless card
         bcmwl_condition = isinstance(self._computer.wifi, device_probe.Broadcom) and (
             self._computer.wifi.chipset in [
                 device_probe.Broadcom.Chipsets.AirPortBrcm4360,
@@ -64,7 +64,7 @@ class ModernWireless(BaseHardware):
         ]
     )
 
-        # 检测Intel无线网卡
+        # Detect Intel wireless card
         intelwl_condition = isinstance(self._computer.wifi, device_probe.IntelWirelessCard) and (
             self._computer.wifi.chipset in [
                 device_probe.IntelWirelessCard.Chipsets.IntelWirelessIDs,
@@ -108,7 +108,7 @@ class ModernWireless(BaseHardware):
             return {}
 
         return {
-            f"{self.patchName} 补充内容": {
+            f"{self.patchName} {self._language_handler.get_translation('wireless_extended', 'Extended')}": {
                 PatchType.OVERWRITE_SYSTEM_VOLUME: {
                     "/usr/libexec": {
                         "airportd": f"13.7.2-{self._xnu_major}",

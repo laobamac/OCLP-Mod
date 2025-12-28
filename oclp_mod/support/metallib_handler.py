@@ -14,6 +14,7 @@ from .  import network_handler, subprocess_wrapper
 from .. import constants
 
 from ..datasets import os_data
+from ..languages.language_handler import LanguageHandler
 
 
 METALLIB_INSTALL_PATH: str  = "/Library/Application Support/Dortania/MetallibSupportPkg"
@@ -32,6 +33,7 @@ class MetalLibraryObject:
         ) -> None:
 
         self.constants: constants.Constants = global_constants
+        self.language_handler: LanguageHandler = LanguageHandler(global_constants)
 
         self.host_build:   str = host_build    # ex. 20A5384c
         self.host_version: str = host_version  # ex. 11.0.1
@@ -228,7 +230,7 @@ class MetalLibraryObject:
                 logging.warning(f"未找到 {self.host_build} ({self.host_version}) 的 metallibs")
                 self.error_msg = f"未找到 {self.host_build} ({self.host_version}) 的 metallibs"
                 return
-            logging.info(f"未找到 {self.host_build} 的直接匹配，回退到最接近的匹配")
+            logging.info(self.language_handler.get_translation("kdk_no_direct_match", "No direct match found for {host_build}, falling back to closest match").format(host_build=self.host_build))
             logging.info(f"最接近的匹配: {self.metallib_closest_match_url_build} ({self.metallib_closest_match_url_version})")
 
             self.metallib_url = self.metallib_closest_match_url
@@ -236,7 +238,7 @@ class MetalLibraryObject:
             self.metallib_url_version = self.metallib_closest_match_url_version
             self.metallib_file_size = self.metallib_closest_match_file_size
         else:
-            logging.info(f"找到 {self.host_build} ({self.host_version}) 的直接匹配")
+            logging.info(self.language_handler.get_translation("kdk_found_direct_match", "Found direct match for {host_build} ({host_version})").format(host_build=self.host_build, host_version=self.host_version))
 
 
         # 检查此 metallib 是否已安装
