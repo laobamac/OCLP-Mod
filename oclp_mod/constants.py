@@ -244,7 +244,7 @@ class Constants:
         self.custom_sip_value:        int = None  #  Set custom SIP value
         self.allow_usb_patch:        bool = False #  Allow USB Patch on Tahoe
         self.allow_hda_patch:        bool = True #  Allow HDA Patch on Tahoe
-        self.use_simplehacapi:       bool = None #  Use SimpleHacAPI to get resources
+        self.use_simplehacapi:       bool = True #  Use SimpleHacAPI to get resources
         self.simplehacapi_url:        str  = "OMAPIv1"  # SimpleHacAPI URL
         self.allow_launchpad_patch:  bool = False # Allow LaunchPad Patch on Tahoe
         self.launchpad_verison:       str  = "26.0 Beta 4"  # Set launchpad used

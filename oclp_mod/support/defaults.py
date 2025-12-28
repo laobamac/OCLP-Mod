@@ -15,7 +15,8 @@ from ..detections import device_probe
 from . import (
     utilities,
     generate_smbios,
-    global_settings
+    global_settings,
+    network_handler
 )
 from ..datasets import (
     smbios_data,
@@ -404,7 +405,87 @@ class GenerateDefaults:
         self.constants.disable_amfi = False
         self.constants.disable_cs_lv = False
 
-
+    def _detect_china_mainland(self) -> bool:
+        """
+        检测当前系统是否在中国大陆区域
+        
+        检测策略：
+        1. 首先尝试基于网络的IP地理位置检测
+        2. 如果网络不可用，回退到时区检测（UTC+8）
+        3. 如果所有检测方法都失败，默认返回False
+        
+        返回值：
+            bool: 如果在中国大陆返回True，否则返回False
+        """
+        try:
+            is_china = False
+            detection_method = ""
+            
+            # 首先尝试网络检测
+            try:
+                network = network_handler.NetworkUtilities()
+                
+                # 检查网络是否可用
+                if network.verify_network_connection():
+                    # 网络可用，使用IP地理位置服务
+                    import requests
+                    
+                    # 尝试多个IP地理位置服务以提高冗余性
+                    ip_services = [
+                        'https://ipapi.co/country/',
+                        'https://ipinfo.io/country',
+                    ]
+                    
+                    for service_url in ip_services:
+                        try:
+                            response = requests.get(service_url, timeout=3)
+                            if response.status_code == 200:
+                                country_data = response.text.strip().upper()
+                                
+                                # ipapi.co和ipinfo.io直接返回国家代码
+                                country_code = country_data
+                                
+                                # 检查国家代码是否表示中国大陆
+                                is_china = (country_code == 'CN')
+                                detection_method = f"IP地理位置服务 ({service_url})"
+                                logging.info(f"通过{service_url}进行网络检测: 国家代码={country_code}, 中国大陆={is_china}")
+                                break
+                                
+                        except Exception as service_error:
+                            logging.debug(f"IP服务{service_url}失败: {service_error}")
+                            continue
+                    
+                    # 如果所有IP服务都失败，回退到时区检测
+                    if detection_method == "":
+                        raise Exception("所有IP地理位置服务都不可用")
+                        
+                else:
+                    # 网络不可用，直接使用时区检测
+                    raise Exception("网络连接不可用")
+                    
+            except Exception as network_error:
+                # 网络检测失败，使用时区检测作为备用方案
+                import time
+                
+                # 中国大陆使用UTC+8时区
+                # time.timezone返回的是本地时间与UTC的秒数偏移（西时区为正数，东时区为负数）
+                offset = time.timezone / -3600  # 转换为小时数，负号因为time.timezone是负数
+                is_china = (abs(offset - 8) < 0.5)  # 允许0.5小时的误差，考虑夏令时等情况
+                detection_method = f"时区检测 (UTC偏移={offset})"
+                logging.info(f"时区检测: UTC偏移={offset}, 中国大陆={is_china}")
+                logging.debug(f"网络检测失败，使用时区检测: {network_error}")
+            
+            # 设置常量值
+            self.constants.use_simplehacapi = is_china
+            logging.info(f"中国大陆区域检测完成: 使用{detection_method}, 结果={is_china}, 设置use_simplehacapi={is_china}")
+            return is_china
+            
+        except Exception as e:
+            logging.error(f"检测中国大陆区域失败: {e}")
+            # 如果检测失败，默认设为False
+            self.constants.use_simplehacapi = True
+            return False
+        
     def _load_gui_defaults(self) -> None:
         """
         Load GUI defaults from global settings
@@ -446,3 +527,12 @@ class GenerateDefaults:
 
                 logging.info(f"设置 {constants_key} 到 {plist[key]}")
                 setattr(self.constants, constants_key, plist[key])
+
+        # 自动检测中国大陆区域以选择API服务器
+        # 仅在 use_simplehacapi 为 True 时进行检测
+        if hasattr(self.constants, 'use_simplehacapi'):
+            if self.constants.use_simplehacapi is True:
+                self._detect_china_mainland()
+        else:
+            # 如果常量不存在，则创建它
+            self.constants.use_simplehacapi = self._detect_china_mainland()
