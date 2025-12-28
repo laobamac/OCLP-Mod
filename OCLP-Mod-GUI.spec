@@ -20,6 +20,8 @@ block_cipher = None
 datas = [
    ('payloads.dmg', '.'),
    ('Universal-Binaries.dmg', '.'),
+   ('oclp_mod/languages/en_US.json', 'oclp_mod/languages'),
+   ('oclp_mod/languages/zh_CN.json', 'oclp_mod/languages'),
 ]
 
 if Path("laobamacInternalResources.dmg").exists():
