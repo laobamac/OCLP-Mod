@@ -68,6 +68,4 @@ python3 Build-Project.command
 open ./dist/
 ```
 
-Once done, you'll find the application generated at `./dist/OCLP-Mod.app`:
-
-![](./images/build-dist.png)
+Once done, you'll find the application generated at `./dist/OCLP-Mod.app`.
