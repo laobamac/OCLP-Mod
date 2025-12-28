@@ -381,5 +381,20 @@
     "wireless_bcm":"BCM Wireless",
     "wireless_unknown":"Unknown Wireless",
     "audio_patch":"Audio Patch",
-    "wireless_extended":"Extended"
+    "wireless_extended":"Extended",
+    "validation_unsupported_host_os":"Unsupported Host OS",
+    "validation_missing_network_connection":"Missing Network Connection",
+    "validation_filevault_enabled":"FileVault Enabled",
+    "validation_sip_enabled":"SIP Enabled",
+    "validation_secure_boot_model_enabled":"SecureBootModel Enabled",
+    "validation_amfi_enabled":"AMFI Enabled",
+    "validation_whatevergreen_missing":"WhateverGreen.kext Missing",
+    "validation_force_opengl_missing":"Force OpenGL Missing",
+    "validation_force_compat_missing":"Force Compat Missing",
+    "validation_nvda_drv_missing":"nvda_drv(_vrl) Boot Argument Missing",
+    "validation_patching_not_possible":"Patching Not Possible",
+    "validation_unpatching_not_possible":"Unpatching Not Possible",
+    "validation_repatching_not_supported":"Repatching Not Supported",
+    "validation_boot_sip_label":"Boot SIP:",
+    "validation_required_label":"Required:"
 }

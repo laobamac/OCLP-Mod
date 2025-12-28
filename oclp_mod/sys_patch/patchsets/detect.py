@@ -80,19 +80,19 @@ class HardwarePatchsetValidation(StrEnum):
     """
     Enum for validation settings
     """
-    UNSUPPORTED_HOST_OS           = "验证: 不支持此系统版本"
-    MISSING_NETWORK_CONNECTION    = "验证: 网络未连接"
-    FILEVAULT_ENABLED             = "验证: 文件保险箱已开启"
-    SIP_ENABLED                   = "验证: SIP已开启"
-    SECURE_BOOT_MODEL_ENABLED     = "验证: SecureBootModel 已开启"
-    AMFI_ENABLED                  = "验证: AMFI已开启"
-    WHATEVERGREEN_MISSING         = "验证: WhateverGreen.kext 未找到"
-    FORCE_OPENGL_MISSING          = "验证: Force OpenGL参数缺失"
-    FORCE_COMPAT_MISSING          = "验证: Force compat参数缺失"
-    NVDA_DRV_MISSING              = "验证: nvda_drv(_vrl)启动参数未添加"
-    PATCHING_NOT_POSSIBLE         = "验证: 无法应用补丁"
-    UNPATCHING_NOT_POSSIBLE       = "验证: 无法卸载补丁"
-    REPATCHING_NOT_SUPPORTED      = "验证: 根目录不纯净，请先卸载一次补丁再继续"
+    UNSUPPORTED_HOST_OS           = "Validation: Unsupported Host OS"
+    MISSING_NETWORK_CONNECTION    = "Validation: Missing Network Connection"
+    FILEVAULT_ENABLED             = "Validation: FileVault Enabled"
+    SIP_ENABLED                   = "Validation: SIP Enabled"
+    SECURE_BOOT_MODEL_ENABLED     = "Validation: SecureBootModel Enabled"
+    AMFI_ENABLED                  = "Validation: AMFI Enabled"
+    WHATEVERGREEN_MISSING         = "Validation: WhateverGreen.kext Missing"
+    FORCE_OPENGL_MISSING          = "Validation: Force OpenGL Missing"
+    FORCE_COMPAT_MISSING          = "Validation: Force Compat Missing"
+    NVDA_DRV_MISSING              = "Validation: nvda_drv(_vrl) Boot Argument Missing"
+    PATCHING_NOT_POSSIBLE         = "Validation: Patching Not Possible"
+    UNPATCHING_NOT_POSSIBLE       = "Validation: Unpatching Not Possible"
+    REPATCHING_NOT_SUPPORTED      = "Validation: Repatching Not Supported"
 
 
 class HardwarePatchsetDetection:
@@ -376,7 +376,7 @@ class HardwarePatchsetDetection:
         for key, value in requirements.items():
             if key in ignore_keys:
                 continue
-            if not key.startswith("验证:"):
+            if not key.startswith("Validation:"):
                 continue
             if value is True:
                 return False
@@ -480,7 +480,7 @@ class HardwarePatchsetDetection:
         """
         current_sip_status  = hex(py_sip_xnu.SipXnu().get_sip_status().value)
         expected_sip_status = hex(self._convert_required_sip_config_to_int(required_sip_configs))
-        sip_string = f"验证: 启动时SIP: {current_sip_status} vs 需要: {expected_sip_status}"
+        sip_string = f"Validation: Boot SIP: {current_sip_status} vs Required: {expected_sip_status}"
         index = list(requirements.keys()).index(HardwarePatchsetValidation.SIP_ENABLED)
         return dict(list(requirements.items())[:index+1] + [(sip_string, True)] + list(requirements.items())[index+1:])
 
@@ -604,10 +604,10 @@ class HardwarePatchsetDetection:
         """
         logging.error("- Breakdown:")
         for key, value in self.device_properties.items():
-            if not key.startswith("验证:"):
+            if not key.startswith("Validation:"):
                 continue
             if key in [HardwarePatchsetValidation.PATCHING_NOT_POSSIBLE, HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE]:
                 continue
             if value is False:
                 continue
-            logging.error(f"  - {key.replace('验证: ', '')}")
+            logging.error(f"  - {key.replace('Validation: ', '')}")

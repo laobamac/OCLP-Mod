@@ -381,5 +381,20 @@
     "wireless_bcm":"BCM无线网卡",
     "wireless_unknown":"未知无线网卡",
     "audio_patch":"音频补丁",
-    "wireless_extended":"补充内容"
+    "wireless_extended":"补充内容",
+    "validation_unsupported_host_os":"不支持此系统版本",
+    "validation_missing_network_connection":"网络未连接",
+    "validation_filevault_enabled":"文件保险箱已开启",
+    "validation_sip_enabled":"SIP已开启",
+    "validation_secure_boot_model_enabled":"SecureBootModel 已开启",
+    "validation_amfi_enabled":"AMFI已开启",
+    "validation_whatevergreen_missing":"WhateverGreen.kext 未找到",
+    "validation_force_opengl_missing":"Force OpenGL参数缺失",
+    "validation_force_compat_missing":"Force compat参数缺失",
+    "validation_nvda_drv_missing":"nvda_drv(_vrl)启动参数未添加",
+    "validation_patching_not_possible":"无法应用补丁",
+    "validation_unpatching_not_possible":"无法卸载补丁",
+    "validation_repatching_not_supported":"根目录不纯净，请先卸载一次补丁再继续",
+    "validation_boot_sip_label":"启动时SIP:",
+    "validation_required_label":"需要:"
 }

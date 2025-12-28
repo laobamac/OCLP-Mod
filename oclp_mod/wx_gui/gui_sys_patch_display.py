@@ -52,6 +52,60 @@ class SysPatchDisplayFrame(wx.Frame):
                 gui_support.RestartHost(self.frame).restart(message=self.language_handler.get_translation("no_patches_needed_restart", "No patches needed!\n\nWould you like to restart now to install OpenCore?"))
 
 
+    def _translate_validation_message(self, validation_key: str) -> str:
+        """
+        Translate validation message key to localized text
+        
+        Args:
+            validation_key: The validation key (e.g., "Validation: AMFI Enabled")
+        
+        Returns:
+            Translated validation message
+        """
+        # Extract the message part after "Validation: "
+        if validation_key.startswith("Validation: "):
+            message_part = validation_key.replace("Validation: ", "", 1)
+            
+            # Map to translation keys
+            translation_map = {
+                "Unsupported Host OS": "validation_unsupported_host_os",
+                "Missing Network Connection": "validation_missing_network_connection",
+                "FileVault Enabled": "validation_filevault_enabled",
+                "SIP Enabled": "validation_sip_enabled",
+                "SecureBootModel Enabled": "validation_secure_boot_model_enabled",
+                "AMFI Enabled": "validation_amfi_enabled",
+                "WhateverGreen.kext Missing": "validation_whatevergreen_missing",
+                "Force OpenGL Missing": "validation_force_opengl_missing",
+                "Force Compat Missing": "validation_force_compat_missing",
+                "nvda_drv(_vrl) Boot Argument Missing": "validation_nvda_drv_missing",
+                "Patching Not Possible": "validation_patching_not_possible",
+                "Unpatching Not Possible": "validation_unpatching_not_possible",
+                "Repatching Not Supported": "validation_repatching_not_supported",
+            }
+            
+            # Handle dynamic SIP messages
+            if message_part.startswith("Boot SIP:"):
+                # Parse dynamic SIP message: "Boot SIP: 0x... vs Required: 0x..."
+                # Localize the labels but keep the hex values
+                parts = message_part.split(" vs ")
+                if len(parts) == 2:
+                    boot_sip_label = self.language_handler.get_translation("validation_boot_sip_label", "Boot SIP:")
+                    required_label = self.language_handler.get_translation("validation_required_label", "Required:")
+                    # Extract hex values
+                    boot_value = parts[0].replace("Boot SIP:", "").strip()
+                    required_value = parts[1].replace("Required:", "").strip()
+                    return f"{boot_sip_label} {boot_value} vs {required_label} {required_value}"
+                return message_part
+            
+            translation_key = translation_map.get(message_part, None)
+            if translation_key:
+                return self.language_handler.get_translation(translation_key, message_part)
+            
+            return message_part
+        
+        return validation_key
+
+
     def _generate_elements_display_patches(self, frame: wx.Frame = None) -> None:
         """
         Generate UI elements for root patching frame
@@ -109,10 +163,10 @@ class SysPatchDisplayFrame(wx.Frame):
         # can_unpatch: bool = not patches[HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE]
         can_unpatch: bool = not patches.get(HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE, False)
 
-        # The patch system uses Chinese prefixes "设置:" and "验证:" in patch names
+        # The patch system uses prefixes "设置:" and "Validation:" in patch names
         # We need to check for these specific prefixes
         settings_prefix = "设置"
-        verification_prefix = "验证"
+        verification_prefix = "Validation"
         
         if not any(not patch.startswith(settings_prefix) and not patch.startswith(verification_prefix) and patches[patch] is True for patch in patches):
             logging.info("No applicable patches available")
@@ -175,7 +229,10 @@ class SysPatchDisplayFrame(wx.Frame):
 
                     if len(patch) > len(longest_patch):
                         longest_patch = patch
-                anchor = wx.StaticText(frame, label=longest_patch.split(f'{verification_prefix}: ')[1] if f'{verification_prefix}: ' in longest_patch else longest_patch, pos=(-1, patch_label.GetPosition()[1] + 20))
+                
+                # Translate the longest patch for sizing
+                translated_longest_patch = self._translate_validation_message(longest_patch)
+                anchor = wx.StaticText(frame, label=translated_longest_patch, pos=(-1, patch_label.GetPosition()[1] + 20))
                 anchor.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
                 anchor.Centre(wx.HORIZONTAL)
                 anchor.Hide()
@@ -189,8 +246,9 @@ class SysPatchDisplayFrame(wx.Frame):
                     if patch in [HardwarePatchsetValidation.PATCHING_NOT_POSSIBLE, HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE]:
                         continue
 
-                    patch_text = patch.split(f'{verification_prefix}: ')[1] if f'{verification_prefix}: ' in patch else patch
-                    patch_label = wx.StaticText(frame, label=f"- {patch_text}", pos=(anchor.GetPosition()[0], anchor.GetPosition()[1] + i))
+                    # Translate the validation message
+                    translated_patch_text = self._translate_validation_message(patch)
+                    patch_label = wx.StaticText(frame, label=f"- {translated_patch_text}", pos=(anchor.GetPosition()[0], anchor.GetPosition()[1] + i))
                     patch_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
                     i = i + 20
 
@@ -321,9 +379,9 @@ class SysPatchDisplayFrame(wx.Frame):
             # ie. all patches applicable
             return True
 
-        # The patch system uses Chinese prefixes "设置:" and "验证:" in patch names
+        # The patch system uses prefixes "设置:" and "Validation:" in patch names
         settings_prefix = "设置"
-        verification_prefix = "验证"
+        verification_prefix = "Validation"
         
         oclp_plist_data = plistlib.load(open(oclp_plist, "rb"))
         for patch in patches:
