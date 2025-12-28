@@ -531,7 +531,7 @@ class GenerateDefaults:
         # 自动检测中国大陆区域以选择API服务器
         # 仅在 use_simplehacapi 为 True 时进行检测
         if hasattr(self.constants, 'use_simplehacapi'):
-            if self.constants.use_simplehacapi is True:
+            if self.constants.use_simplehacapi:
                 self._detect_china_mainland()
         else:
             # 如果常量不存在，则创建它
