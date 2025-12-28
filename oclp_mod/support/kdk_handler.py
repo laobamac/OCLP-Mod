@@ -180,13 +180,13 @@ class KernelDebugKitObject:
         parsed_version = cast(packaging.version.Version, packaging.version.parse(host_version))
 
         if os_data.os_conversion.os_to_kernel(str(parsed_version.major)) < os_data.os_data.ventura:
-            self.error_msg = "macOS Monterey 或更早版本不需要 KDK"
+            self.error_msg = self.language_handler.get_translation("kdk_monterey_or_earlier", "macOS Monterey or earlier does not require KDK")
             logging.warning(f"{self.error_msg}")
             return
 
         self.kdk_installed_path = self._local_kdk_installed()
         if self.kdk_installed_path:
-            logging.info(f"KDK 已安装 ({Path(self.kdk_installed_path).name})，跳过")
+            logging.info(self.language_handler.get_translation("kdk_already_installed", "KDK already installed ({kdk_name}), skipping").format(kdk_name=Path(self.kdk_installed_path).name))
             self.kdk_already_installed = True
             self.success = True
             return
@@ -194,31 +194,31 @@ class KernelDebugKitObject:
         remote_kdk_version = self._get_remote_kdks()
 
         if remote_kdk_version is None:
-            logging.warning("无法获取 KDK 列表，回退到本地 KDK 匹配")
+            logging.warning(self.language_handler.get_translation("kdk_unable_to_get_list", "Unable to get KDK list, falling back to local KDK matching"))
 
             # 首先检查是否安装了与当前 macOS 版本匹配的 KDK
             # 例如 13.0.1 对应 13.0
             loose_version = f"{parsed_version.major}.{parsed_version.minor}"
-            logging.info(f"检查松散匹配的 KDK {loose_version}")
+            logging.info(self.language_handler.get_translation("kdk_checking_loose_match", "Checking loosely matched KDK {loose_version}").format(loose_version=loose_version))
             self.kdk_installed_path = self._local_kdk_installed(match=loose_version, check_version=True)
             if self.kdk_installed_path:
-                logging.info(f"找到匹配的 KDK: {Path(self.kdk_installed_path).name}")
+                logging.info(self.language_handler.get_translation("kdk_found_match", "Found matching KDK: {kdk_name}").format(kdk_name=Path(self.kdk_installed_path).name))
                 self.kdk_already_installed = True
                 self.success = True
                 return
 
             older_version = f"{parsed_version.major}.{parsed_version.minor - 1 if parsed_version.minor > 0 else 0}"
-            logging.info(f"检查匹配的 KDK {older_version}")
+            logging.info(self.language_handler.get_translation("kdk_checking_match", "Checking matched KDK {older_version}").format(older_version=older_version))
             self.kdk_installed_path = self._local_kdk_installed(match=older_version, check_version=True)
             if self.kdk_installed_path:
-                logging.info(f"找到匹配的 KDK: {Path(self.kdk_installed_path).name}")
+                logging.info(self.language_handler.get_translation("kdk_found_match", "Found matching KDK: {kdk_name}").format(kdk_name=Path(self.kdk_installed_path).name))
                 self.kdk_already_installed = True
                 self.success = True
                 return
 
-            logging.warning(f"找不到匹配 {host_version} 或 {older_version} 的 KDK，请手动安装一个")
+            logging.warning(self.language_handler.get_translation("kdk_not_found_manual_install", "Unable to find matching KDK for {host_version} or {older_version}, please manually install one").format(host_version=host_version, older_version=older_version))
 
-            self.error_msg = f"无法联系 KdkSupportPkg API，并且没有安装匹配 {host_version} ({host_build}) 或 {older_version} 的 KDK。\n请确保您有网络连接或手动安装一个 KDK."
+            self.error_msg = self.language_handler.get_translation("kdk_api_contact_failed", "Unable to contact KdkSupportPkg API, and no matching KDK for {host_version} ({host_build}) or {older_version} is installed.\nPlease ensure you have a network connection or manually install a KDK.").format(host_version=host_version, host_build=host_build, older_version=older_version)
 
             return
 

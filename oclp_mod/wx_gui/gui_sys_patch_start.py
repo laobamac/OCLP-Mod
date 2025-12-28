@@ -439,7 +439,7 @@ class SysPatchStartFrame(wx.Frame):
         Thus we'll need to see if the exact same OCLP build was used already
         """
 
-        logging.info("Checking if new patches are needed")
+        logging.info(self.language_handler.get_translation("checking_new_patches", "Checking if new patches are needed"))
 
         if self.constants.commit_info[0] in ["Running from source", "Built from source"]:
             return True

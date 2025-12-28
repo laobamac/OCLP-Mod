@@ -54,6 +54,7 @@ from ... import constants
 
 from ...datasets import sip_data
 from ...datasets.os_data import os_data
+from ...languages.language_handler import LanguageHandler
 from ...support import (
     network_handler,
     utilities,
@@ -103,6 +104,7 @@ class HardwarePatchsetDetection:
                  validation: bool = False # Whether to run validation checks
                  ) -> None:
         self._constants = constants
+        self._language_handler = LanguageHandler(constants)
 
         self._xnu_major  = xnu_major  or self._constants.detected_os
         self._xnu_minor  = xnu_minor  or self._constants.detected_os_minor
@@ -450,16 +452,16 @@ class HardwarePatchsetDetection:
         """
         if self._can_patch(requirements, ignore_keys=[HardwarePatchsetValidation.MISSING_NETWORK_CONNECTION]) is False:
             return requirements, device_properties
-        logging.info("网络连接缺失，检查是否适用网络补丁")
+        logging.info(self._language_handler.get_translation("network_missing_check_patches", "Network connection missing, checking if network patches are applicable"))
         if self._already_has_networking_patches() is True:
-            logging.info("网络补丁已应用，需要网络连接")
+            logging.info(self._language_handler.get_translation("network_patches_already_applied", "Network patches already applied, network connection required"))
             return requirements, device_properties
 
         if not any([key.startswith("网卡") for key in device_properties.keys()]):
-            logging.info("网络补丁不适用，需要网络连接")
+            logging.info(self._language_handler.get_translation("network_patches_not_applicable", "Network patches not applicable, network connection required"))
             return requirements, device_properties
 
-        logging.info("网络补丁适用，移除其他补丁")
+        logging.info(self._language_handler.get_translation("network_patches_applicable", "Network patches applicable, removing other patches"))
         for key in list(device_properties.keys()):
             if key.startswith("网卡"):
                 continue
