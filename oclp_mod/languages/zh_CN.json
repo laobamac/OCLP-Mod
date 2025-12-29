@@ -600,5 +600,9 @@
     "kdk_plist_malformed": "提供的KDK Info.plist格式错误，无法创建备份",
     "kdk_backup_exists": "备份已存在，跳过",
     "kdk_backup_failed": "创建KDK备份失败:",
-    "kdk_install_kdk_failed": "安装KDK失败"
+    "kdk_install_kdk_failed": "安装KDK失败",
+    "kdk_merge_unable_to_get_info": "无法获取 KDK 信息",
+    "kdk_merge_unable_to_retrieve": "无法检索 KDK",
+    "kdk_merge_unable_to_download": "无法下载 KDK",
+    "kdk_merge_checksum_failed": "KDK 校验和验证失败"
 }

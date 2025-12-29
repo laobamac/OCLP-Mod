@@ -600,5 +600,9 @@
     "kdk_plist_malformed": "Malformed KDK Info.plist provided, cannot create backup",
     "kdk_backup_exists": "Backup already exists, skipping",
     "kdk_backup_failed": "Failed to create KDK backup:",
-    "kdk_install_kdk_failed": "Failed to install KDK"
+    "kdk_install_kdk_failed": "Failed to install KDK",
+    "kdk_merge_unable_to_get_info": "Unable to get KDK info",
+    "kdk_merge_unable_to_retrieve": "Unable to retrieve KDK",
+    "kdk_merge_unable_to_download": "Unable to download KDK",
+    "kdk_merge_checksum_failed": "KDK checksum validation failed"
 }

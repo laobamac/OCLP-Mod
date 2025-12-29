@@ -113,14 +113,14 @@ class KernelDebugKitMerge:
         # Next, grab KDK information (ie. what's the latest KDK for this OS)
         kdk_obj = kdk_handler.KernelDebugKitObject(self.constants, self.constants.detected_os_build, self.constants.detected_os_version)
         if kdk_obj.success is False:
-            logging.info(f"无法获取 KDK 信息： {kdk_obj.error_msg}")
+            logging.info(self.language_handler.get_translation("kdk_merge_unable_to_get_info", "Unable to get KDK info") + f": {kdk_obj.error_msg}")
             raise Exception(f"Unable to get KDK info: {kdk_obj.error_msg}")
 
         # If no KDK is installed, download and install it
         if kdk_obj.kdk_already_installed is False:
             kdk_download_obj = kdk_obj.retrieve_download()
             if not kdk_download_obj:
-                logging.info(f"无法检索 KDK： {kdk_obj.error_msg}")
+                logging.info(self.language_handler.get_translation("kdk_merge_unable_to_retrieve", "Unable to retrieve KDK") + f": {kdk_obj.error_msg}")
                 raise Exception(f"Could not retrieve KDK: {kdk_obj.error_msg}")
 
             # Hold thread until download is complete
@@ -128,18 +128,18 @@ class KernelDebugKitMerge:
 
             if kdk_download_obj.download_complete is False:
                 error_msg = kdk_download_obj.error_msg
-                logging.info(f"无法下载 KDK： {error_msg}")
+                logging.info(self.language_handler.get_translation("kdk_merge_unable_to_download", "Unable to download KDK") + f": {error_msg}")
                 raise Exception(f"Could not download KDK: {error_msg}")
 
             if kdk_obj.validate_kdk_checksum() is False:
-                logging.info(f"KDK 校验和验证失败： {kdk_obj.error_msg}")
+                logging.info(self.language_handler.get_translation("kdk_merge_checksum_failed", "KDK checksum validation failed") + f": {kdk_obj.error_msg}")
                 raise Exception(f"KDK checksum validation failed: {kdk_obj.error_msg}")
 
             kdk_handler.KernelDebugKitUtilities(self.constants).install_kdk_dmg(self.constants.kdk_download_path)
             # re-init kdk_obj to get the new kdk_installed_path
             kdk_obj = kdk_handler.KernelDebugKitObject(self.constants, self.constants.detected_os_build, self.constants.detected_os_version)
             if kdk_obj.success is False:
-                logging.info(f"无法获取 KDK 信息： {kdk_obj.error_msg}")
+                logging.info(self.language_handler.get_translation("kdk_merge_unable_to_get_info", "Unable to get KDK info") + f": {kdk_obj.error_msg}")
                 raise Exception(f"Unable to get KDK info: {kdk_obj.error_msg}")
 
             if kdk_obj.kdk_already_installed is False:
