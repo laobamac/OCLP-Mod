@@ -700,16 +700,16 @@ class KernelDebugKitUtilities:
         """
 
         if not kdk_path.exists():
-            logging.warning("KDK does not exist, cannot create backup")
+            logging.warning(self.language_handler.get_translation("kdk_backup_does_not_exist", "KDK does not exist, cannot create backup"))
             return
         if not kdk_info_plist.exists():
-            logging.warning("KDK Info.plist does not exist, cannot create backup")
+            logging.warning(self.language_handler.get_translation("kdk_plist_does_not_exist", "KDK Info.plist does not exist, cannot create backup"))
             return
 
         kdk_info_dict = plistlib.load(kdk_info_plist.open("rb"))
 
         if 'version' not in kdk_info_dict or 'build' not in kdk_info_dict:
-            logging.warning("Malformed KDK Info.plist provided, cannot create backup")
+            logging.warning(self.language_handler.get_translation("kdk_plist_malformed", "Malformed KDK Info.plist provided, cannot create backup"))
             return
 
         if not Path(KDK_INSTALL_PATH).exists():
@@ -720,10 +720,10 @@ class KernelDebugKitUtilities:
 
         logging.info(self.language_handler.get_translation("kdk_creating_backup", "Creating backup: {kdk_name}").format(kdk_name=kdk_dst_name))
         if kdk_dst_path.exists():
-            logging.info("Backup already exists, skipping")
+            logging.info(self.language_handler.get_translation("kdk_backup_exists", "Backup already exists, skipping"))
             return
 
         result = subprocess_wrapper.run_as_root(generate_copy_arguments(kdk_path, kdk_dst_path), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if result.returncode != 0:
-            logging.info("Failed to create KDK backup:")
+            logging.info(self.language_handler.get_translation("kdk_backup_failed", "Failed to create KDK backup:"))
             subprocess_wrapper.log(result)

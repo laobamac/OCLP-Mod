@@ -10,6 +10,7 @@ from ... import constants
 from ...datasets import os_data
 from ...support import subprocess_wrapper, kdk_handler
 from ...volume import generate_copy_arguments
+from ...languages.language_handler import LanguageHandler
 
 
 class KernelDebugKitMerge:
@@ -18,6 +19,7 @@ class KernelDebugKitMerge:
         self.constants: constants.Constants = global_constants
         self.mount_location = mount_location
         self.skip_root_kmutil_requirement = skip_root_kmutil_requirement
+        self.language_handler = LanguageHandler(global_constants)
 
 
     def _matching_kdk_already_merged(self, kdk_path: str) -> bool:
@@ -105,7 +107,7 @@ class KernelDebugKitMerge:
         # If a KDK was pre-downloaded, install it
         if self.constants.kdk_download_path.exists():
             if kdk_handler.KernelDebugKitUtilities(self.constants).install_kdk_dmg(self.constants.kdk_download_path) is False:
-                logging.info("安装KDK失败")
+                logging.info(self.language_handler.get_translation("kdk_install_kdk_failed", "Failed to install KDK"))
                 raise Exception("Failed to install KDK")
 
         # Next, grab KDK information (ie. what's the latest KDK for this OS)

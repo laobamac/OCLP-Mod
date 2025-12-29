@@ -594,5 +594,11 @@
     "kdk_mount_failed": "Failed to mount KDK:",
     "kdk_pkg_not_found_dmg": "KDK package not found in DMG, possibly corrupted!!!",
     "kdk_install_success": "Successfully installed KDK",
-    "kdk_creating_backup": "Creating backup: {kdk_name}"
+    "kdk_creating_backup": "Creating backup: {kdk_name}",
+    "kdk_backup_does_not_exist": "KDK does not exist, cannot create backup",
+    "kdk_plist_does_not_exist": "KDK Info.plist does not exist, cannot create backup",
+    "kdk_plist_malformed": "Malformed KDK Info.plist provided, cannot create backup",
+    "kdk_backup_exists": "Backup already exists, skipping",
+    "kdk_backup_failed": "Failed to create KDK backup:",
+    "kdk_install_kdk_failed": "Failed to install KDK"
 }

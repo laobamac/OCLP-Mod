@@ -594,5 +594,11 @@
     "kdk_mount_failed": "挂载KDK失败:",
     "kdk_pkg_not_found_dmg": "在DMG中找不到KDK包，可能是损坏的!!!",
     "kdk_install_success": "成功安装KDK",
-    "kdk_creating_backup": "创建备份: {kdk_name}"
+    "kdk_creating_backup": "创建备份: {kdk_name}",
+    "kdk_backup_does_not_exist": "KDK不存在，无法创建备份",
+    "kdk_plist_does_not_exist": "KDK Info.plist不存在，无法创建备份",
+    "kdk_plist_malformed": "提供的KDK Info.plist格式错误，无法创建备份",
+    "kdk_backup_exists": "备份已存在，跳过",
+    "kdk_backup_failed": "创建KDK备份失败:",
+    "kdk_install_kdk_failed": "安装KDK失败"
 }
