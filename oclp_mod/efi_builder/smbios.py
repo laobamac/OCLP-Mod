@@ -19,6 +19,7 @@ from ..support import (
    utilities,
    generate_smbios
 )
+from ..languages.language_handler import LanguageHandler
 from ..datasets import (
    smbios_data,
    cpu_data,
@@ -37,6 +38,7 @@ class BuildSMBIOS:
        self.model: str = model
        self.config: dict = config
        self.constants: constants.Constants = global_constants
+       self._language_handler = LanguageHandler(self.constants)
 
        self._build()
 
@@ -49,7 +51,7 @@ class BuildSMBIOS:
        if self.constants.allow_oc_everywhere is False or self.constants.allow_native_spoofs is True:
            if self.constants.serial_settings == "None":
                # Credit to Parrotgeek1 for boot.efi and hv_vmm_present patch sets
-               logging.info("启用主板ID无检查补丁")
+               logging.info(self._language_handler.get_translation("enable_board_id_skip_patch"))
                support.BuildSupport(self.model, self.constants, self.config).get_item_by_kv(self.config["Booter"]["Patch"], "Comment", "Skip Board ID check")["Enabled"] = True
 
            else:
@@ -103,13 +105,13 @@ class BuildSMBIOS:
                    spoofed_model = generate_smbios.set_smbios_model_spoof(self.model)
        else:
            spoofed_model = self.constants.override_smbios
-       logging.info(f"使用Model ID: {spoofed_model}")
+       logging.info(self._language_handler.get_translation("using_model_id").format(model=spoofed_model))
 
        spoofed_board = ""
        if spoofed_model in smbios_data.smbios_dictionary:
            if "Board ID" in smbios_data.smbios_dictionary[spoofed_model]:
                spoofed_board = smbios_data.smbios_dictionary[spoofed_model]["Board ID"]
-       logging.info(f"使用Board ID: {spoofed_board}")
+       logging.info(self._language_handler.get_translation("using_board_id").format(board=spoofed_board))
 
        self.spoofed_model = spoofed_model
        self.spoofed_board = spoofed_board

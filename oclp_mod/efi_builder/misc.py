@@ -14,6 +14,7 @@ from .. import constants
 
 from ..support import generate_smbios
 from ..detections import device_probe
+from ..languages.language_handler import LanguageHandler
 
 from ..datasets import (
     model_array,
@@ -35,6 +36,7 @@ xw
         self.config: dict = config
         self.constants: constants.Constants = global_constants
         self.computer: device_probe.Computer = self.constants.computer
+        self._language_handler = LanguageHandler(self.constants)
 
         self._build()
 
@@ -92,7 +94,7 @@ xw
             patch_args = "none"
 
         if patch_args != "":
-            logging.info(f"- 设置 RestrictEvents 修补参数: {patch_args}")
+            logging.info(self._language_handler.get_translation("set_restrict_events_patch_args").format(args=patch_args))
             support.BuildSupport(self.model, self.constants, self.config).enable_kext("RestrictEvents.kext", self.constants.restrictevents_version, self.constants.restrictevents_path)
             self.config["NVRAM"]["Add"]["4D1FDA02-38C7-4A6A-9CC6-4BCCA8B30102"]["revpatch"] = patch_args
 
@@ -346,7 +348,7 @@ xw
        General OpenCorePkg Handler
        """
 
-       logging.info("正在添加 OpenCanopy GUI")
+       logging.info(self._language_handler.get_translation("adding_opencanopy_gui"))
        shutil.copy(self.constants.gui_path, self.constants.oc_folder)
        support.BuildSupport(self.model, self.constants, self.config).get_efi_binary_by_path("OpenCanopy.efi", "UEFI", "Drivers")["Enabled"] = True
        support.BuildSupport(self.model, self.constants, self.config).get_efi_binary_by_path("OpenRuntime.efi", "UEFI", "Drivers")["Enabled"] = True

@@ -163,9 +163,9 @@ class SysPatchDisplayFrame(wx.Frame):
         # can_unpatch: bool = not patches[HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE]
         can_unpatch: bool = not patches.get(HardwarePatchsetValidation.UNPATCHING_NOT_POSSIBLE, False)
 
-        # The patch system uses prefixes "设置:" and "Validation:" in patch names
+        # The patch system uses prefixes "Settings:" and "Validation:" in patch names
         # We need to check for these specific prefixes
-        settings_prefix = "设置"
+        settings_prefix = "Settings"
         verification_prefix = "Validation"
         
         if not any(not patch.startswith(settings_prefix) and not patch.startswith(verification_prefix) and patches[patch] is True for patch in patches):
@@ -379,8 +379,8 @@ class SysPatchDisplayFrame(wx.Frame):
             # ie. all patches applicable
             return True
 
-        # The patch system uses prefixes "设置:" and "Validation:" in patch names
-        settings_prefix = "设置"
+        # The patch system uses prefixes "Settings:" and "Validation:" in patch names
+        settings_prefix = "Settings"
         verification_prefix = "Validation"
         
         oclp_plist_data = plistlib.load(open(oclp_plist, "rb"))

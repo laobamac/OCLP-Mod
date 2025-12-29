@@ -604,5 +604,19 @@
     "kdk_merge_unable_to_get_info": "无法获取 KDK 信息",
     "kdk_merge_unable_to_retrieve": "无法检索 KDK",
     "kdk_merge_unable_to_download": "无法下载 KDK",
-    "kdk_merge_checksum_failed": "KDK 校验和验证失败"
+    "kdk_merge_checksum_failed": "KDK 校验和验证失败",
+    "enable_tahoe_filevault": "- 启用Tahoe 26的文件保险箱",
+    "add_4k_5k_display_patch": "- 添加 4K/5K 显示补丁",
+    "enable_boot_logo_patch": "启用 Boot Logo 补丁",
+    "add_sata_hibernate_patch": "- 添加 SATA 休眠补丁",
+    "enable_board_id_skip_patch": "启用主板ID无检查补丁",
+    "disable_secure_boot_model": "- 禁用 SecureBootModel",
+    "set_restrict_events_patch_args": "- 设置 RestrictEvents 修补参数: {args}",
+    "adding_opencanopy_gui": "正在添加 OpenCanopy GUI",
+    "using_model_id": "使用Model ID: {model}",
+    "using_board_id": "使用Board ID: {board}",
+    "settings_kdk_required": "设置: 需要KDK",
+    "settings_kdk_missing": "设置: 未找到KDK",
+    "settings_metallib_required": "设置: 需要MetallibSupportPkg.pkg",
+    "settings_metallib_missing": "设置: MetallibSupportPkg.pkg未找到"
 }

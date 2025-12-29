@@ -14,6 +14,7 @@ from .. import constants
 
 from ..support import generate_smbios
 from ..detections import device_probe
+from ..languages.language_handler import LanguageHandler
 
 from ..datasets import (
     smbios_data,
@@ -34,6 +35,7 @@ class BuildFirmware:
         self.config: dict = config
         self.constants: constants.Constants = global_constants
         self.computer: device_probe.Computer = self.constants.computer
+        self._language_handler = LanguageHandler(self.constants)
 
         self._build()
 
@@ -61,7 +63,7 @@ class BuildFirmware:
             return
 
         if smbios_data.smbios_dictionary[self.model]["Max OS Supported"] >= os_data.os_data.monterey and self.model not in ["MacPro6,1", "Macmini7,1"]:
-            logging.info("启用 Boot Logo 补丁")
+            logging.info(self._language_handler.get_translation("enable_boot_logo_patch"))
             support.BuildSupport(self.model, self.constants, self.config).get_item_by_kv(self.config["Booter"]["Patch"], "Comment", "Patch SkipLogo")["Enabled"] = True
 
     def _power_management_handling(self) -> None:
@@ -162,7 +164,7 @@ class BuildFirmware:
         
         # APFS check
         # 使用Sequoia 15.5的APFS驱动来启用Tahoe的文件保险箱
-        logging.info("- 启用Tahoe 26的文件保险箱")
+        logging.info(self._language_handler.get_translation("enable_tahoe_filevault"))
         self.config["UEFI"]["APFS"]["EnableJumpstart"] = False
         shutil.copy(self.constants.sequoia_apfs_driver_path, self.constants.drivers_path)
         support.BuildSupport(self.model, self.constants, self.config).get_efi_binary_by_path("apfs_aligned.efi", "UEFI", "Drivers")["Enabled"] = True
@@ -292,7 +294,7 @@ class BuildFirmware:
         if "Dual DisplayPort Display" not in smbios_data.smbios_dictionary[self.model]:
             return
 
-        logging.info("- 添加 4K/5K 显示补丁")
+        logging.info(self._language_handler.get_translation("add_4k_5k_display_patch"))
         # 设置 LauncherPath 为 '/boot.efi'
         # 这是为了确保只有 Mac 的固件呈现启动选项，而不是 OpenCore
         # https://github.com/acidanthera/OpenCorePkg/blob/0.7.6/Library/OcAppleBootPolicyLib/OcAppleBootPolicyLib.c#L50-L73

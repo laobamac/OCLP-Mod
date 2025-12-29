@@ -71,10 +71,10 @@ class HardwarePatchsetSettings(StrEnum):
     """
     Enum for patch settings
     """
-    KERNEL_DEBUG_KIT_REQUIRED     = "设置: 需要KDK"
-    KERNEL_DEBUG_KIT_MISSING      = "设置: 未找到KDK"
-    METALLIB_SUPPORT_PKG_REQUIRED = "设置: 需要MetallibSupportPkg.pkg"
-    METALLIB_SUPPORT_PKG_MISSING  = "设置: MetallibSupportPkg.pkg未找到"
+    KERNEL_DEBUG_KIT_REQUIRED     = "Settings: KDK Required"
+    KERNEL_DEBUG_KIT_MISSING      = "Settings: KDK Missing"
+    METALLIB_SUPPORT_PKG_REQUIRED = "Settings: MetallibSupportPkg.pkg Required"
+    METALLIB_SUPPORT_PKG_MISSING  = "Settings: MetallibSupportPkg.pkg Missing"
 
 
 class HardwarePatchsetValidation(StrEnum):

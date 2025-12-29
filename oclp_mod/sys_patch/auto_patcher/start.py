@@ -146,7 +146,7 @@ class StartAutomaticPatching:
         if utilities.check_seal() is True:
             logging.info("- 检测到快照封印完好，检测修补")
             patches = HardwarePatchsetDetection(self.constants).device_properties
-            if not any(not patch.startswith("设置") and not patch.startswith("验证") and patches[patch] is True for patch in patches):
+            if not any(not patch.startswith("Settings") and not patch.startswith("Validation") and patches[patch] is True for patch in patches):
                 patches = {}
             if patches:
                 logging.info("- 检测到适用的修补，确定是否可以修补")
@@ -157,7 +157,7 @@ class StartAutomaticPatching:
                 logging.info("- 确定可以修补，检查OCLP更新")
                 patch_string = ""
                 for patch in patches:
-                    if patches[patch] is True and not patch.startswith("设置") and not patch.startswith("验证"):
+                    if patches[patch] is True and not patch.startswith("Settings") and not patch.startswith("Validation"):
                         patch_string += f"- {patch}\n"
 
                 logging.info("- 在Github上未发现新二进制文件，继续进行修补")
