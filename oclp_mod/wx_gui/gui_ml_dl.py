@@ -1,11 +1,13 @@
 import wx
-import requests
+import requests  # Used by DownloadProgressFrame for file downloads and for exception handling
 import threading
 from wx.lib.agw.customtreectrl import CustomTreeCtrl
 import time
 
 from .. import constants
 from ..languages.language_handler import LanguageHandler
+from ..support import network_handler
+from ..support import metallib_handler
 
 
 mlurl = ""
@@ -142,14 +144,60 @@ class DownloadMLFrame(wx.Frame):
 
     def fetch_MetalLib_data(self):
         time.sleep(1)
-        try:
-            response = requests.get("https://oclpapi.simplehac.cn/MetallibSupportPkg/manifest.json")
-            response.raise_for_status()
-            MetalLib_data = response.json()
+        
+        # Determine API links based on constants configuration
+        metallib_api_links = []
+        
+        # If proxy is enabled, prioritize SimpleHac API
+        if self.constants.use_simplehacapi:
+            # Select link based on configured API node
+            if self.constants.simplehacapi_url == "OMAPIv1":
+                metallib_api_links.append(("OMAPIv1", f"{metallib_handler.OMAPIv1}{metallib_handler.METALLIB_INFO_JSON}"))
+            else:
+                # Default to OMAPIv2
+                metallib_api_links.append(("OMAPIv2", f"{metallib_handler.OMAPIv2}{metallib_handler.METALLIB_INFO_JSON}"))
+            
+            # Add fallback link
+            metallib_api_links.append(("Github - Overseas", metallib_handler.METALLIB_API_LINK_ORIGIN))
+        else:
+            # Not using proxy, prioritize original link
+            metallib_api_links.append(("Github - Overseas", metallib_handler.METALLIB_API_LINK_ORIGIN))
+            
+            # Add fallback SimpleHac API link
+            if self.constants.simplehacapi_url == "OMAPIv1":
+                metallib_api_links.append(("OMAPIv1", f"{metallib_handler.OMAPIv1}{metallib_handler.METALLIB_INFO_JSON}"))
+            else:
+                metallib_api_links.append(("OMAPIv2", f"{metallib_handler.OMAPIv2}{metallib_handler.METALLIB_INFO_JSON}"))
+        
+        # Attempt API connections
+        MetalLib_data = None
+        for api_name, api_link in metallib_api_links:
+            try:
+                results = network_handler.NetworkUtilities().get(
+                    api_link,
+                    headers={
+                        "User-Agent": f"OCLP/{self.constants.patcher_version}"
+                    },
+                    timeout=5
+                )
+                
+                if results.status_code == 200:
+                    MetalLib_data = results.json()
+                    break
+                    
+            except requests.exceptions.RequestException:
+                # Catch all network-related errors and try next API
+                continue
+        
+        if MetalLib_data:
             wx.CallAfter(self.list_ctrl.SetData, MetalLib_data)
             wx.CallAfter(self.loading_frame.close)
-        except requests.RequestException as e:
-            wx.MessageBox(f"{self.language_handler.get_translation('Failed_to_retrieve_MetalLib_information:')} {e}", self.language_handler.get_translation('Error'), wx.OK | wx.ICON_ERROR)
+        else:
+            error_msg = (
+                f"{self.language_handler.get_translation('Failed_to_retrieve_MetalLib_information:')} "
+                f"{self.language_handler.get_translation('all_api_failed', 'All API connections failed')}"
+            )
+            wx.MessageBox(error_msg, self.language_handler.get_translation('Error'), wx.OK | wx.ICON_ERROR)
             wx.CallAfter(self.loading_frame.close)
 
     def on_copy(self, event):
