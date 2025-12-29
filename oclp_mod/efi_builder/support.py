@@ -23,6 +23,8 @@ class BuildSupport:
        self.model: str = model
        self.config: dict = config
        self.constants: constants.Constants = global_constants
+       # Access language_handler from constants
+       self.language_handler = getattr(self.constants, 'language_handler', None)
 
 
    @staticmethod
@@ -55,7 +57,7 @@ class BuildSupport:
 
        kext: dict = self.get_item_by_kv(self.config["Kernel"]["Add"], "BundlePath", bundle_path)
        if not kext:
-           logging.info(f"- 无法找到 kext {bundle_path}!")
+           logging.info(self.language_handler.get_translation("build_unable_find_kext").format(kext=bundle_path) if self.language_handler else f"- Unable to find kext {bundle_path}!")
            raise IndexError
        return kext
 
@@ -72,7 +74,7 @@ class BuildSupport:
 
        efi_binary: dict = self.get_item_by_kv(self.config[entry_type][efi_type], "Path", bundle_name)
        if not efi_binary:
-           logging.info(f"- 无法找到 {efi_type}: {bundle_name}!")
+           logging.info(self.language_handler.get_translation("build_unable_find_efi").format(type=efi_type, name=bundle_name) if self.language_handler else f"- Unable to find {efi_type}: {bundle_name}!")
            raise IndexError
        return efi_binary
 
@@ -96,7 +98,7 @@ class BuildSupport:
        if kext["Enabled"] is True:
            return
 
-       logging.info(f"- 添加 {kext_name} {kext_version}")
+       logging.info(self.language_handler.get_translation("build_adding_kext").format(name=kext_name, version=kext_version) if self.language_handler else f"- Adding {kext_name} {kext_version}")
        shutil.copy(kext_path, self.constants.kexts_path)
        kext["Enabled"] = True
 
@@ -109,11 +111,12 @@ class BuildSupport:
        if self.constants.vault is False:
            return
 
-       logging.info("- 对 EFI 进行签名\n=========================================")
+       logging.info(self.language_handler.get_translation("build_signing_efi") if self.language_handler else "- Signing EFI
+=========================================")
        popen = subprocess.Popen([str(self.constants.vault_path), f"{self.constants.oc_folder}/"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
        for stdout_line in iter(popen.stdout.readline, ""):
            logging.info(stdout_line.strip())
-       logging.info("=========================================")
+       logging.info(self.language_handler.get_translation("build_separator") if self.language_handler else "=========================================")
 
    def validate_pathing(self) -> None:
        """
@@ -122,16 +125,16 @@ class BuildSupport:
        This ensures that OpenCore won't hit a critical error and fail to boot
        """
 
-       logging.info("- 验证生成的配置")
+       logging.info(self.language_handler.get_translation("build_validating_config") if self.language_handler else "- Validating generated configuration")
        if not Path(self.constants.opencore_release_folder / Path("EFI/OC/config.plist")):
-           logging.info("- OpenCore 配置文件缺失!!!")
+           logging.info(self.language_handler.get_translation("build_missing_config") if self.language_handler else "- OpenCore configuration file missing!!!")
            raise Exception("OpenCore 配置文件缺失")
 
        config_plist = plistlib.load(Path(self.constants.opencore_release_folder / Path("EFI/OC/config.plist")).open("rb"))
 
        for acpi in config_plist["ACPI"]["Add"]:
            if not Path(self.constants.opencore_release_folder / Path("EFI/OC/ACPI") / Path(acpi["Path"])).exists():
-               logging.info(f"- 缺少 ACPI 表: {acpi['Path']}")
+               logging.info(self.language_handler.get_translation("build_missing_acpi").format(table=acpi['Path']) if self.language_handler else f"- Missing ACPI table: {acpi['Path']}")
                raise Exception(f"缺少 ACPI 表: {acpi['Path']}")
 
        for kext in config_plist["Kernel"]["Add"]:
@@ -139,35 +142,35 @@ class BuildSupport:
            kext_binary_path = Path(kext_path / Path(kext["ExecutablePath"]))
            kext_plist_path = Path(kext_path / Path(kext["PlistPath"]))
            if not kext_path.exists():
-               logging.info(f"- 缺少 kext: {kext_path}")
+               logging.info(self.language_handler.get_translation("build_missing_kext").format(kext=kext_path) if self.language_handler else f"- Missing kext: {kext_path}")
                raise Exception(f"缺少 {kext_path}")
            if not kext_binary_path.exists():
-               logging.info(f"- 缺少 {kext['BundlePath']}'s 可执行文件: {kext_binary_path}")
+               logging.info(self.language_handler.get_translation("build_missing_kext_exec").format(kext=kext['BundlePath'], exec=kext_binary_path) if self.language_handler else f"- Missing {kext['BundlePath']}'s executable: {kext_binary_path}")
                raise Exception(f"缺少 {kext_binary_path}")
            if not kext_plist_path.exists():
-               logging.info(f"- 缺少 {kext['BundlePath']}'s plist: {kext_plist_path}")
+               logging.info(self.language_handler.get_translation("build_missing_kext_plist").format(kext=kext['BundlePath'], plist=kext_plist_path) if self.language_handler else f"- Missing {kext['BundlePath']}'s plist: {kext_plist_path}")
                raise Exception(f"缺少 {kext_plist_path}")
 
        for tool in config_plist["Misc"]["Tools"]:
            if not Path(self.constants.opencore_release_folder / Path("EFI/OC/Tools") / Path(tool["Path"])).exists():
-               logging.info(f"- 缺少工具: {tool['Path']}")
+               logging.info(self.language_handler.get_translation("build_missing_tool").format(tool=tool['Path']) if self.language_handler else f"- Missing tool: {tool['Path']}")
                raise Exception(f"缺少工具: {tool['Path']}")
 
        for driver in config_plist["UEFI"]["Drivers"]:
            if not Path(self.constants.opencore_release_folder / Path("EFI/OC/Drivers") / Path(driver["Path"])).exists():
-               logging.info(f"- 缺少驱动: {driver['Path']}")
+               logging.info(self.language_handler.get_translation("build_missing_driver").format(driver=driver['Path']) if self.language_handler else f"- Missing driver: {driver['Path']}")
                raise Exception(f"缺少驱动: {driver['Path']}")
 
        # 验证本地文件
        # 报告它们没有关联的 config.plist 条目（即未被使用）
        for tool_files in Path(self.constants.opencore_release_folder / Path("EFI/OC/Tools")).glob("*"):
            if tool_files.name not in [x["Path"] for x in config_plist["Misc"]["Tools"]]:
-               logging.info(f"- 配置中缺少工具: {tool_files.name}")
+               logging.info(self.language_handler.get_translation("build_missing_tool_config").format(tool=tool_files.name) if self.language_handler else f"- Missing tool in configuration: {tool_files.name}")
                raise Exception(f"配置中缺少工具: {tool_files.name}")
 
        for driver_file in Path(self.constants.opencore_release_folder / Path("EFI/OC/Drivers")).glob("*"):
            if driver_file.name not in [x["Path"] for x in config_plist["UEFI"]["Drivers"]]:
-               logging.info(f"- 找到额外的驱动: {driver_file.name}")
+               logging.info(self.language_handler.get_translation("build_found_extra_driver").format(driver=driver_file.name) if self.language_handler else f"- Found extra driver: {driver_file.name}")
                raise Exception(f"找到额外的驱动: {driver_file.name}")
 
        self._validate_malformed_kexts(self.constants.opencore_release_folder / Path("EFI/OC/Kexts"))
@@ -185,7 +188,7 @@ class BuildSupport:
            if "CFBundleExecutable" in kext_data:
                expected_executable = Path(kext_folder / Path("Contents/MacOS") / Path(kext_data["CFBundleExecutable"]))
                if not expected_executable.exists():
-                   logging.info(f"- 缺少 {kext_folder.name} 的可执行文件: Contents/MacOS/{expected_executable.name}")
+                   logging.info(self.language_handler.get_translation("build_missing_kext_exec").format(kext=kext_folder.name, exec=f"Contents/MacOS/{expected_executable.name}") if self.language_handler else f"- Missing {kext_folder.name}'s executable: Contents/MacOS/{expected_executable.name}")
                    raise Exception(f" - 缺少 {kext_folder.name} 的可执行文件: Contents/MacOS/{expected_executable.name}")
 
            if Path(kext_folder / Path("Contents/PlugIns")).exists():
@@ -197,7 +200,7 @@ class BuildSupport:
        清理文件和条目
        """
 
-       logging.info("- 清理文件")
+       logging.info(self.language_handler.get_translation("build_cleaning_files") if self.language_handler else "- Cleaning up files")
        # 删除未使用的条目
        entries_to_clean = {
            "ACPI":   ["Add", "Delete", "Patch"],
