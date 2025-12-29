@@ -164,7 +164,7 @@ class OSUpdateFrame(wx.Frame):
 
         self.kdk_install_result = False
         def _install_kdk_thread():
-            self.kdk_install_result = kdk_handler.KernelDebugKitUtilities().install_kdk_dmg(self.constants.kdk_download_path, only_install_backup=True)
+            self.kdk_install_result = kdk_handler.KernelDebugKitUtilities(self.constants).install_kdk_dmg(self.constants.kdk_download_path, only_install_backup=True)
 
         kdk_install_thread = threading.Thread(target=_install_kdk_thread)
         kdk_install_thread.start()

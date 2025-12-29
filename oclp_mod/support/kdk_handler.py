@@ -272,11 +272,11 @@ class KernelDebugKitObject:
 
         if self.kdk_url == "":
             if self.kdk_closest_match_url == "":
-                logging.warning(f"未找到适用于 {host_build} ({host_version}) 的 KDK")
-                self.error_msg = f"未找到适用于 {host_build} ({host_version}) 的 KDK"
+                logging.warning(self.language_handler.get_translation("kdk_not_found_for_build", "KDK not found for {host_build} ({host_version})").format(host_build=host_build, host_version=host_version))
+                self.error_msg = self.language_handler.get_translation("kdk_not_found_for_build", "KDK not found for {host_build} ({host_version})").format(host_build=host_build, host_version=host_version)
                 return
             logging.info(self.language_handler.get_translation("kdk_no_direct_match", "No direct match found for {host_build}, falling back to closest match").format(host_build=host_build))
-            logging.info(f"最接近的匹配: {self.kdk_closest_match_url_build} ({self.kdk_closest_match_url_version})")
+            logging.info(self.language_handler.get_translation("kdk_closest_match", "Closest match: {build} ({version})").format(build=self.kdk_closest_match_url_build, version=self.kdk_closest_match_url_version))
 
             self.kdk_url = self.kdk_closest_match_url
             self.kdk_url_build = self.kdk_closest_match_url_build
@@ -289,7 +289,7 @@ class KernelDebugKitObject:
         # 检查此 KDK 是否已安装
         self.kdk_installed_path = self._local_kdk_installed(match=self.kdk_url_build)
         if self.kdk_installed_path:
-            logging.info(f"KDK 已安装 ({Path(self.kdk_installed_path).name})，跳过")
+            logging.info(self.language_handler.get_translation("kdk_installed_skip", "KDK already installed ({kdk_name}), skipping").format(kdk_name=Path(self.kdk_installed_path).name))
             self.kdk_already_installed = True
             self.success = True
             return
@@ -317,18 +317,18 @@ class KernelDebugKitObject:
         self.error_msg = ""
 
         if self.kdk_already_installed:
-            logging.info("无需下载，KDK 已安装")
+            logging.info(self.language_handler.get_translation("kdk_no_download_needed", "No download needed, KDK already installed"))
             self.success = True
             return None
 
         if self.kdk_url == "":
-            self.error_msg = "无法检索 KDK 目录，没有 KDK 可下载"
+            self.error_msg = self.language_handler.get_translation("kdk_unable_to_retrieve", "Unable to retrieve KDK catalog, no KDK available for download")
             logging.error(self.error_msg)
             return None
 
-        logging.info(f"返回 KDK 的 DownloadUrl: {self.kdk_url}")
-        logging.info(f"返回 KDK 的 DownloadObject: {Path(self.kdk_url).name}")
-        logging.info(f"返回的KDK预期大小: {network_handler.DownloadObject.convert_size(self, str(self.kdk_url_expected_size))}")
+        logging.info(self.language_handler.get_translation("kdk_return_download_url", "Returning KDK DownloadUrl: {url}").format(url=self.kdk_url))
+        logging.info(self.language_handler.get_translation("kdk_return_download_object", "Returning KDK DownloadObject: {name}").format(name=Path(self.kdk_url).name))
+        logging.info(self.language_handler.get_translation("kdk_expected_size", "Expected KDK size: {size}").format(size=network_handler.DownloadObject.convert_size(self, str(self.kdk_url_expected_size))))
         self.success = True
 
         kdk_download_path = self.constants.kdk_download_path if override_path == "" else Path(override_path)
@@ -357,7 +357,7 @@ class KernelDebugKitObject:
             plist_path.touch()
             plistlib.dump(kdk_dict, plist_path.open("wb"), sort_keys=False)
         except Exception as e:
-            logging.error(f"生成 KDK Info.plist 失败: {e}")
+            logging.error(self.language_handler.get_translation("kdk_generate_plist_failed", "Failed to generate KDK Info.plist: {error}").format(error=e))
 
     def _local_kdk_valid(self, kdk_path: Path) -> bool:
         """
@@ -376,14 +376,14 @@ class KernelDebugKitObject:
         """
 
         if not Path(f"{kdk_path}/System/Library/CoreServices/SystemVersion.plist").exists():
-            logging.info(f"发现损坏的KDK ({kdk_path.name})，由于缺少SystemVersion.plist而删除")
+            logging.info(self.language_handler.get_translation("kdk_corrupted_missing_systemversion", "Found corrupted KDK ({kdk_name}), removing due to missing SystemVersion.plist").format(kdk_name=kdk_path.name))
             self._remove_kdk(kdk_path)
             return False
 
         # Get build from KDK
         kdk_plist_data = plistlib.load(Path(f"{kdk_path}/System/Library/CoreServices/SystemVersion.plist").open("rb"))
         if "ProductBuildVersion" not in kdk_plist_data:
-            logging.info(f"发现损坏的KDK ({kdk_path.name})，由于缺少ProductBuildVersion而删除")
+            logging.info(self.language_handler.get_translation("kdk_corrupted_missing_buildversion", "Found corrupted KDK ({kdk_name}), removing due to missing ProductBuildVersion").format(kdk_name=kdk_path.name))
             self._remove_kdk(kdk_path)
             return False
 
@@ -491,15 +491,15 @@ class KernelDebugKitObject:
                 if not kdk_pkg.name.endswith(f"{match}.pkg"):
                     continue
 
-            logging.info(f"找到KDK备份: {kdk_pkg.name}")
+            logging.info(self.language_handler.get_translation("kdk_found_backup", "Found KDK backup: {kdk_name}").format(kdk_name=kdk_pkg.name))
             if self.passive is False:
-                logging.info("尝试恢复KDK")
-                if KernelDebugKitUtilities().install_kdk_pkg(kdk_pkg):
-                    logging.info("成功恢复KDK")
+                logging.info(self.language_handler.get_translation("kdk_attempting_restore", "Attempting to restore KDK"))
+                if KernelDebugKitUtilities(self.constants).install_kdk_pkg(kdk_pkg):
+                    logging.info(self.language_handler.get_translation("kdk_restore_success", "Successfully restored KDK"))
                     return self._local_kdk_installed(match=match, check_version=check_version)
             else:
                 # When in passive mode, we're just checking if a KDK could be restored
-                logging.info("KDK恢复被跳过，处于被动模式")
+                logging.info(self.language_handler.get_translation("kdk_restore_skipped_passive", "KDK restore skipped, in passive mode"))
                 return kdk_pkg
 
         return None
@@ -517,18 +517,18 @@ class KernelDebugKitObject:
             return
 
         if not Path(kdk_path).exists():
-            logging.warning(f"KDK不存在: {kdk_path}")
+            logging.warning(self.language_handler.get_translation("kdk_does_not_exist", "KDK does not exist: {kdk_path}").format(kdk_path=kdk_path))
             return
 
         rm_args = ["/bin/rm", "-rf" if Path(kdk_path).is_dir() else "-f", kdk_path]
 
         result = subprocess_wrapper.run_as_root(rm_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if result.returncode != 0:
-            logging.warning(f"无法删除KDK: {kdk_path}")
+            logging.warning(self.language_handler.get_translation("kdk_unable_to_remove", "Unable to remove KDK: {kdk_path}").format(kdk_path=kdk_path))
             subprocess_wrapper.log(result)
             return
 
-        logging.info(f"成功删除KDK: {kdk_path}")
+        logging.info(self.language_handler.get_translation("kdk_successfully_removed", "Successfully removed KDK: {kdk_path}").format(kdk_path=kdk_path))
 
 
     def _remove_unused_kdks(self, exclude_builds: list = None) -> None:
@@ -555,7 +555,7 @@ class KernelDebugKitObject:
         if not Path(KDK_INSTALL_PATH).exists():
             return
 
-        logging.info("清理未使用的KDK")
+        logging.info(self.language_handler.get_translation("kdk_cleaning_unused", "Cleaning up unused KDKs"))
         for kdk_folder in Path(KDK_INSTALL_PATH).iterdir():
             if kdk_folder.name.endswith(".kdk") or kdk_folder.name.endswith(".pkg"):
                 should_remove = True
@@ -586,15 +586,15 @@ class KernelDebugKitObject:
             kdk_dmg_path = self.constants.kdk_download_path
 
         if not Path(kdk_dmg_path).exists():
-            logging.error(f"KDK DMG不存在: {kdk_dmg_path}")
+            logging.error(self.language_handler.get_translation("kdk_dmg_does_not_exist", "KDK DMG does not exist: {kdk_path}").format(kdk_path=kdk_dmg_path))
             return False
 
         # TODO: should we use the checksum from the API?
         result = subprocess.run(["/usr/bin/hdiutil", "verify", self.constants.kdk_download_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if result.returncode != 0:
-            logging.info("错误: 内核调试工具包校验和验证失败！")
+            logging.info(self.language_handler.get_translation("kdk_checksum_failed", "Error: Kernel Debug Kit checksum verification failed!"))
             subprocess_wrapper.log(result)
-            msg = "内核调试工具包校验和验证失败，请重试。\n\n如果此问题持续存在，请确保您在稳定的网络连接（例如以太网）上下载"
+            msg = self.language_handler.get_translation("kdk_checksum_failed_retry", "Kernel Debug Kit checksum verification failed, please try again.\n\nIf this issue persists, please ensure you are downloading on a stable network connection (e.g., Ethernet)")
             logging.info(f"{msg}")
 
             self.error_msg = msg
@@ -602,7 +602,7 @@ class KernelDebugKitObject:
 
         self._remove_unused_kdks()
         self.success = True
-        logging.info("内核调试工具包校验和已验证")
+        logging.info(self.language_handler.get_translation("kdk_checksum_verified", "Kernel Debug Kit checksum verified"))
         return True
 
 
@@ -612,8 +612,11 @@ class KernelDebugKitUtilities:
 
     """
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, global_constants: constants.Constants = None) -> None:
+        if global_constants is None:
+            global_constants = constants.Constants()
+        self.constants: constants.Constants = global_constants
+        self.language_handler: LanguageHandler = LanguageHandler(global_constants)
 
 
     def install_kdk_pkg(self, kdk_path: Path) -> bool:
@@ -627,14 +630,14 @@ class KernelDebugKitUtilities:
             bool: True if successful, False if not
         """
 
-        logging.info(f"安装KDK包: {kdk_path.name}")
-        logging.info(f"- 这可能需要一段时间...")
+        logging.info(self.language_handler.get_translation("kdk_installing_package", "Installing KDK package: {kdk_name}").format(kdk_name=kdk_path.name))
+        logging.info(self.language_handler.get_translation("kdk_may_take_time", "- This may take a while..."))
 
         # TODO: Check whether enough disk space is available
 
         result = subprocess_wrapper.run_as_root(["/usr/sbin/installer", "-pkg", kdk_path, "-target", "/"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if result.returncode != 0:
-            logging.info("KDK安装失败:")
+            logging.info(self.language_handler.get_translation("kdk_install_failed", "KDK installation failed:"))
             subprocess_wrapper.log(result)
             return False
         return True
@@ -651,17 +654,17 @@ class KernelDebugKitUtilities:
             bool: True if successful, False if not
         """
 
-        logging.info(f"提取下载的KDK磁盘镜像")
+        logging.info(self.language_handler.get_translation("kdk_extracting_dmg", "Extracting downloaded KDK disk image"))
         with tempfile.TemporaryDirectory() as mount_point:
             result = subprocess_wrapper.run_as_root(["/usr/bin/hdiutil", "attach", kdk_path, "-mountpoint", mount_point, "-nobrowse"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             if result.returncode != 0:
-                logging.info("挂载KDK失败:")
+                logging.info(self.language_handler.get_translation("kdk_mount_failed", "Failed to mount KDK:"))
                 subprocess_wrapper.log(result)
                 return False
 
             kdk_pkg_path = Path(f"{mount_point}/KernelDebugKit.pkg")
             if not kdk_pkg_path.exists():
-                logging.warning("在DMG中找不到KDK包，可能是损坏的!!!")
+                logging.warning(self.language_handler.get_translation("kdk_pkg_not_found_dmg", "KDK package not found in DMG, possibly corrupted!!!"))
                 self._unmount_disk_image(mount_point)
                 return False
 
@@ -674,7 +677,7 @@ class KernelDebugKitUtilities:
             self._create_backup(kdk_pkg_path, Path(f"{kdk_path.parent}/{KDK_INFO_PLIST}"))
             self._unmount_disk_image(mount_point)
 
-        logging.info("成功安装KDK")
+        logging.info(self.language_handler.get_translation("kdk_install_success", "Successfully installed KDK"))
         return True
 
     def _unmount_disk_image(self, mount_point) -> None:
@@ -697,16 +700,16 @@ class KernelDebugKitUtilities:
         """
 
         if not kdk_path.exists():
-            logging.warning("KDK does not exist, cannot create backup")
+            logging.warning(self.language_handler.get_translation("kdk_backup_does_not_exist", "KDK does not exist, cannot create backup"))
             return
         if not kdk_info_plist.exists():
-            logging.warning("KDK Info.plist does not exist, cannot create backup")
+            logging.warning(self.language_handler.get_translation("kdk_plist_does_not_exist", "KDK Info.plist does not exist, cannot create backup"))
             return
 
         kdk_info_dict = plistlib.load(kdk_info_plist.open("rb"))
 
         if 'version' not in kdk_info_dict or 'build' not in kdk_info_dict:
-            logging.warning("Malformed KDK Info.plist provided, cannot create backup")
+            logging.warning(self.language_handler.get_translation("kdk_plist_malformed", "Malformed KDK Info.plist provided, cannot create backup"))
             return
 
         if not Path(KDK_INSTALL_PATH).exists():
@@ -715,12 +718,12 @@ class KernelDebugKitUtilities:
         kdk_dst_name = f"KDK_{kdk_info_dict['version']}_{kdk_info_dict['build']}.pkg"
         kdk_dst_path = Path(f"{KDK_INSTALL_PATH}/{kdk_dst_name}")
 
-        logging.info(f"创建备份: {kdk_dst_name}")
+        logging.info(self.language_handler.get_translation("kdk_creating_backup", "Creating backup: {kdk_name}").format(kdk_name=kdk_dst_name))
         if kdk_dst_path.exists():
-            logging.info("Backup already exists, skipping")
+            logging.info(self.language_handler.get_translation("kdk_backup_exists", "Backup already exists, skipping"))
             return
 
         result = subprocess_wrapper.run_as_root(generate_copy_arguments(kdk_path, kdk_dst_path), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if result.returncode != 0:
-            logging.info("Failed to create KDK backup:")
+            logging.info(self.language_handler.get_translation("kdk_backup_failed", "Failed to create KDK backup:"))
             subprocess_wrapper.log(result)
