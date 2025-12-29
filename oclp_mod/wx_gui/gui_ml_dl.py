@@ -1,5 +1,5 @@
 import wx
-import requests
+import requests  # Used by DownloadProgressFrame for file downloads and for exception handling
 import threading
 from wx.lib.agw.customtreectrl import CustomTreeCtrl
 import time
