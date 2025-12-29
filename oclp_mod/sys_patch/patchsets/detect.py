@@ -197,7 +197,7 @@ class HardwarePatchsetDetection:
         """
         Determine if repatching is not allowed
         """
-        oclp_patch_path = "/System/Library/CoreServices/OpenCore-Legacy-Patcher.plist"
+        oclp_patch_path = "/System/Library/CoreServices/oclp-mod.plist"
         if not Path(oclp_patch_path).exists():
             return self._is_root_volume_dirty()
 
@@ -207,11 +207,11 @@ class HardwarePatchsetDetection:
             logging.error("Installed patches are from different commit, unpatching is required")
             return True
 
-        wireless_keys = {"Legacy Wireless", "Modern Wireless Common"}
+        wireless_keys = {"无线网卡"}
 
         # Keep in sync with generate_patchset_plist
         metadata_keys = {
-            "OpenCore Legacy Patcher",
+            "OCLP-Mod",
             "PatcherSupportPkg",
             "Time Patched",
             "Commit URL",
