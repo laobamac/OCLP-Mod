@@ -797,7 +797,7 @@ class SettingsFrame(wx.Frame):
                     "value": self._get_system_settings("Moraea_ColorWidgetDisabled"),
                     "variable": "Moraea_ColorWidgetDisabled",
                     "description": [
-                        self.language_handler.get_translation("Control_the_application_of_widget_colors_on_the_desktop"),
+                        "",
                     ],
                     "override_function": self._update_system_defaults,
                     "condition": gui_support.CheckProperties(self.constants).host_is_non_metal(general_check=True)
