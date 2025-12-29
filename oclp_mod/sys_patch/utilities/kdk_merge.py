@@ -104,7 +104,7 @@ class KernelDebugKitMerge:
 
         # If a KDK was pre-downloaded, install it
         if self.constants.kdk_download_path.exists():
-            if kdk_handler.KernelDebugKitUtilities().install_kdk_dmg(self.constants.kdk_download_path) is False:
+            if kdk_handler.KernelDebugKitUtilities(self.constants).install_kdk_dmg(self.constants.kdk_download_path) is False:
                 logging.info("安装KDK失败")
                 raise Exception("Failed to install KDK")
 
@@ -133,7 +133,7 @@ class KernelDebugKitMerge:
                 logging.info(f"KDK 校验和验证失败： {kdk_obj.error_msg}")
                 raise Exception(f"KDK checksum validation failed: {kdk_obj.error_msg}")
 
-            kdk_handler.KernelDebugKitUtilities().install_kdk_dmg(self.constants.kdk_download_path)
+            kdk_handler.KernelDebugKitUtilities(self.constants).install_kdk_dmg(self.constants.kdk_download_path)
             # re-init kdk_obj to get the new kdk_installed_path
             kdk_obj = kdk_handler.KernelDebugKitObject(self.constants, self.constants.detected_os_build, self.constants.detected_os_version)
             if kdk_obj.success is False:
