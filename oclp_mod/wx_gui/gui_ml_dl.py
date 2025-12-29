@@ -190,14 +190,18 @@ class DownloadMLFrame(wx.Frame):
                     MetalLib_data = results.json()
                     break
                     
-            except (requests.exceptions.Timeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError) as e:
+            except (requests.exceptions.Timeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError):
                 continue
         
         if MetalLib_data:
             wx.CallAfter(self.list_ctrl.SetData, MetalLib_data)
             wx.CallAfter(self.loading_frame.close)
         else:
-            wx.MessageBox(f"{self.language_handler.get_translation('Failed_to_retrieve_MetalLib_information:')} {self.language_handler.get_translation('all_api_failed', 'All API connections failed')}", self.language_handler.get_translation('Error'), wx.OK | wx.ICON_ERROR)
+            error_msg = (
+                f"{self.language_handler.get_translation('Failed_to_retrieve_MetalLib_information:')} "
+                f"{self.language_handler.get_translation('all_api_failed', 'All API connections failed')}"
+            )
+            wx.MessageBox(error_msg, self.language_handler.get_translation('Error'), wx.OK | wx.ICON_ERROR)
             wx.CallAfter(self.loading_frame.close)
 
     def on_copy(self, event):
