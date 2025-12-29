@@ -7,15 +7,10 @@ import time
 from .. import constants
 from ..languages.language_handler import LanguageHandler
 from ..support import network_handler
+from ..support import metallib_handler
 
 
 mlurl = ""
-
-# API URLs for MetalLib manifest
-OMAPIv1 = "https://next.oclpapi.simplehac.cn/"
-OMAPIv2 = "https://subsequent.oclpapi.simplehac.cn/"
-METALLIB_INFO_JSON = "MetallibSupportPkg/manifest.json"
-METALLIB_API_LINK_ORIGIN = "https://dortania.github.io/MetallibSupportPkg/manifest.json"
 
 class DownloadProgressFrame(wx.Frame):
     def __init__(self, parent, title,global_constants: constants.Constants, url, file_path):
@@ -157,22 +152,22 @@ class DownloadMLFrame(wx.Frame):
         if self.constants.use_simplehacapi:
             # Select link based on configured API node
             if self.constants.simplehacapi_url == "OMAPIv1":
-                metallib_api_links.append(("OMAPIv1", f"{OMAPIv1}{METALLIB_INFO_JSON}"))
+                metallib_api_links.append(("OMAPIv1", f"{metallib_handler.OMAPIv1}{metallib_handler.METALLIB_INFO_JSON}"))
             else:
                 # Default to OMAPIv2
-                metallib_api_links.append(("OMAPIv2", f"{OMAPIv2}{METALLIB_INFO_JSON}"))
+                metallib_api_links.append(("OMAPIv2", f"{metallib_handler.OMAPIv2}{metallib_handler.METALLIB_INFO_JSON}"))
             
             # Add fallback link
-            metallib_api_links.append(("Github - Overseas", METALLIB_API_LINK_ORIGIN))
+            metallib_api_links.append(("Github - Overseas", metallib_handler.METALLIB_API_LINK_ORIGIN))
         else:
             # Not using proxy, prioritize original link
-            metallib_api_links.append(("Github - Overseas", METALLIB_API_LINK_ORIGIN))
+            metallib_api_links.append(("Github - Overseas", metallib_handler.METALLIB_API_LINK_ORIGIN))
             
             # Add fallback SimpleHac API link
             if self.constants.simplehacapi_url == "OMAPIv1":
-                metallib_api_links.append(("OMAPIv1", f"{OMAPIv1}{METALLIB_INFO_JSON}"))
+                metallib_api_links.append(("OMAPIv1", f"{metallib_handler.OMAPIv1}{metallib_handler.METALLIB_INFO_JSON}"))
             else:
-                metallib_api_links.append(("OMAPIv2", f"{OMAPIv2}{METALLIB_INFO_JSON}"))
+                metallib_api_links.append(("OMAPIv2", f"{metallib_handler.OMAPIv2}{metallib_handler.METALLIB_INFO_JSON}"))
         
         # Attempt API connections
         MetalLib_data = None
@@ -190,7 +185,8 @@ class DownloadMLFrame(wx.Frame):
                     MetalLib_data = results.json()
                     break
                     
-            except (requests.exceptions.Timeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError):
+            except requests.exceptions.RequestException:
+                # Catch all network-related errors and try next API
                 continue
         
         if MetalLib_data:

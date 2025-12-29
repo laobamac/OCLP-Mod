@@ -7,15 +7,10 @@ import time
 from .. import constants
 from ..languages.language_handler import LanguageHandler
 from ..support import network_handler
+from ..support import kdk_handler
 
 
 kdkurl = ""
-
-# API URLs for KDK manifest
-OMAPIv1 = "https://next.oclpapi.simplehac.cn/"
-OMAPIv2 = "https://subsequent.oclpapi.simplehac.cn/"
-KDK_INFO_JSON = "KdkSupportPkg/manifest.json"
-KDK_API_LINK_ORIGIN = "https://dortania.github.io/KdkSupportPkg/manifest.json"
 
 class DownloadProgressFrame(wx.Frame):
     def __init__(self, parent, title, global_constants: constants.Constants,url, file_path):
@@ -156,22 +151,22 @@ class DownloadKDKFrame(wx.Frame):
         if self.constants.use_simplehacapi:
             # Select link based on configured API node
             if self.constants.simplehacapi_url == "OMAPIv1":
-                kdk_api_links.append(("OMAPIv1", f"{OMAPIv1}{KDK_INFO_JSON}"))
+                kdk_api_links.append(("OMAPIv1", f"{kdk_handler.OMAPIv1}{kdk_handler.KDK_INFO_JSON}"))
             else:
                 # Default to OMAPIv2
-                kdk_api_links.append(("OMAPIv2", f"{OMAPIv2}{KDK_INFO_JSON}"))
+                kdk_api_links.append(("OMAPIv2", f"{kdk_handler.OMAPIv2}{kdk_handler.KDK_INFO_JSON}"))
             
             # Add fallback link
-            kdk_api_links.append(("Github - Overseas", KDK_API_LINK_ORIGIN))
+            kdk_api_links.append(("Github - Overseas", kdk_handler.KDK_API_LINK_ORIGIN))
         else:
             # Not using proxy, prioritize original link
-            kdk_api_links.append(("Github - Overseas", KDK_API_LINK_ORIGIN))
+            kdk_api_links.append(("Github - Overseas", kdk_handler.KDK_API_LINK_ORIGIN))
             
             # Add fallback SimpleHac API link
             if self.constants.simplehacapi_url == "OMAPIv1":
-                kdk_api_links.append(("OMAPIv1", f"{OMAPIv1}{KDK_INFO_JSON}"))
+                kdk_api_links.append(("OMAPIv1", f"{kdk_handler.OMAPIv1}{kdk_handler.KDK_INFO_JSON}"))
             else:
-                kdk_api_links.append(("OMAPIv2", f"{OMAPIv2}{KDK_INFO_JSON}"))
+                kdk_api_links.append(("OMAPIv2", f"{kdk_handler.OMAPIv2}{kdk_handler.KDK_INFO_JSON}"))
         
         # Attempt API connections
         kdk_data = None
@@ -189,7 +184,8 @@ class DownloadKDKFrame(wx.Frame):
                     kdk_data = results.json()
                     break
                     
-            except (requests.exceptions.Timeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError):
+            except requests.exceptions.RequestException:
+                # Catch all network-related errors and try next API
                 continue
         
         if kdk_data:
