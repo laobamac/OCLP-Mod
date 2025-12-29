@@ -10,6 +10,7 @@ from .. import constants
 
 from ..support import utilities
 from ..detections import device_probe
+from ..languages.language_handler import LanguageHandler
 
 from ..datasets import (
     model_array,
@@ -30,6 +31,7 @@ class BuildStorage:
         self.config: dict = config
         self.constants: constants.Constants = global_constants
         self.computer: device_probe.Computer = self.constants.computer
+        self._language_handler = LanguageHandler(self.constants)
 
         self._build()
 
@@ -76,11 +78,11 @@ class BuildStorage:
                 if drive in smbios_data.smbios_dictionary[self.model]["Stock Storage"]:
                     if not self.constants.custom_model:
                         if self.computer.third_party_sata_ssd is True:
-                            logging.info("- 添加 SATA 休眠补丁")
+                            logging.info(self._language_handler.get_translation("add_sata_hibernate_patch"))
                             self.config["Kernel"]["Quirks"]["ThirdPartyDrives"] = True
                             break
                     else:
-                        logging.info("- 添加 SATA 休眠补丁")
+                        logging.info(self._language_handler.get_translation("add_sata_hibernate_patch"))
                         self.config["Kernel"]["Quirks"]["ThirdPartyDrives"] = True
                         break
 

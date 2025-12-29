@@ -71,10 +71,10 @@ class HardwarePatchsetSettings(StrEnum):
     """
     Enum for patch settings
     """
-    KERNEL_DEBUG_KIT_REQUIRED     = "设置: 需要KDK"
-    KERNEL_DEBUG_KIT_MISSING      = "设置: 未找到KDK"
-    METALLIB_SUPPORT_PKG_REQUIRED = "设置: 需要MetallibSupportPkg.pkg"
-    METALLIB_SUPPORT_PKG_MISSING  = "设置: MetallibSupportPkg.pkg未找到"
+    KERNEL_DEBUG_KIT_REQUIRED     = "Settings: KDK Required"
+    KERNEL_DEBUG_KIT_MISSING      = "Settings: KDK Missing"
+    METALLIB_SUPPORT_PKG_REQUIRED = "Settings: MetallibSupportPkg.pkg Required"
+    METALLIB_SUPPORT_PKG_MISSING  = "Settings: MetallibSupportPkg.pkg Missing"
 
 
 class HardwarePatchsetValidation(StrEnum):
@@ -207,7 +207,7 @@ class HardwarePatchsetDetection:
             logging.error("Installed patches are from different commit, unpatching is required")
             return True
 
-        wireless_keys = {"无线网卡"}
+        wireless_keys = {"Legacy Wireless", "Modern Wireless"}
 
         # Keep in sync with generate_patchset_plist
         metadata_keys = {
@@ -457,13 +457,13 @@ class HardwarePatchsetDetection:
             logging.info(self._language_handler.get_translation("network_patches_already_applied", "Network patches already applied, network connection required"))
             return requirements, device_properties
 
-        if not any([key.startswith("网卡") for key in device_properties.keys()]):
+        if not any([key.startswith("Networking:") for key in device_properties.keys()]):
             logging.info(self._language_handler.get_translation("network_patches_not_applicable", "Network patches not applicable, network connection required"))
             return requirements, device_properties
 
         logging.info(self._language_handler.get_translation("network_patches_applicable", "Network patches applicable, removing other patches"))
         for key in list(device_properties.keys()):
-            if key.startswith("网卡"):
+            if key.startswith("Networking:"):
                 continue
             device_properties.pop(key, None)
 

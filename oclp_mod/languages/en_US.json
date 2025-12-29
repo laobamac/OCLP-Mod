@@ -604,5 +604,19 @@
     "kdk_merge_unable_to_get_info": "Unable to get KDK info",
     "kdk_merge_unable_to_retrieve": "Unable to retrieve KDK",
     "kdk_merge_unable_to_download": "Unable to download KDK",
-    "kdk_merge_checksum_failed": "KDK checksum validation failed"
+    "kdk_merge_checksum_failed": "KDK checksum validation failed",
+    "enable_tahoe_filevault": "- Enable Tahoe 26 FileVault",
+    "add_4k_5k_display_patch": "- Add 4K/5K Display Patch",
+    "enable_boot_logo_patch": "Enable Boot Logo Patch",
+    "add_sata_hibernate_patch": "- Add SATA Hibernate Patch",
+    "enable_board_id_skip_patch": "Enable Board ID Skip Patch",
+    "disable_secure_boot_model": "- Disable SecureBootModel",
+    "set_restrict_events_patch_args": "- Set RestrictEvents patch arguments: {args}",
+    "adding_opencanopy_gui": "Adding OpenCanopy GUI",
+    "using_model_id": "Using Model ID: {model}",
+    "using_board_id": "Using Board ID: {board}",
+    "settings_kdk_required": "Settings: KDK Required",
+    "settings_kdk_missing": "Settings: KDK Missing",
+    "settings_metallib_required": "Settings: MetallibSupportPkg.pkg Required",
+    "settings_metallib_missing": "Settings: MetallibSupportPkg.pkg Missing"
 }

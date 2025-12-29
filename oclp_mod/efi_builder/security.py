@@ -11,6 +11,7 @@ from .. import constants
 
 from ..support import utilities
 from ..detections import device_probe
+from ..languages.language_handler import LanguageHandler
 
 from ..datasets import (
     smbios_data,
@@ -30,6 +31,7 @@ class BuildSecurity:
         self.config: dict = config
         self.constants: constants.Constants = global_constants
         self.computer: device_probe.Computer = self.constants.computer
+        self._language_handler = LanguageHandler(self.constants)
 
         self._build()
 
@@ -85,7 +87,7 @@ class BuildSecurity:
             support.BuildSupport(self.model, self.constants, self.config).enable_kext("CSLVFixup.kext", self.constants.cslvfixup_version, self.constants.cslvfixup_path)
 
         if self.constants.secure_status is False:
-            logging.info("- 禁用 SecureBootModel")
+            logging.info(self._language_handler.get_translation("disable_secure_boot_model"))
             self.config["Misc"]["Security"]["SecureBootModel"] = "Disabled"
 
         if smbios_data.smbios_dictionary[self.model]["Max OS Supported"] < os_data.os_data.sonoma:
