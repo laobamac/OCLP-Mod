@@ -50,7 +50,7 @@ class SettingsFrame(wx.Frame):
 
         self.settings = self._settings()
 
-        self.frame_modal = wx.Dialog(parent, title=title, size=(600, 750))
+        self.frame_modal = wx.Dialog(parent, title=title, size=(600, 710))
 
         self._generate_elements(self.frame_modal)
         self.frame_modal.ShowWindowModal()

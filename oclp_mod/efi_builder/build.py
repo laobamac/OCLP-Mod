@@ -49,10 +49,7 @@ class BuildOpenCore:
         self.model: str = model
         self.config: dict = None
         self.constants: constants.Constants = global_constants
-        # Add language_handler to constants for access by all builder classes
-        if not hasattr(self.constants, 'language_handler'):
-            self.constants.language_handler = LanguageHandler(self.constants)
-        self.language_handler = self.constants.language_handler
+        self.language_handler = LanguageHandler(self.constants)
 
         self._build_opencore()
 

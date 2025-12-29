@@ -111,8 +111,7 @@ class BuildSupport:
        if self.constants.vault is False:
            return
 
-       logging.info(self.language_handler.get_translation("build_signing_efi") if self.language_handler else "- Signing EFI
-=========================================")
+       logging.info(self.language_handler.get_translation("build_signing_efi") if self.language_handler else "- Signing EFI =========================================")
        popen = subprocess.Popen([str(self.constants.vault_path), f"{self.constants.oc_folder}/"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
        for stdout_line in iter(popen.stdout.readline, ""):
            logging.info(stdout_line.strip())
