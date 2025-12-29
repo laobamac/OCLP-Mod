@@ -366,7 +366,7 @@ class HardwarePatchsetDetection:
         seal = content["Sealed"]
 
         if "Broken" in seal:
-            logging.error(f"系统卷已受损，需要取消修补")
+            logging.error(self._language_handler.get_translation("system_volume_broken", "System volume is broken, unpatching is required"))
             return True
 
         return False
@@ -436,7 +436,7 @@ class HardwarePatchsetDetection:
 
         if metal_3802_gpu_present and metal_31001_gpu_present and self._xnu_major >= os_data.sequoia.value:
             if metal_31001_name != "显卡: AMD Legacy GCN":
-                logging.error("无法混用 Metal 3802 and Metal 31001 GPUs 在 macOS Sequoia 或更新版本")
+                logging.error(self._language_handler.get_translation("cannot_mix_metal_gpus", "Cannot mix Metal 3802 and Metal 31001 GPUs on macOS Sequoia or newer"))
                 logging.error("Stripping out Metal 3802 GPUs")
                 for hardware in list(present_hardware):
                     if hardware.hardware_variant_graphics_subclass() == HardwareVariantGraphicsSubclass.METAL_3802_GRAPHICS:

@@ -418,5 +418,7 @@
     "validation_unpatching_not_possible":"无法卸载补丁",
     "validation_repatching_not_supported":"根目录不纯净，请先卸载一次补丁再继续",
     "validation_boot_sip_label":"启动时SIP:",
-    "validation_required_label":"需要:"
+    "validation_required_label":"需要:",
+    "system_volume_broken":"系统卷已受损，需要取消修补",
+    "cannot_mix_metal_gpus":"无法混用 Metal 3802 and Metal 31001 GPUs 在 macOS Sequoia 或更新版本"
 }
