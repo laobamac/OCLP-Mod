@@ -1,6 +1,16 @@
 {
     "app_title": "Open Core Legacy Patcher MOD v{version}",
     "build_and_install": "构建并安装OpenCore",
+    "build_and_install_title": "创建&安装OpenCore",
+    "build_model_label": "型号: {model}",
+    "build_install_button": "🔩 安装 OpenCore",
+    "build_return_button": "返回",
+    "build_error_message": "构建OpenCore遇到错误",
+    "build_error_title": "未能构建OpenCore",
+    "build_complete_message": "你想现在安装OpenCore吗?",
+    "build_complete_title": "完成OpenCore构建！",
+    "build_install_to_disk": "安装到磁盘",
+    "build_view_log": "查看生成日志",
     "build_description": [
         "提供额外指导",
         "要启动更高的系统版本\n需要.app或其他安装程序"

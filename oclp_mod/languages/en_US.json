@@ -1,6 +1,16 @@
 {
     "app_title": "Open Core Legacy Patcher MOD v{version}",
-    "build_and_install": "Build and Install OpenCore", 
+    "build_and_install": "Build and Install OpenCore",
+    "build_and_install_title": "Build and Install OpenCore",
+    "build_model_label": "Model: {model}",
+    "build_install_button": "🔩 Install OpenCore",
+    "build_return_button": "Return",
+    "build_error_message": "An error occurred while building OpenCore",
+    "build_error_title": "Failed to build OpenCore",
+    "build_complete_message": "Do you want to install OpenCore now?",
+    "build_complete_title": "OpenCore Build Complete!",
+    "build_install_to_disk": "Install to Disk",
+    "build_view_log": "View Build Log",
     "build_description": [
         "Provides additional guidance",
         "To start a higher system version\nrequires .app or other installer"
