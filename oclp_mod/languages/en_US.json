@@ -408,5 +408,7 @@
     "validation_unpatching_not_possible":"Unpatching Not Possible",
     "validation_repatching_not_supported":"Repatching Not Supported",
     "validation_boot_sip_label":"Boot SIP:",
-    "validation_required_label":"Required:"
+    "validation_required_label":"Required:",
+    "system_volume_broken":"System volume is broken, unpatching is required",
+    "cannot_mix_metal_gpus":"Cannot mix Metal 3802 and Metal 31001 GPUs on macOS Sequoia or newer"
 }
