@@ -15,6 +15,7 @@ from datetime import date
 from .. import constants
 
 from ..support import utilities
+from ..languages.language_handler import LanguageHandler
 
 from .networking import (
     wired,
@@ -48,6 +49,7 @@ class BuildOpenCore:
         self.model: str = model
         self.config: dict = None
         self.constants: constants.Constants = global_constants
+        self.language_handler = LanguageHandler(self.constants)
 
         self._build_opencore()
 
@@ -58,7 +60,8 @@ class BuildOpenCore:
         """
 
         utilities.cls()
-        logging.info(f"正在构建配置 {'针对外部' if self.constants.custom_model else '针对模型'}: {self.model}")
+        model_type = self.language_handler.get_translation("build_for_external") if self.constants.custom_model else self.language_handler.get_translation("build_for_model")
+        logging.info(f"{self.language_handler.get_translation('build_building_configuration')} {model_type}: {self.model}")
 
         self._generate_base()
         self._set_revision()
@@ -86,7 +89,7 @@ class BuildOpenCore:
 
         # Work-around ocvalidate
         if self.constants.validate is False:
-            logging.info("- 添加 bootmgfw.efi BlessOverride")
+            logging.info(self.language_handler.get_translation("build_adding_blessoverride"))
             self.config["Misc"]["BlessOverride"] += ["\\EFI\\Microsoft\\Boot\\bootmgfw.efi"]
 
 
@@ -96,25 +99,26 @@ class BuildOpenCore:
         """
 
         if not Path(self.constants.build_path).exists():
-            logging.info("创建构建文件夹")
+            logging.info(self.language_handler.get_translation("build_creating_folder"))
             Path(self.constants.build_path).mkdir()
         else:
-            logging.info("构建文件夹已存在，跳过")
+            logging.info(self.language_handler.get_translation("build_folder_exists"))
 
         if Path(self.constants.opencore_zip_copied).exists():
-            logging.info("删除旧的 OpenCore 压缩包副本")
+            logging.info(self.language_handler.get_translation("build_removing_old_zip"))
             Path(self.constants.opencore_zip_copied).unlink()
         if Path(self.constants.opencore_release_folder).exists():
-            logging.info("删除旧的 OpenCore 文件夹副本")
+            logging.info(self.language_handler.get_translation("build_removing_old_folder"))
             shutil.rmtree(self.constants.opencore_release_folder, onerror=rmtree_handler, ignore_errors=True)
 
         logging.info("")
-        logging.info(f"- 添加 OpenCore v{self.constants.opencore_version} {'DEBUG' if self.constants.opencore_debug is True else 'RELEASE'}")
+        oc_type = 'DEBUG' if self.constants.opencore_debug is True else 'RELEASE'
+        logging.info(self.language_handler.get_translation("build_adding_opencore").format(version=self.constants.opencore_version, type=oc_type))
         shutil.copy(self.constants.opencore_zip_source, self.constants.build_path)
         zipfile.ZipFile(self.constants.opencore_zip_copied).extractall(self.constants.build_path)
 
         # Setup config.plist for editing
-        logging.info("- 添加 config.plist 以供 OpenCore 使用")
+        logging.info(self.language_handler.get_translation("build_adding_configplist"))
         shutil.copy(self.constants.plist_template, self.constants.oc_folder)
         self.config = plistlib.load(Path(self.constants.plist_path).open("rb"))
 
@@ -126,12 +130,12 @@ class BuildOpenCore:
 
         self.config["#Revision"]["Build-Version"] = f"{self.constants.patcher_version} - {date.today()}"
         if not self.constants.custom_model:
-            self.config["#Revision"]["Build-Type"] = "在目标机器上构建的 OpenCore"
+            self.config["#Revision"]["Build-Type"] = self.language_handler.get_translation("build_type_target")
             computer_copy = copy.copy(self.constants.computer)
             computer_copy.ioregistry = None
             self.config["#Revision"]["Hardware-Probe"] = pickle.dumps(computer_copy)
         else:
-            self.config["#Revision"]["Build-Type"] = "为外部机器构建的 OpenCore"
+            self.config["#Revision"]["Build-Type"] = self.language_handler.get_translation("build_type_external")
         self.config["#Revision"]["OpenCore-Version"] = f"{self.constants.opencore_version} - {'DEBUG' if self.constants.opencore_debug is True else 'RELEASE'}"
         self.config["#Revision"]["Original-Model"] = self.model
         self.config["NVRAM"]["Add"]["4D1FDA02-38C7-4A6A-9CC6-4BCCA8B30102"]["OCLP-Version"] = f"{self.constants.patcher_version}"
@@ -169,6 +173,6 @@ class BuildOpenCore:
         support.BuildSupport(self.model, self.constants, self.config).validate_pathing()
 
         logging.info("")
-        logging.info(f"您的 {self.model} 的 OpenCore EFI 已构建完成，位于:")
+        logging.info(self.language_handler.get_translation("build_efi_complete").format(model=self.model))
         logging.info(f"    {self.constants.opencore_release_folder}")
         logging.info("")
