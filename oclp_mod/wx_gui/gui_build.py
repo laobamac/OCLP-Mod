@@ -11,6 +11,7 @@ import time
 from .. import constants
 
 from ..efi_builder import build
+from ..languages.language_handler import LanguageHandler
 
 from ..wx_gui import (
     gui_main_menu,
@@ -38,6 +39,7 @@ class BuildFrame(wx.Frame):
         self.constants: constants.Constants = global_constants
         self.title: str = title
         self.stock_output = logging.getLogger().handlers[0].stream
+        self.language_handler: LanguageHandler = LanguageHandler(global_constants)
 
         self.frame_modal = wx.Dialog(self, title=title, size=(400, 200))
 
@@ -65,16 +67,16 @@ class BuildFrame(wx.Frame):
         """
         frame = self if not frame else frame
 
-        title_label = wx.StaticText(frame, label="创建&安装OpenCore", pos=(-1,5))
+        title_label = wx.StaticText(frame, label=self.language_handler.get_translation("build_and_install_title", "Build and Install OpenCore"), pos=(-1,5))
         title_label.SetFont(gui_support.font_factory(19, wx.FONTWEIGHT_BOLD))
         title_label.Centre(wx.HORIZONTAL)
 
-        model_label = wx.StaticText(frame, label=f"型号: {self.constants.custom_model or self.constants.computer.real_model}", pos=(-1,30))
+        model_label = wx.StaticText(frame, label=self.language_handler.get_translation("build_model_label", "Model: {model}").format(model=self.constants.custom_model or self.constants.computer.real_model), pos=(-1,30))
         model_label.SetFont(gui_support.font_factory(13, wx.FONTWEIGHT_NORMAL))
         model_label.Centre(wx.HORIZONTAL)
 
         # Button: Install OpenCore
-        install_button = wx.Button(frame, label="🔩 安装 OpenCore", pos=(-1, model_label.GetPosition()[1] + model_label.GetSize()[1]), size=(150, 30))
+        install_button = wx.Button(frame, label=self.language_handler.get_translation("build_install_button", "🔩 Install OpenCore"), pos=(-1, model_label.GetPosition()[1] + model_label.GetSize()[1]), size=(150, 30))
         install_button.Bind(wx.EVT_BUTTON, self.on_install)
         install_button.Centre(wx.HORIZONTAL)
         install_button.Disable()
@@ -86,7 +88,7 @@ class BuildFrame(wx.Frame):
         self.text_box = text_box
 
         # Button: Return to Main Menu
-        return_button = wx.Button(frame, label="返回", pos=(-1, text_box.GetPosition()[1] + text_box.GetSize()[1] + 5), size=(150, 30))
+        return_button = wx.Button(frame, label=self.language_handler.get_translation("build_return_button", "Return"), pos=(-1, text_box.GetPosition()[1] + text_box.GetSize()[1] + 5), size=(150, 30))
         return_button.Bind(wx.EVT_BUTTON, self.on_return_to_main_menu)
         return_button.Centre(wx.HORIZONTAL)
         return_button.Disable()
@@ -116,8 +118,8 @@ class BuildFrame(wx.Frame):
         if self.build_successful is False:
             dialog = wx.MessageDialog(
                 parent=self,
-                message="构建OpenCore遇到错误",
-                caption="未能构建OpenCore",
+                message=self.language_handler.get_translation("build_error_message", "An error occurred while building OpenCore"),
+                caption=self.language_handler.get_translation("build_error_title", "Failed to build OpenCore"),
                 style=wx.OK | wx.ICON_ERROR
             )
             dialog.ShowModal()
@@ -125,11 +127,11 @@ class BuildFrame(wx.Frame):
 
         dialog = wx.MessageDialog(
             parent=self,
-            message=f"你想现在安装OpenCore吗?",
-            caption="完成OpenCore构建！",
+            message=self.language_handler.get_translation("build_complete_message", "Do you want to install OpenCore now?"),
+            caption=self.language_handler.get_translation("build_complete_title", "OpenCore Build Complete!"),
             style=wx.YES_NO | wx.ICON_QUESTION
         )
-        dialog.SetYesNoLabels("安装到磁盘", "查看生成日志")
+        dialog.SetYesNoLabels(self.language_handler.get_translation("build_install_to_disk", "Install to Disk"), self.language_handler.get_translation("build_view_log", "View Build Log"))
 
         self.on_install() if dialog.ShowModal() == wx.ID_YES else self.install_button.Enable()
 
