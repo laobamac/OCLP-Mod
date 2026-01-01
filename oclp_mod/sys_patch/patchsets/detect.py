@@ -202,10 +202,10 @@ class HardwarePatchsetDetection:
         oclp_plist = plistlib.load(open(oclp_patch_path, "rb"))
 
         if self._constants.computer.oclp_sys_url != self._constants.commit_info[2]:
-            logging.error("Installed patches are from different commit, unpatching is required")
+            logging.error("使用不同版本的OCLP-Mod安装过补丁，需要先卸载补丁")
             return True
 
-        wireless_keys = {"无线网卡"}
+        wireless_keys = {"BCM无线网卡", "Intel无线网卡", "Intel/BCM双网卡", "Broadcom无线网卡", "Atheros无线网卡"}
 
         # Keep in sync with generate_patchset_plist
         metadata_keys = {
