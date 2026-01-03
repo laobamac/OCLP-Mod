@@ -105,37 +105,6 @@ class ZSHFunctions:
         return _script
 
 
-    def generate_create_alias(self) -> str:
-        """
-        ZSH function to create alias
-        """
-
-        _script = ""
-
-        _script += "function _createAlias() {\n"
-        _script += "    local mainPath=$1\n"
-        _script += "    local aliasPath=$2\n\n"
-
-        _script += "    # Check if alias path exists\n"
-        _script += "    if [[ -e $aliasPath ]]; then\n"
-        _script += "        # Check if alias path is a symbolic link\n"
-        _script += "        if [[ -L $aliasPath ]]; then\n"
-        _script += "            echo \"Removing old symbolic link: $aliasPath\"\n"
-        _script += "            /bin/rm -f $aliasPath\n"
-        _script += "        else\n"
-        _script += "            echo \"Removing old file: $aliasPath\"\n"
-        _script += "            /bin/rm -rf $aliasPath\n"
-        _script += "        fi\n"
-        _script += "    fi\n\n"
-
-        _script += "    # Create symbolic link\n"
-        _script += "    echo \"Creating symbolic link: $aliasPath\"\n"
-        _script += "    /bin/ln -s $mainPath $aliasPath\n"
-        _script += "}\n"
-
-        return _script
-
-
     def generate_start_patching(self) -> str:
         """
         ZSH function to start patching
@@ -281,7 +250,6 @@ class ZSHFunctions:
 
         _script += "function _main() {\n"
         _script += "    _setSUIDBit \"$pathToTargetVolume/$helperPath\"\n"
-        _script += "    _createAlias \"$pathToTargetVolume/$mainAppPath\" \"$pathToTargetVolume/$shimAppPath\"\n"
         _script += "    _prewarmGatekeeper \"$pathToTargetVolume/$mainAppPath\"\n"
         if is_autopkg:
             _script += "    _startPatching \"$pathToTargetVolume/$executablePath\"\n"
@@ -315,7 +283,6 @@ class GenerateScripts:
         self.zsh_functions = ZSHFunctions()
 
         self.files = [
-            "Applications/OCLP-Mod.app",
             "Library/Application Support/laobamac/Update.plist",
             "Library/Application Support/laobamac/OCLP-Mod.app",
             "Library/PrivilegedHelperTools/com.laobamac.oclp-mod.privileged-helper"
@@ -415,9 +382,9 @@ class GenerateScripts:
         _script += f"# {'AutoPkg Assets' if is_autopkg else 'OCLP-Mod'} Post Install Script\n"
         _script += self._generate_header_bar()
         if is_autopkg:
-            _script += "# Set UID, create alias, start patching, and reboot.\n"
+            _script += "# Set UID, start patching, and reboot.\n"
         else:
-            _script += "# Set SUID bit on helper tool, and create app alias.\n"
+            _script += "# Set SUID bit on helper tool.\n"
         _script += self._generate_header_bar()
         _script += "\n\n"
 
@@ -430,7 +397,6 @@ class GenerateScripts:
 
         _script += "helperPath=\"Library/PrivilegedHelperTools/com.laobamac.oclp-mod.privileged-helper\"\n"
         _script += "mainAppPath=\"Library/Application Support/laobamac/OCLP-Mod.app\"\n"
-        _script += "shimAppPath=\"Applications/OCLP-Mod.app\"\n"
         if is_autopkg:
             _script += "executablePath=\"$mainAppPath/Contents/MacOS/OCLP-Mod\"\n"
 
@@ -441,8 +407,6 @@ class GenerateScripts:
         _script += "\n"
 
         _script += self.zsh_functions.generate_set_suid_bit()
-        _script += "\n"
-        _script += self.zsh_functions.generate_create_alias()
         _script += "\n"
         _script += self.zsh_functions.generate_prewarm_gatekeeper()
         _script += "\n"
