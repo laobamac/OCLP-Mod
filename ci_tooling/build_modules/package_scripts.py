@@ -285,7 +285,8 @@ class GenerateScripts:
         self.files = [
             "Library/Application Support/laobamac/Update.plist",
             "Library/Application Support/laobamac/OCLP-Mod.app",
-            "Library/PrivilegedHelperTools/com.laobamac.oclp-mod.privileged-helper"
+            "Library/PrivilegedHelperTools/com.laobamac.oclp-mod.privileged-helper",
+            "Applications/OCLP-Mod.app"
         ]
 
         self.additional_auto_pkg_files = [
