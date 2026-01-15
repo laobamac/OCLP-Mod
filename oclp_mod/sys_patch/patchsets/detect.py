@@ -221,7 +221,7 @@ class HardwarePatchsetDetection:
 
         existing_patches = set(oclp_plist) - wireless_keys - metadata_keys
         if existing_patches:
-            logging.error(f"Patch(es) already installed: {', '.join(existing_patches)}, unpatching is required")
+            logging.error(f"以下补丁已安装: {', '.join(existing_patches)}, 需要卸载")
             return True
 
         return False

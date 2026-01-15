@@ -2,7 +2,7 @@
 
 *Automatically generated from GitHub releases*
 *Source: https://github.com/laobamac/OCLP-Mod*
-*Last update: 2026-01-07 01:22:37*
+*Last update: 2026-01-07 22:28:30*
 
 ---
 
@@ -275,7 +275,6 @@
 
 - 修复手动下载KDK，Metallib版本不对应的问题
 - 允许复制下载加速链接自行使用其他工具下载
-- ![QQ_1732460850097](https://github.com/user-attachments/assets/eb382357-6fe5-4b2c-acd0-5f78f0a4d5e8)
 
 [Full Release](https://github.com/laobamac/OCLP-Mod/releases/tag/2.4.1)
 
@@ -302,7 +301,6 @@
 - 添加自动更新，使用SimpleHac的`OCLP-API`，国内可满速
 - 汉化剩余字符串
 - 修改`checkNetwork`方法，修改`downloadObj`实现国内加速
-- ![666](https://img.wjwj.top/2024/11/24/eb21e9d68fe309a2f336e66de0af2a8b.png)
 - 添加对AR9485，AR9565等网卡的支持（仅环境补丁）
 
 [Full Release](https://github.com/laobamac/OCLP-Mod/releases/tag/2.4.0)
@@ -357,9 +355,9 @@
 ## 2.1.1
 *Release date: 2024-10-01*
 
-# Add KDK/MetalLib files accelerated download url.
-Thanks llkk/moeyy/ghproxy and others.
-## Please use .pkg to install!!! .app file maybe make errors.
+- Add KDK/MetalLib files accelerated download url.
+- Thanks llkk/moeyy/ghproxy and others.
+- Please use .pkg to install!!! .app file maybe make errors.
 
 [Full Release](https://github.com/laobamac/OCLP-Mod/releases/tag/2.1.1)
 
@@ -368,10 +366,10 @@ Thanks llkk/moeyy/ghproxy and others.
 ## 2.1.0
 *Release date: 2024-10-01*
 
-## 1.Add IntelWireless and BCM Wireless Card patch back.
-## 2.Sinicize almost all strings.
+- 1.Add IntelWireless and BCM Wireless Card patch back.
+- 2.Sinicize almost all strings.
 More see here [ChangeLog](https://github.com/dortania/OpenCore-Legacy-Patcher/blob/main/CHANGELOG.md)
-## ⚠️Please use .pkg to install OCLP-Mod！！！Open .app directly maybe make error.
+- ⚠️Please use .pkg to install OCLP-Mod！！！Open .app directly maybe make error.
 
 [Full Release](https://github.com/laobamac/OCLP-Mod/releases/tag/2.1.0)
 
