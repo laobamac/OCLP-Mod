@@ -2,9 +2,21 @@
 
 *Automatically generated from GitHub releases*
 *Source: https://github.com/laobamac/OCLP-Mod*
-*Last update: 2026-01-07 22:28:30*
+*Last update: 2026-01-15 22:27:11*
 
 ---
+
+## 3.1.4
+*Release date: 2026-01-15*
+
+- 添加OCLP-Mod Shim，现在你可以在 **macOS Tahoe** 的 **Spotlight Plus** 中找到并打开 **OCLP-Mod** 了！
+- 修正了 **无线网卡补丁** 内错误的“需要下载KDK”设置
+- 修正了部分未翻译的字符串
+
+[Full Release](https://github.com/laobamac/OCLP-Mod/releases/tag/3.1.4)
+
+---
+
 
 ## 3.1.3
 *Release date: 2026-01-01*
