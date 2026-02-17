@@ -1,3 +1,11 @@
+## 此项目进入维护阶段，后续不再提供任何更新与修复
+## 即日起，一切提交都将从dortania/OpenCore-Legacy-Patcher仓库同步
+## 感谢一切对此项目作出贡献、喜欢使用此项目的小伙伴
+### 没有特殊原因，仅因为未来精力不足，我需要投入其他能够持续发展的项目，而不是已经到达终点的黑苹果
+### 未来再见
+
+----
+
 <div align="center">
              <img src="docs/images/OC-Mod.png" alt="OCLP-Mod Logo" width="256" />
              <h1>OCLP-Mod</h1>
