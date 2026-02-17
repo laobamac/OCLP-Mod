@@ -28,7 +28,7 @@ class PatcherSupportPkgMount:
             logging.info("- PatcherSupportPkg 资源缺失，Patcher 可能已损坏!!!")
             return False
 
-        output = subprocess.run(
+        output = subprocess_wrapper.run_as_root(
             [
                 "/usr/bin/hdiutil", "attach", "-noverify", f"{self.constants.payload_local_binaries_root_path_dmg}",
                 "-mountpoint", Path(self.constants.payload_path / Path("Universal-Binaries")),

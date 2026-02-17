@@ -40,7 +40,7 @@ class RoutePayloadDiskImage:
             logging.info("创建 payloads 目录")
             Path(self.temp_dir.name / Path("payloads")).mkdir(parents=True, exist_ok=True)
             self._unmount_active_dmgs(unmount_all_active=False)
-            output = subprocess.run(
+            output = subprocess_wrapper.run_as_root(
                 [
                     "/usr/bin/hdiutil", "attach", "-noverify", f"{self.constants.payload_path_dmg}",
                     "-mountpoint", Path(self.temp_dir.name / Path("payloads")),
