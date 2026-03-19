@@ -237,60 +237,46 @@ class KernelDebugKitObject:
             candidate_kdks = []
             for kdk in remote_kdk_version:
                 kdk_version = cast(packaging.version.Version, packaging.version.parse(kdk["version"]))
+                if kdk_version > parsed_version:
+                    continue
+                if kdk_version.major != parsed_version.major:
+                    continue
+                if kdk_version.minor not in range(parsed_version.minor - 1, parsed_version.minor + 1):
+                    continue
                 
-                # 判断是否为 macOS 26.4 及以上版本
-                is_macos_26_4_or_higher = (
-                    parsed_version.major > 26 or 
-                    (parsed_version.major == 26 and parsed_version.minor >= 4)
-                )
-                
-                if is_macos_26_4_or_higher:
-                    # macOS 26.4 及以上：允许大于等于当前版本的 KDK
-                    if kdk_version >= parsed_version:
-                        candidate_kdks.append(kdk)
-                else:
-                    # macOS 26.4 以下：保持原有逻辑，只允许小于等于当前版本的 KDK
-                    if kdk_version > parsed_version:
-                        continue
-                    if kdk_version.major != parsed_version.major:
-                        continue
-                    if kdk_version.minor not in range(parsed_version.minor - 1, parsed_version.minor + 1):
-                        continue
-                    candidate_kdks.append(kdk)
+                candidate_kdks.append(kdk)
 
-            # 按构建号排序
+            # 按构建号排序（降序，最新的在前）
+            candidate_kdks.sort(key=lambda x: x["build"], reverse=True)
+            
+            # 判断是否为 macOS 26.4 及以上版本
+            is_macos_26_4_or_higher = (
+                parsed_version.major > 26 or 
+                (parsed_version.major == 26 and parsed_version.minor >= 4)
+            )
+            
             if candidate_kdks:
-                # 按构建号排序（降序，最新的在前）
-                candidate_kdks.sort(key=lambda x: x["build"], reverse=True)
-                
-                is_macos_26_4_or_higher = (
-                    parsed_version.major > 26 or 
-                    (parsed_version.major == 26 and parsed_version.minor >= 4)
-                )
-                
                 if is_macos_26_4_or_higher:
-                    # macOS 26.4 及以上：优先选择大于等于当前构建号的最新版本
-                    greater_or_equal_kdk = None
+                    # macOS 26.4+ 优先选择构建号大于等于当前构建的最新版本
+                    closest_kdk = None
                     for kdk in candidate_kdks:
                         if kdk["build"] >= host_build:
-                            greater_or_equal_kdk = kdk
+                            closest_kdk = kdk
                             break
                     
-                    if greater_or_equal_kdk:
-                        closest_kdk = greater_or_equal_kdk
-                        logging.info(f"找到大于等于当前构建号的版本: {closest_kdk['build']}")
-                    else:
-                        # 如果没有大于等于的版本，选择小于等于当前构建的最新版本
+                    # 如果没有找到大于等于的版本
+                    if closest_kdk is None:
                         for kdk in candidate_kdks:
                             if kdk["build"] <= host_build:
                                 closest_kdk = kdk
                                 break
-                        else:
-                            # 如果还是没有，选择最小的版本
+                        
+                        # 如果还是没有，选择最小的版本（最老的）
+                        if closest_kdk is None:
                             closest_kdk = candidate_kdks[-1]
-                        logging.info(f"未找到大于等于的版本，回退到小于等于的版本: {closest_kdk['build']}")
                 else:
-                    # macOS 26.4 以下：保持原有逻辑，选择小于等于当前构建的最新版本
+                    # 选择构建号小于等于当前构建的最新版本
+                    logging.info("macOS 26.4 以下版本，使用原逻辑")
                     closest_kdk = None
                     for kdk in candidate_kdks:
                         if kdk["build"] <= host_build:
@@ -299,7 +285,7 @@ class KernelDebugKitObject:
                     
                     # 如果没有找到小于等于的版本，选择最小的版本（最老的）
                     if closest_kdk is None:
-                        closest_kdk = candidate_kdks[-1]  # 排序后最后一个是最小的
+                        closest_kdk = candidate_kdks[-1]
                 
                 self.kdk_closest_match_url = closest_kdk["url"]
                 self.kdk_closest_match_url_build = closest_kdk["build"]
