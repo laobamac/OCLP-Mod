@@ -257,33 +257,36 @@ class KernelDebugKitObject:
             
             if candidate_kdks:
                 if is_macos_26_4_or_higher:
-                    # macOS 26.4+ 优先选择构建号大于等于当前构建的最新版本
+                    # 找出比主机旧的最新 KDK 作为日期参考
+                    latest_older_kdk = next((k for k in candidate_kdks if k["build"] <= host_build), None)
+                    
                     closest_kdk = None
                     for kdk in candidate_kdks:
-                        if kdk["build"] >= host_build:
+                        if kdk["build"] > host_build:
+                            # 排除 Beta (小写字母结尾) 或 发布日期早于旧版正式版的 KDK
+                            if kdk["build"][-1].islower():
+                                continue
+                            if latest_older_kdk and kdk.get("date", "") < latest_older_kdk.get("date", ""):
+                                continue
+                            
+                            closest_kdk = kdk
+                            break
+                        
+                        elif kdk["build"] <= host_build:
+                            # 匹配旧版中最新的一个
                             closest_kdk = kdk
                             break
                     
-                    # 如果没有找到大于等于的版本
                     if closest_kdk is None:
-                        for kdk in candidate_kdks:
-                            if kdk["build"] <= host_build:
-                                closest_kdk = kdk
-                                break
-                        
-                        # 如果还是没有，选择最小的版本（最老的）
-                        if closest_kdk is None:
-                            closest_kdk = candidate_kdks[-1]
+                        closest_kdk = candidate_kdks[-1]
                 else:
-                    # 选择构建号小于等于当前构建的最新版本
-                    logging.info("macOS 26.4 以下版本，使用原逻辑")
+                    # macOS 26.4 以下版本：仅选择构建号小于等于当前构建的最新版本
                     closest_kdk = None
                     for kdk in candidate_kdks:
                         if kdk["build"] <= host_build:
                             closest_kdk = kdk
                             break
                     
-                    # 如果没有找到小于等于的版本，选择最小的版本（最老的）
                     if closest_kdk is None:
                         closest_kdk = candidate_kdks[-1]
                 
@@ -323,7 +326,6 @@ class KernelDebugKitObject:
         logging.info(f"- KDK URL: {self.kdk_url}")
 
         self.success = True
-
 
     def retrieve_download(self, override_path: str = "") -> network_handler.DownloadObject:
         """
