@@ -31,7 +31,7 @@ Add Chinese language ,Intel Wireless in Sequoia ,KDK/MetalLib files accelerated 
 
 Noteworthy features of OCLP-Mod:
 
-* Support for macOS Big Sur, Monterey, Ventura, Sonoma and Sequoia
+* Support for macOS Big Sur, Monterey, Ventura, Sonoma, Sequoia and Tahoe
 * Native Over the Air (OTA) System Updates
 * Supports Penryn and newer Macs
 * Full support for WPA Wi-Fi and Personal Hotspot on BCM943224 and newer wireless chipsets
