@@ -30,6 +30,7 @@ OMAPIv2:          str  = "https://subsequent.oclpapi.simplehac.cn/"
 KDK_API_LINK_ORIGIN:     str  = "https://dortania.github.io/KdkSupportPkg/manifest.json"
 
 KDK_ASSET_LIST:   list = None
+KDK_SESSION_SELECTION = None
 
 class KernelDebugKitObject:
     """
@@ -163,14 +164,8 @@ class KernelDebugKitObject:
     def _get_latest_kdk(self, host_build: str = None, host_version: str = None) -> None:
         """
         获取当前 macOS 版本的最新 KDK
-
-        Parameters:
-            host_build (str, optional):   当前 macOS 版本的构建版本。
-                                          如果为空，则使用类中的 host_build。默认为 None。
-            host_version (str, optional): 当前 macOS 版本。
-                                          如果为空，则使用类中的 host_version。默认为 None。
         """
-
+        global KDK_SESSION_SELECTION
         if host_build is None and host_version is None:
             host_build   = self.host_build
             host_version = self.host_version
@@ -182,6 +177,7 @@ class KernelDebugKitObject:
             logging.warning(f"{self.error_msg}")
             return
 
+        # 检查当前系统是否已安装完全匹配的 KDK
         self.kdk_installed_path = self._local_kdk_installed()
         if self.kdk_installed_path:
             logging.info(f"KDK 已安装 ({Path(self.kdk_installed_path).name})，跳过")
@@ -191,139 +187,109 @@ class KernelDebugKitObject:
 
         remote_kdk_version = self._get_remote_kdks()
 
+        # 如果 API 无法访问，回退到原有的本地模糊匹配逻辑
         if remote_kdk_version is None:
             logging.warning("无法获取 KDK 列表，回退到本地 KDK 匹配")
-
-            # 首先检查是否安装了与当前 macOS 版本匹配的 KDK
-            # 例如 13.0.1 对应 13.0
             loose_version = f"{parsed_version.major}.{parsed_version.minor}"
-            logging.info(f"检查松散匹配的 KDK {loose_version}")
             self.kdk_installed_path = self._local_kdk_installed(match=loose_version, check_version=True)
             if self.kdk_installed_path:
-                logging.info(f"找到匹配的 KDK: {Path(self.kdk_installed_path).name}")
                 self.kdk_already_installed = True
                 self.success = True
                 return
-
-            older_version = f"{parsed_version.major}.{parsed_version.minor - 1 if parsed_version.minor > 0 else 0}"
-            logging.info(f"检查匹配的 KDK {older_version}")
-            self.kdk_installed_path = self._local_kdk_installed(match=older_version, check_version=True)
-            if self.kdk_installed_path:
-                logging.info(f"找到匹配的 KDK: {Path(self.kdk_installed_path).name}")
-                self.kdk_already_installed = True
-                self.success = True
-                return
-
-            logging.warning(f"找不到匹配 {host_version} 或 {older_version} 的 KDK，请手动安装一个")
-
-            self.error_msg = f"无法联系 KdkSupportPkg API，并且没有安装匹配 {host_version} ({host_build}) 或 {older_version} 的 KDK。\n请确保您有网络连接或手动安装一个 KDK."
-
+            self.error_msg = "无法连接 API 且本地无匹配 KDK。"
             return
 
-        # 首先检查精确匹配
+        # 尝试精确匹配当前 Build
         for kdk in remote_kdk_version:
-            if (kdk["build"] != host_build):
-                continue
-            self.kdk_url = kdk["url"]
-            self.kdk_url_build = kdk["build"]
-            self.kdk_url_version = kdk["version"]
-            self.kdk_url_expected_size = kdk["fileSize"]
-            self.kdk_url_is_exactly_match = True
-            break
+            if (kdk["build"] == host_build):
+                self.kdk_url = kdk["url"]
+                self.kdk_url_build = kdk["build"]
+                self.kdk_url_version = kdk["version"]
+                self.kdk_url_expected_size = kdk["fileSize"]
+                self.kdk_url_is_exactly_match = True
+                logging.info(f"找到 {host_build} ({host_version}) 的直接匹配")
+                break
 
-        # 如果没有精确匹配，检查最接近的匹配
+        # 如果没有精确匹配，检查本次运行的内存缓存或磁盘记录
         if self.kdk_url == "":
-            # 收集所有可能的候选版本
-            candidate_kdks = []
+            cached_choice = None
+            if KDK_SESSION_SELECTION:
+                cached_choice = KDK_SESSION_SELECTION
+                logging.info(f"使用本次运行中已记录的手动选择: {cached_choice['build']}")
+            else:
+                kdk_plist_path = Path(self.constants.kdk_download_path).parent / KDK_INFO_PLIST
+                if kdk_plist_path.exists():
+                    try:
+                        kdk_info = plistlib.load(kdk_plist_path.open("rb"))
+                        for kdk in remote_kdk_version:
+                            if kdk["build"] == kdk_info.get("build"):
+                                cached_choice = kdk
+                                logging.info(f"从磁盘记录中恢复您的选择: {cached_choice['build']}")
+                                KDK_SESSION_SELECTION = kdk
+                                break
+                    except:
+                        pass
+
+            if cached_choice:
+                self.kdk_url = cached_choice["url"]
+                self.kdk_url_build = cached_choice["build"]
+                self.kdk_url_version = cached_choice["version"]
+                self.kdk_url_expected_size = cached_choice["fileSize"]
+                self.kdk_url_is_exactly_match = False
+                
+                # 检查缓存选择的版本是否已经安装
+                self.kdk_installed_path = self._local_kdk_installed(match=self.kdk_url_build)
+                if self.kdk_installed_path:
+                    logging.info(f"选定的 KDK ({self.kdk_url_build}) 已安装，跳过下载")
+                    self.kdk_already_installed = True
+                self.success = True
+                return
+
+        if self.kdk_url == "":
             for kdk in remote_kdk_version:
                 kdk_version = cast(packaging.version.Version, packaging.version.parse(kdk["version"]))
-                if kdk_version > parsed_version:
-                    continue
-                if kdk_version.major != parsed_version.major:
+                if kdk_version > parsed_version or kdk_version.major != parsed_version.major:
                     continue
                 if kdk_version.minor not in range(parsed_version.minor - 1, parsed_version.minor + 1):
                     continue
-                
-                candidate_kdks.append(kdk)
+                self.kdk_closest_match_url = kdk["url"]
+                self.kdk_closest_match_url_build = kdk["build"]
+                self.kdk_closest_match_url_version = kdk["version"]
+                self.kdk_closest_match_url_expected_size = kdk["fileSize"]
+                break
 
-            # 按构建号排序（降序，最新的在前）
-            candidate_kdks.sort(key=lambda x: x["build"], reverse=True)
+            # 触发交互窗口
+            logging.warning(f"未找到 {host_build} 的直接匹配，等待用户手动选择")
+            selection = self._show_manual_selection_ui(remote_kdk_version)
             
-            # 判断是否为 macOS 26.4 及以上版本
-            is_macos_26_4_or_higher = (
-                parsed_version.major > 26 or 
-                (parsed_version.major == 26 and parsed_version.minor >= 4)
-            )
-            
-            if candidate_kdks:
-                if is_macos_26_4_or_higher:
-                    # 找出比主机旧的最新 KDK 作为日期参考
-                    latest_older_kdk = next((k for k in candidate_kdks if k["build"] <= host_build), None)
-                    
-                    closest_kdk = None
-                    for kdk in candidate_kdks:
-                        if kdk["build"] > host_build:
-                            # 排除 Beta (小写字母结尾) 或 发布日期早于旧版正式版的 KDK
-                            if kdk["build"][-1].islower():
-                                continue
-                            if latest_older_kdk and kdk.get("date", "") < latest_older_kdk.get("date", ""):
-                                continue
-                            
-                            closest_kdk = kdk
-                            break
-                        
-                        elif kdk["build"] <= host_build:
-                            # 匹配旧版中最新的一个
-                            closest_kdk = kdk
-                            break
-                    
-                    if closest_kdk is None:
-                        closest_kdk = candidate_kdks[-1]
-                else:
-                    # macOS 26.4 以下版本：仅选择构建号小于等于当前构建的最新版本
-                    closest_kdk = None
-                    for kdk in candidate_kdks:
-                        if kdk["build"] <= host_build:
-                            closest_kdk = kdk
-                            break
-                    
-                    if closest_kdk is None:
-                        closest_kdk = candidate_kdks[-1]
-                
-                self.kdk_closest_match_url = closest_kdk["url"]
-                self.kdk_closest_match_url_build = closest_kdk["build"]
-                self.kdk_closest_match_url_version = closest_kdk["version"]
-                self.kdk_closest_match_url_expected_size = closest_kdk["fileSize"]
+            if selection == "AUTO":
+                if self.kdk_closest_match_url == "":
+                    self.error_msg = "未找到推荐的 KDK 且无精确匹配。"
+                    return
+                self.kdk_url = self.kdk_closest_match_url
+                self.kdk_url_build = self.kdk_closest_match_url_build
+                self.kdk_url_version = self.kdk_closest_match_url_version
+                self.kdk_url_expected_size = self.kdk_closest_match_url_expected_size
+                logging.info("用户选择了自动匹配")
+            elif selection: # 用户从列表选择了特定版本
+                KDK_SESSION_SELECTION = selection # 存入全局变量
+                self.kdk_url = selection["url"]
+                self.kdk_url_build = selection["build"]
+                self.kdk_url_version = selection["version"]
+                self.kdk_url_expected_size = selection["fileSize"]
                 self.kdk_url_is_exactly_match = False
-
-        if self.kdk_url == "":
-            if self.kdk_closest_match_url == "":
-                logging.warning(f"未找到适用于 {host_build} ({host_version}) 的 KDK")
-                self.error_msg = f"未找到适用于 {host_build} ({host_version}) 的 KDK"
+                logging.info(f"用户手动选择了: {self.kdk_url_build}")
+            else:
+                self.error_msg = "用户取消了 KDK 选择，无法继续。"
+                logging.warning(self.error_msg)
                 return
-            logging.info(f"未找到 {host_build} 的直接匹配，回退到最接近的匹配")
-            logging.info(f"最接近的匹配: {self.kdk_closest_match_url_build} ({self.kdk_closest_match_url_version})")
 
-            self.kdk_url = self.kdk_closest_match_url
-            self.kdk_url_build = self.kdk_closest_match_url_build
-            self.kdk_url_version = self.kdk_closest_match_url_version
-            self.kdk_url_expected_size = self.kdk_closest_match_url_expected_size
-        else:
-            logging.info(f"找到 {host_build} ({host_version}) 的直接匹配")
-
-
-        # 检查此 KDK 是否已安装
         self.kdk_installed_path = self._local_kdk_installed(match=self.kdk_url_build)
         if self.kdk_installed_path:
-            logging.info(f"KDK 已安装 ({Path(self.kdk_installed_path).name})，跳过")
+            logging.info(f"选定的 KDK ({self.kdk_url_build}) 已安装，跳过下载")
             self.kdk_already_installed = True
             self.success = True
             return
-
-        logging.info("推荐的 KDK 如下:")
-        logging.info(f"- KDK 构建版本: {self.kdk_url_build}")
-        logging.info(f"- KDK 版本: {self.kdk_url_version}")
-        logging.info(f"- KDK URL: {self.kdk_url}")
 
         self.success = True
 
@@ -630,6 +596,59 @@ class KernelDebugKitObject:
         logging.info("内核调试工具包校验和已验证")
         return True
 
+    def _show_manual_selection_ui(self, remote_kdks: list) -> any:
+        """
+        通过 AppleScript 弹出原生对话框（无需新模块）
+        """
+        warning_msg = (
+            f"⚠️ 警告：未找到与当前系统 ({self.host_build}) 精确匹配的 KDK。\\n\\n"
+            "安装不匹配的版本可能会导致内核崩溃或系统无法启动。\\n建议优先手动选择！建议优先手动选择！建议优先手动选择！。"
+        )
+
+        # 第一步：弹出带有“自动选择”按钮的警告框
+        btn_script = (
+            f'display dialog "{warning_msg}" '
+            'with title "KDK 匹配警告" '
+            'buttons {"手动选择列表", "自动选择"} '
+            'default button "手动选择列表" '
+            'with icon caution'
+        )
+
+        try:
+            # 使用已有的 subprocess 模块调用 osascript
+            res = subprocess.run(["osascript", "-e", btn_script], capture_output=True, text=True)
+            user_response = res.stdout.strip()
+
+            if "自动选择" in user_response:
+                return "AUTO"
+            
+            if "手动选择列表" in user_response:
+                options = [f"{k['version']} ({k['build']})" for k in remote_kdks[:20]] # 取前20个
+                as_list = '{"' + '", "'.join(options) + '"}'
+                
+                list_script = (
+                    f'choose from list {as_list} '
+                    'with title "选择 KDK 版本" '
+                    'with prompt "请从下方列表中选择一个您认为合适的版本：" '
+                    'OK button name "确认" cancel button name "取消"'
+                )
+                
+                res_list = subprocess.run(["osascript", "-e", list_script], capture_output=True, text=True)
+                list_choice = res_list.stdout.strip()
+
+                if list_choice == "false" or not list_choice:
+                    return None # 用户取消了列表选择
+                
+                # 提取括号内的 build 号并匹配回对象
+                selected_build = list_choice.split("(")[-1].split(")")[0]
+                for kdk in remote_kdks:
+                    if kdk["build"] == selected_build:
+                        return kdk
+            
+            return None # 取消或关闭窗口
+        except Exception as e:
+            logging.error(f"无法调起原生交互窗口: {e}")
+            return "AUTO" # 出错时保守起见回退到自动逻辑
 
 class KernelDebugKitUtilities:
     """

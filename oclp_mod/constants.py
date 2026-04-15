@@ -13,7 +13,7 @@ from .detections import device_probe
 class Constants:
     def __init__(self) -> None:
         # Patcher Versioning
-        self.patcher_version:                 str = "3.1.8"  # oclp-mod
+        self.patcher_version:                 str = "3.1.9"  # oclp-mod
         self.patcher_support_pkg_version:     str = "2.0.0"  # PatcherSupportPkg
         self.copyright_date:                  str = "Copyright © 2020-2026 Dortania and laobamac"
         self.patcher_name:                    str = "OCLP-Mod"
@@ -28,12 +28,12 @@ class Constants:
 
         # OpenCore Versioning
         # https://github.com/acidanthera/OpenCorePkg
-        self.opencore_version: str = "1.0.6"
+        self.opencore_version: str = "1.0.7"
 
         # Kext Versioning
         ## Acidanthera
         ## https://github.com/acidanthera
-        self.lilu_version:               str = "1.7.1"  #      Lilu
+        self.lilu_version:               str = "1.7.2"  #      Lilu
         self.whatevergreen_version:      str = "1.7.0"  #      WhateverGreen
         self.whatevergreen_navi_version: str = "1.6.7-Navi"  # WhateverGreen (Navi Patch)
         self.airportbcrmfixup_version:   str = "2.2.0"  #      AirPortBrcmFixup
@@ -43,7 +43,7 @@ class Constants:
         self.featureunlock_version:      str = "1.1.8"  #      FeatureUnlock
         self.debugenhancer_version:      str = "1.1.1"  #      DebugEnhancer
         self.cpufriend_version:          str = "1.3.0"  #      CPUFriend
-        self.bluetool_version:           str = "2.7.1"  #      BlueToolFixup (BrcmPatchRAM)
+        self.bluetool_version:           str = "2.7.2"  #      BlueToolFixup (BrcmPatchRAM)
         self.cslvfixup_version:          str = "2.6.1"  #      CSLVFixup
         self.autopkg_version:            str = "1.0.4"  #      AutoPkgInstaller
         self.cryptexfixup_version:       str = "1.0.5"  #      CryptexFixup
